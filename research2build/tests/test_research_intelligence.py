@@ -723,6 +723,187 @@ class TestProjectGenerator:
         result = generate_project_proposals([])
         assert isinstance(result, list)
 
+    def test_empty_input(self):
+        result = generate_project_proposals([])
+        assert result == []
+
+    def test_none_input(self):
+        result = generate_project_proposals(None)
+        assert result == []
+
+    def test_one_valid_opportunity(self):
+        opp = ResearchOpportunity(
+            opportunity_id="opp_1",
+            title="Data-Efficient Learning and Synthetic Augmentation",
+            description="Investigate data-efficient learning methods to reduce labeled dataset dependence.",
+            keywords=["data efficiency", "semi-supervised"],
+            paper_ids=["p1", "p2"],
+            evidence=["[p1] limited data"],
+        )
+        proposals = generate_project_proposals([opp])
+        # 1 opportunity generates 3 distinct grounded directions
+        assert len(proposals) == 3
+        for p in proposals:
+            assert isinstance(p, ProjectProposal)
+            assert "opp_1" in p.source_opportunity_ids
+            assert p.paper_ids == ["p1", "p2"]
+            assert p.evidence == ["[p1] limited data"]
+            assert p.novelty_confidence == "Requires human validation"
+
+    def test_generation_of_three_to_five_proposals(self):
+        opps_2 = [
+            ResearchOpportunity(title="Data-Efficient Learning", description="Alleviate data scarcity"),
+            ResearchOpportunity(title="Model Compression", description="Reduce GPU memory"),
+        ]
+        res_2 = generate_project_proposals(opps_2)
+        assert 3 <= len(res_2) <= 5
+
+        opps_4 = [
+            ResearchOpportunity(title="Data-Efficient Learning", description="Alleviate data scarcity"),
+            ResearchOpportunity(title="Model Compression", description="Reduce GPU memory"),
+            ResearchOpportunity(title="Low-Latency Inference", description="Accelerate inference"),
+            ResearchOpportunity(title="Grounded Factuality", description="Mitigate hallucinations"),
+        ]
+        res_4 = generate_project_proposals(opps_4)
+        assert len(res_4) == 4
+
+        opps_7 = [
+            ResearchOpportunity(title=f"Opp {i}", description=f"Desc {i}") for i in range(7)
+        ]
+        res_7 = generate_project_proposals(opps_7)
+        assert len(res_7) == 5  # Clamped to MAX_PROPOSALS
+
+    def test_malformed_missing_fields(self):
+        inputs = [
+            None,
+            {"title": ""},
+            {"opportunity_id": "opp_dict", "title": "Low-Latency Inference", "description": "Reduce latency"},
+        ]
+        res = generate_project_proposals(inputs)
+        assert len(res) == 3
+        assert any("Low-Latency" in p.title for p in res)
+
+    def test_major_opportunity_domains(self):
+        domains = [
+            ("Model Compression and Compute-Efficient Optimization", "Quantization Toolkit"),
+            ("Low-Latency Inference Acceleration", "Speculative Decoding"),
+            ("Distributed Scaling and Sub-Quadratic Architectures", "Scaling Benchmark"),
+            ("Domain-Robust Representations", "Cross-Domain Robustness"),
+            ("Grounded Factuality and Verification Mechanisms", "Factuality Verification"),
+            ("Balanced Benchmarking and Algorithmic Debiasing", "Debiasing"),
+            ("Interpretable Architectures and Mechanistic Explainability", "Interpretability"),
+            ("Active Learning and Weak Supervision Pipelines", "Programmatic Labeling"),
+            ("Ecological Validity and Real-World Evaluation Frameworks", "Stress-Testing"),
+            ("Robust Optimization and Sensitivity Minimization", "Prompt Perturbation"),
+        ]
+        for opp_title, expected_keyword in domains:
+            opp = ResearchOpportunity(title=opp_title, description=f"Address {opp_title}")
+            props = generate_project_proposals([opp])
+            assert len(props) >= 1
+            assert any(expected_keyword.lower() in p.title.lower() for p in props), f"Failed for {opp_title}"
+
+    def test_generic_fallback(self):
+        opp = ResearchOpportunity(
+            opportunity_id="custom_opp",
+            title="Acoustic Waveform Restoration",
+            description="Reconstruct corrupted audio signals in noisy acoustic environments.",
+            keywords=["audio", "acoustics", "restoration"],
+            paper_ids=["pA"],
+            evidence=["[pA] audio corruption observed"],
+        )
+        props = generate_project_proposals([opp])
+        assert len(props) == 3
+        assert "Acoustic Waveform Restoration" in props[0].title
+        assert "Acoustic Waveform Restoration" in props[1].title
+        assert "custom_opp" in props[0].source_opportunity_ids
+        assert props[0].paper_ids == ["pA"]
+
+    def test_distinct_proposal_generation(self):
+        opp = ResearchOpportunity(
+            title="Data-Efficient Learning and Synthetic Augmentation",
+            description="Investigate data efficiency",
+        )
+        props = generate_project_proposals([opp])
+        titles = [p.title for p in props]
+        assert len(set(titles)) == len(titles)  # All titles must be distinct
+        summaries = [p.summary for p in props]
+        assert len(set(summaries)) == len(summaries)  # All summaries must be distinct
+
+    def test_duplicate_prevention(self):
+        opp1 = ResearchOpportunity(opportunity_id="o1", title="Model Compression", description="Reduce GPU footprint")
+        opp2 = ResearchOpportunity(opportunity_id="o2", title="Model Compression", description="Reduce GPU footprint")
+        props = generate_project_proposals([opp1, opp2])
+        titles = [p.title for p in props]
+        assert len(set(titles)) == len(titles)
+
+    def test_supporting_ids_and_evidence_preserved(self):
+        opp = ResearchOpportunity(
+            opportunity_id="opp_target",
+            title="Grounded Factuality",
+            description="Mitigate hallucinations",
+            paper_ids=["paper_101", "paper_102"],
+            evidence=["[paper_101] model hallucinated dates", "[paper_102] wrong facts"],
+        )
+        props = generate_project_proposals([opp])
+        for p in props:
+            assert p.source_opportunity_ids == ["opp_target"]
+            assert p.paper_ids == ["paper_101", "paper_102"]
+            assert "[paper_101] model hallucinated dates" in p.evidence
+            assert "[paper_102] wrong facts" in p.evidence
+
+    def test_novelty_confidence_is_requires_human_validation(self):
+        opp = ResearchOpportunity(title="Data Efficiency", description="Data scarcity")
+        props = generate_project_proposals([opp])
+        for p in props:
+            assert p.novelty_confidence == "Requires human validation"
+
+    def test_deterministic_output(self):
+        opp1 = ResearchOpportunity(opportunity_id="o1", title="Data Efficiency", description="Desc 1", paper_ids=["p1"])
+        opp2 = ResearchOpportunity(opportunity_id="o2", title="Model Compression", description="Desc 2", paper_ids=["p2"])
+        run1 = generate_project_proposals([opp1, opp2])
+        run2 = generate_project_proposals([opp1, opp2])
+
+        assert len(run1) == len(run2)
+        for p1, p2 in zip(run1, run2):
+            assert p1.proposal_id == p2.proposal_id
+            assert p1.title == p2.title
+            assert p1.summary == p2.summary
+            assert p1.problem_statement == p2.problem_statement
+            assert p1.source_opportunity_ids == p2.source_opportunity_ids
+            assert p1.objectives == p2.objectives
+            assert p1.proposed_methods == p2.proposed_methods
+            assert p1.expected_outcomes == p2.expected_outcomes
+            assert p1.key_features == p2.key_features
+            assert p1.technical_approach == p2.technical_approach
+            assert p1.feasibility_notes == p2.feasibility_notes
+            assert p1.paper_ids == p2.paper_ids
+            assert p1.evidence == p2.evidence
+            assert p1.novelty_confidence == p2.novelty_confidence
+
+    def test_no_research_gap_or_novelty_claims(self):
+        opp = ResearchOpportunity(title="Model Compression", description="Reduce GPU memory")
+        props = generate_project_proposals([opp])
+        for p in props:
+            assert "research gap" not in p.title.lower()
+            assert "research gap" not in p.summary.lower()
+            assert "research gap" not in p.problem_statement.lower()
+            assert "novelty" not in p.title.lower()
+            assert "novelty" not in p.summary.lower()
+
+    def test_no_unrelated_fabricated_research_topics(self):
+        opp = ResearchOpportunity(
+            title="Data-Efficient Learning and Synthetic Augmentation",
+            description="Investigate semi-supervised learning and synthetic data augmentation.",
+        )
+        props = generate_project_proposals([opp])
+        for p in props:
+            combined = f"{p.title} {p.summary} {p.problem_statement}".lower()
+            # Must remain related to data/augmentation/samples
+            assert any(term in combined for term in ["data", "synthetic", "sample", "supervis", "learning"])
+            # Must NOT fabricate unrelated quantum or robotics topics
+            assert "quantum" not in combined
+            assert "robotics" not in combined
+
 
 # ── Service / pipeline tests ────────────────────────────────────────
 
@@ -750,3 +931,5 @@ class TestPipeline:
         assert result.recurring_limitations[0].frequency == 2
         assert len(result.opportunities) == 1
         assert "Data-Efficient" in result.opportunities[0].title
+        assert len(result.proposals) >= 3
+        assert any("Data-Efficient" in p.title for p in result.proposals)
