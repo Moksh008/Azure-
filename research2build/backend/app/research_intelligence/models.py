@@ -36,13 +36,41 @@ class PaperComparison(BaseModel):
         default_factory=list,
         description="Shared methodological approaches across the papers.",
     )
-    contradictions: list[str] = Field(
+    methodological_differences: list[str] = Field(
         default_factory=list,
-        description="Contradictory findings or claims between papers.",
+        description="Methodological approaches unique to specific papers.",
+    )
+    shared_datasets: list[str] = Field(
+        default_factory=list,
+        description="Datasets used across multiple papers.",
+    )
+    dataset_differences: list[str] = Field(
+        default_factory=list,
+        description="Datasets unique to individual papers.",
+    )
+    key_findings: list[str] = Field(
+        default_factory=list,
+        description="Preserved key findings from the compared papers.",
     )
     common_limitations: list[str] = Field(
         default_factory=list,
         description="Limitations mentioned in more than one paper.",
+    )
+    all_limitations: list[str] = Field(
+        default_factory=list,
+        description="All limitations preserved from each paper.",
+    )
+    agreements: list[str] = Field(
+        default_factory=list,
+        description="Points of agreement or consensus across papers.",
+    )
+    differences: list[str] = Field(
+        default_factory=list,
+        description="Areas where papers differ in methodology, datasets, or focus.",
+    )
+    contradictions: list[str] = Field(
+        default_factory=list,
+        description="Contradictory findings or claims between papers.",
     )
 
 
