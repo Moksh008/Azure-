@@ -1,4 +1,19 @@
-from chunker import chunk_text
+from app.retrieval.chunker import chunk_text
+
+
+def test_chunk_text():
+    text = (
+        "Fake news detection is an important research area. "
+        "Social media platforms allow information to spread quickly."
+    )
+    chunks = chunk_text(text, max_words=5, overlap_words=2)
+    assert len(chunks) > 0
+    assert isinstance(chunks[0], str)
+
+
+def test_chunk_text_empty():
+    assert chunk_text("") == []
+    assert chunk_text("   ") == []
 
 
 def main():

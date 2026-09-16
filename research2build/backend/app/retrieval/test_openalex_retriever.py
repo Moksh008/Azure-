@@ -3,6 +3,11 @@ import asyncio
 from app.retrieval.openalex_retriever import OpenAlexRetriever
 
 
+def test_openalex_retriever_instantiation():
+    retriever = OpenAlexRetriever()
+    assert retriever is not None
+
+
 async def main():
     retriever = OpenAlexRetriever()
 

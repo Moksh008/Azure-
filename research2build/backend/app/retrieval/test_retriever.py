@@ -1,6 +1,16 @@
 import asyncio
+import pytest
 
 from app.retrieval.demo_retriever import DemoRetriever
+
+
+@pytest.mark.anyio
+async def test_demo_retriever():
+    retriever = DemoRetriever()
+    chunks = await retriever.retrieve("test question", top_k=2)
+    assert len(chunks) == 2
+    assert chunks[0].chunk_id == "demo-001"
+    assert chunks[1].chunk_id == "demo-002"
 
 
 async def main():
