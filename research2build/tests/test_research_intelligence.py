@@ -365,6 +365,168 @@ class TestLimitations:
         result = find_recurring_limitations([])
         assert isinstance(result, list)
 
+    def test_none_input(self):
+        result = find_recurring_limitations(None)
+        assert result == []
+
+    def test_two_papers_with_same_limitation(self):
+        p1 = {"id": "p1", "limitations": ["High GPU memory consumption"]}
+        p2 = {"id": "p2", "limitations": ["High GPU memory consumption"]}
+        result = find_recurring_limitations([p1, p2])
+
+        assert len(result) == 1
+        assert isinstance(result[0], RecurringLimitation)
+        assert result[0].frequency == 2
+        assert result[0].paper_ids == ["p1", "p2"]
+
+    def test_three_papers_with_recurring_limitation(self):
+        papers = [
+            {"id": "p1", "limitations": ["Inference latency is high during burst queries."]},
+            {"id": "p2", "limitations": ["Slow inference latency observed under load."]},
+            {"id": "p3", "limitations": ["High inference latency remains a major bottleneck."]},
+        ]
+        result = find_recurring_limitations(papers)
+
+        assert len(result) == 1
+        assert result[0].frequency == 3
+        assert result[0].paper_ids == ["p1", "p2", "p3"]
+        assert result[0].severity == "high"
+
+    def test_differently_worded_conceptually_similar_limitations(self):
+        papers = [
+            {"id": "p1", "limitations": ["limited training data"]},
+            {"id": "p2", "limitations": ["small dataset size"]},
+            {"id": "p3", "limitations": ["insufficient data for training"]},
+        ]
+        result = find_recurring_limitations(papers)
+
+        assert len(result) == 1
+        assert result[0].frequency == 3
+        assert result[0].paper_ids == ["p1", "p2", "p3"]
+        assert "data" in result[0].description.lower() or "dataset" in result[0].description.lower()
+
+    def test_unrelated_limitations_sharing_one_word_not_merged(self):
+        # Should NOT merge merely because both use 'limited'
+        papers = [
+            {"id": "p1", "limitations": ["limited model interpretability"]},
+            {"id": "p2", "limitations": ["limited training data"]},
+        ]
+        result = find_recurring_limitations(papers)
+        # Neither recurs in >= 2 papers, so result must be empty
+        assert result == []
+
+    def test_unique_limitation_single_paper(self):
+        papers = [
+            {"id": "p1", "limitations": ["Specialized microphone hardware required"]},
+            {"id": "p2", "limitations": ["Only tested on English text"]},
+        ]
+        result = find_recurring_limitations(papers)
+        assert result == []
+
+    def test_papers_with_no_limitations(self):
+        papers = [
+            {"id": "p1", "title": "Paper One", "limitations": []},
+            {"id": "p2", "title": "Paper Two"},
+            {"id": "p3", "title": "Paper Three", "limitations": None},
+        ]
+        result = find_recurring_limitations(papers)
+        assert result == []
+
+    def test_dictionary_input(self):
+        papers = [
+            {"paper_id": "doc1", "weaknesses": ["Scalability bottlenecks on large graphs"]},
+            {"paper_id": "doc2", "challenges": ["Fails to scale on large graphs"]},
+        ]
+        result = find_recurring_limitations(papers)
+        assert len(result) == 1
+        assert result[0].paper_ids == ["doc1", "doc2"]
+        assert result[0].frequency == 2
+
+    def test_pydantic_object_input(self):
+        from pydantic import BaseModel as BM
+
+        class PaperModel(BM):
+            paper_id: str
+            title: str
+            limitations: list[str]
+
+        p1 = PaperModel(paper_id="m1", title="M1", limitations=["High annotation cost for human labels"])
+        p2 = PaperModel(paper_id="m2", title="M2", limitations=["Expensive human labeling and annotation"])
+
+        result = find_recurring_limitations([p1, p2])
+        assert len(result) == 1
+        assert result[0].paper_ids == ["m1", "m2"]
+        assert result[0].frequency == 2
+
+    def test_multiple_different_recurring_limitations(self):
+        papers = [
+            {
+                "id": "p1",
+                "limitations": [
+                    "High computational cost and GPU memory demand",
+                    "High inference latency under load",
+                ],
+            },
+            {
+                "id": "p2",
+                "limitations": [
+                    "High compute overhead requiring expensive hardware",
+                    "High inference latency during peak hours",
+                ],
+            },
+            {
+                "id": "p3",
+                "limitations": [
+                    "High computational cost with multi-GPU requirement",
+                ],
+            },
+        ]
+        result = find_recurring_limitations(papers)
+        assert len(result) == 2
+        # First should be compute cost (freq 3), second should be latency (freq 2)
+        assert result[0].frequency == 3
+        assert result[1].frequency == 2
+
+    def test_preservation_of_original_limitation_evidence(self):
+        papers = [
+            {"id": "p1", "limitations": ["Limited training data available for rare disease classes."]},
+            {"id": "p2", "limitations": ["Small dataset size restricts broader clinical adoption."]},
+        ]
+        result = find_recurring_limitations(papers)
+        assert len(result) == 1
+        assert hasattr(result[0], "evidence")
+        assert len(result[0].evidence) == 2
+        assert any("[p1] Limited training data" in ev for ev in result[0].evidence)
+        assert any("[p2] Small dataset size" in ev for ev in result[0].evidence)
+
+    def test_deterministic_output(self):
+        papers = [
+            {"id": "p1", "limitations": ["High compute cost", "Limited data"]},
+            {"id": "p2", "limitations": ["High compute cost", "Limited data"]},
+        ]
+        run1 = find_recurring_limitations(papers)
+        run2 = find_recurring_limitations(papers)
+
+        assert len(run1) == len(run2)
+        for r1, r2 in zip(run1, run2):
+            assert r1.limitation_id == r2.limitation_id
+            assert r1.description == r2.description
+            assert r1.paper_ids == r2.paper_ids
+            assert r1.frequency == r2.frequency
+            assert r1.severity == r2.severity
+            assert r1.evidence == r2.evidence
+
+    def test_no_unsupported_research_gap_novelty_claims(self):
+        papers = [
+            {"id": "p1", "limitations": ["Lack of demographic diversity"]},
+            {"id": "p2", "limitations": ["Dataset bias and demographic representation"]},
+        ]
+        result = find_recurring_limitations(papers)
+        for rl in result:
+            assert "research gap" not in rl.description.lower()
+            assert "novelty" not in rl.description.lower()
+            assert "gap" not in rl.description.lower()
+
 
 class TestOpportunities:
     def test_returns_list(self):
@@ -392,3 +554,13 @@ class TestPipeline:
     def test_pipeline_rejects_single_paper(self):
         with pytest.raises(ValueError):
             run_pipeline(["only_one"])
+
+    def test_pipeline_with_recurring_limitations(self):
+        papers = [
+            {"id": "p1", "title": "Paper 1", "limitations": ["Small dataset size"]},
+            {"id": "p2", "title": "Paper 2", "limitations": ["Limited training data"]},
+        ]
+        result = run_pipeline(papers)
+        assert isinstance(result, PipelineResult)
+        assert len(result.recurring_limitations) == 1
+        assert result.recurring_limitations[0].frequency == 2
