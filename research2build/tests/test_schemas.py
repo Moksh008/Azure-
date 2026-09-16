@@ -1,4 +1,7 @@
-from shared.schemas import Citation, EvidenceChunk
+import pytest
+from pydantic import ValidationError
+
+from shared.schemas import Citation, EvidenceChunk, GroundedClaim
 
 
 def _sample_chunk() -> EvidenceChunk:
@@ -30,3 +33,16 @@ def test_citation_from_chunk_accepts_explicit_quote():
 
     assert citation.quote == "single datacenter"
     assert citation.chunk_id == chunk.chunk_id
+
+
+def test_grounded_claim_requires_at_least_one_citation():
+    with pytest.raises(ValidationError):
+        GroundedClaim(claim="Latency is a common limitation.", citations=[])
+
+
+def test_grounded_claim_holds_citations():
+    chunk = _sample_chunk()
+    citation = Citation.from_chunk(chunk, quote="single datacenter")
+    claim = GroundedClaim(claim="Latency is a common limitation.", citations=[citation])
+
+    assert claim.citations == [citation]

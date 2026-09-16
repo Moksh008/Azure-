@@ -85,6 +85,21 @@ class Citation(BaseModel):
         )
 
 
+class GroundedClaim(BaseModel):
+    """An LLM-generated claim paired with the Citations that support it.
+
+    Any function returning generated text downstream of retrieval (Q&A
+    answers, analysis fields, opportunities, projects) should return
+    GroundedClaims rather than bare strings, so grounding can't be
+    silently dropped. `citations` must be non-empty: a claim with no
+    supporting evidence violates the project's core rule that no
+    ungrounded claim may be produced (see CLAUDE.md).
+    """
+
+    claim: str
+    citations: list[Citation] = Field(min_length=1)
+
+
 class RetrievalRequest(BaseModel):
     query: str
     top_k: int = Field(default=5, ge=1, le=20)
