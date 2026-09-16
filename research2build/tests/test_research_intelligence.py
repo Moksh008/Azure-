@@ -533,6 +533,190 @@ class TestOpportunities:
         result = generate_opportunities([])
         assert isinstance(result, list)
 
+    def test_empty_input(self):
+        result = generate_opportunities([])
+        assert result == []
+
+    def test_none_input(self):
+        result = generate_opportunities(None)
+        assert result == []
+
+    def test_one_recurring_limitation_to_one_opportunity(self):
+        lim = RecurringLimitation(
+            limitation_id="lim_1",
+            description="Limited training data and small dataset size",
+            paper_ids=["p1", "p2"],
+            frequency=2,
+            severity="medium",
+            evidence=["[p1] limited data", "[p2] small dataset"],
+        )
+        opps = generate_opportunities([lim])
+        assert len(opps) == 1
+        opp = opps[0]
+        assert isinstance(opp, ResearchOpportunity)
+        assert opp.source_limitation_ids == ["lim_1"]
+        assert "Data-Efficient" in opp.title
+        assert len(opp.keywords) > 0
+
+    def test_multiple_recurring_limitations(self):
+        lim1 = RecurringLimitation(
+            limitation_id="lim_1",
+            description="High computational cost and hardware resource demands",
+            paper_ids=["p1", "p2"],
+            frequency=2,
+        )
+        lim2 = RecurringLimitation(
+            limitation_id="lim_2",
+            description="High inference latency and runtime overhead",
+            paper_ids=["p1", "p3"],
+            frequency=2,
+        )
+        opps = generate_opportunities([lim1, lim2])
+        assert len(opps) == 2
+        titles = {opp.title for opp in opps}
+        assert "Model Compression and Compute-Efficient Optimization" in titles
+        assert "Low-Latency Inference Acceleration and Caching" in titles
+
+    def test_common_limitation_categories(self):
+        categories = [
+            ("Limited training data", "Data-Efficient Learning"),
+            ("High computational cost and GPU memory overhead", "Model Compression"),
+            ("High inference latency during peak queries", "Low-Latency Inference"),
+            ("Scalability bottlenecks on large graphs", "Distributed Scaling"),
+            ("Susceptibility to hallucinations and unfaithful answers", "Grounded Factuality"),
+            ("Limited model interpretability", "Interpretable Architectures"),
+            ("Dataset bias and lack of demographic diversity", "Balanced Benchmarking"),
+            ("High manual annotation cost", "Active Learning"),
+            ("Narrow evaluation on synthetic benchmarks", "Ecological Validity"),
+            ("High sensitivity to prompts and noise", "Robust Optimization"),
+        ]
+        for desc, expected_title_part in categories:
+            lim = RecurringLimitation(
+                description=desc,
+                paper_ids=["p1", "p2"],
+                frequency=2,
+            )
+            opps = generate_opportunities([lim])
+            assert len(opps) == 1, f"Failed for limitation: {desc}"
+            assert expected_title_part in opps[0].title, f"Expected '{expected_title_part}' in '{opps[0].title}' for '{desc}'"
+
+    def test_unknown_limitation_fallback(self):
+        lim = RecurringLimitation(
+            limitation_id="custom_1",
+            description="Audio waveform distortion under reverberant room acoustics",
+            paper_ids=["pA", "pB"],
+            frequency=2,
+            evidence=["[pA] audio distortion observed"],
+        )
+        opps = generate_opportunities([lim])
+        assert len(opps) == 1
+        opp = opps[0]
+        assert "Audio Waveform Distortion" in opp.title
+        assert "Audio waveform distortion under reverberant room acoustics" in opp.description
+        assert opp.source_limitation_ids == ["custom_1"]
+
+    def test_supporting_paper_ids_preserved(self):
+        lim = RecurringLimitation(
+            description="High computational cost",
+            paper_ids=["paper_alpha", "paper_beta", "paper_gamma"],
+            frequency=3,
+        )
+        opps = generate_opportunities([lim])
+        assert len(opps) == 1
+        assert opps[0].paper_ids == ["paper_alpha", "paper_beta", "paper_gamma"]
+
+    def test_evidence_preserved(self):
+        lim = RecurringLimitation(
+            description="Limited training data",
+            paper_ids=["p1", "p2"],
+            evidence=["[p1] limited samples in rare classes", "[p2] few labeled records"],
+        )
+        opps = generate_opportunities([lim])
+        assert len(opps) == 1
+        assert len(opps[0].evidence) == 2
+        assert "[p1] limited samples in rare classes" in opps[0].evidence
+        assert "[p2] few labeled records" in opps[0].evidence
+
+    def test_novelty_confidence_is_requires_human_validation(self):
+        lim = RecurringLimitation(
+            description="Scalability bottlenecks",
+            paper_ids=["p1", "p2"],
+        )
+        opps = generate_opportunities([lim])
+        assert len(opps) == 1
+        assert opps[0].novelty_confidence == "Requires human validation"
+
+    def test_no_research_gap_claim(self):
+        lim = RecurringLimitation(
+            description="High computational cost",
+            paper_ids=["p1", "p2"],
+        )
+        opps = generate_opportunities([lim])
+        for opp in opps:
+            assert "research gap" not in opp.title.lower()
+            assert "research gap" not in opp.description.lower()
+            assert "novelty" not in opp.title.lower()
+
+    def test_deterministic_output(self):
+        lim1 = RecurringLimitation(
+            limitation_id="l1",
+            description="High compute overhead",
+            paper_ids=["p1", "p2"],
+        )
+        lim2 = RecurringLimitation(
+            limitation_id="l2",
+            description="High inference latency",
+            paper_ids=["p2", "p3"],
+        )
+        run1 = generate_opportunities([lim1, lim2])
+        run2 = generate_opportunities([lim1, lim2])
+
+        assert len(run1) == len(run2)
+        for o1, o2 in zip(run1, run2):
+            assert o1.opportunity_id == o2.opportunity_id
+            assert o1.title == o2.title
+            assert o1.description == o2.description
+            assert o1.source_limitation_ids == o2.source_limitation_ids
+            assert o1.novelty_confidence == o2.novelty_confidence
+            assert o1.keywords == o2.keywords
+            assert o1.paper_ids == o2.paper_ids
+            assert o1.evidence == o2.evidence
+
+    def test_duplicate_opportunity_prevention(self):
+        # Two limitations that belong to the same core category
+        lim1 = RecurringLimitation(
+            limitation_id="lim_a",
+            description="Limited training data",
+            paper_ids=["p1", "p2"],
+            evidence=["[p1] few examples"],
+        )
+        lim2 = RecurringLimitation(
+            limitation_id="lim_b",
+            description="Small dataset size",
+            paper_ids=["p2", "p3"],
+            evidence=["[p3] small dataset"],
+        )
+        opps = generate_opportunities([lim1, lim2])
+        # Should be deduplicated into a single combined opportunity
+        assert len(opps) == 1
+        opp = opps[0]
+        assert "Data-Efficient" in opp.title
+        assert "lim_a" in opp.source_limitation_ids
+        assert "lim_b" in opp.source_limitation_ids
+        assert set(opp.paper_ids) == {"p1", "p2", "p3"}
+        assert len(opp.evidence) == 2
+
+    def test_malformed_entries_handled_safely(self):
+        # Gracefully handle None and dict inputs
+        inputs = [
+            None,
+            {"limitation_id": "dict_1", "description": "High latency", "paper_ids": ["d1", "d2"]},
+            {"description": ""},
+        ]
+        opps = generate_opportunities(inputs)
+        assert len(opps) == 1
+        assert "Low-Latency" in opps[0].title
+
 
 class TestProjectGenerator:
     def test_returns_list(self):
@@ -564,3 +748,5 @@ class TestPipeline:
         assert isinstance(result, PipelineResult)
         assert len(result.recurring_limitations) == 1
         assert result.recurring_limitations[0].frequency == 2
+        assert len(result.opportunities) == 1
+        assert "Data-Efficient" in result.opportunities[0].title

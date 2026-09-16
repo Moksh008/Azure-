@@ -143,6 +143,14 @@ class ResearchOpportunity(BaseModel):
         default_factory=list,
         description="Relevant keywords for discoverability.",
     )
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of supporting papers from source limitations.",
+    )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Preserved limitation evidence excerpts from supporting papers.",
+    )
 
 
 # ---------------------------------------------------------------------------
