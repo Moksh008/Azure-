@@ -1,0 +1,103 @@
+from abc import ABC, abstractmethod
+import hashlib
+import math
+import os
+from typing import Optional
+
+
+class EmbeddingProvider(ABC):
+    @abstractmethod
+    def embed(self, text: str) -> list[float]:
+        """Embed a single text string into a vector."""
+        raise NotImplementedError
+
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Embed multiple text strings into vectors."""
+        return [self.embed(t) for t in texts]
+
+
+class HashEmbeddingProvider(EmbeddingProvider):
+    """
+    A lightweight, deterministic embedding provider for local development and testing.
+    Uses SHA-256 feature hashing with L2-normalization to build reproducible vectors.
+    """
+
+    def __init__(self, vector_dim: int = 128):
+        self.vector_dim = vector_dim
+
+    def embed(self, text: str) -> list[float]:
+        if not text.strip():
+            return [0.0] * self.vector_dim
+
+        vector = [0.0] * self.vector_dim
+        words = text.lower().split()
+
+        for word in words:
+            hash_digest = hashlib.sha256(word.encode("utf-8")).digest()
+            index = int.from_bytes(hash_digest[:4], "big") % self.vector_dim
+            val = (int.from_bytes(hash_digest[4:8], "big") % 2000 - 1000) / 1000.0
+            vector[index] += val
+
+        norm = math.sqrt(sum(v * v for v in vector))
+        if norm > 0:
+            vector = [v / norm for v in vector]
+
+        return vector
+
+
+class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
+    """
+    Production embedding provider targeting Azure OpenAI Service.
+    Falls back to HashEmbeddingProvider if RETRIEVAL_ALLOW_LOCAL_FALLBACK is enabled.
+    """
+
+    def __init__(
+        self,
+        endpoint: Optional[str] = None,
+        api_key: Optional[str] = None,
+        deployment: Optional[str] = None,
+        allow_fallback: Optional[bool] = None,
+    ):
+        self.endpoint = endpoint
+        self.api_key = api_key
+        self.deployment = deployment
+
+        if allow_fallback is None:
+            allow_fallback = (
+                os.getenv("RETRIEVAL_ALLOW_LOCAL_FALLBACK", "true").lower()
+                == "true"
+            )
+        self.allow_fallback = allow_fallback
+        self._fallback_provider = HashEmbeddingProvider()
+
+    def embed(self, text: str) -> list[float]:
+        if not self.endpoint or not self.api_key or not self.deployment:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    "Azure OpenAI embedding credentials missing and local fallback disabled."
+                )
+            return self._fallback_provider.embed(text)
+
+        import httpx
+
+        try:
+            url = (
+                f"{self.endpoint.rstrip('/')}/openai/deployments/"
+                f"{self.deployment}/embeddings?api-version=2023-05-15"
+            )
+            headers = {
+                "api-key": self.api_key,
+                "Content-Type": "application/json",
+            }
+            payload = {"input": text}
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(url, json=payload, headers=headers)
+                res.raise_for_status()
+                data = res.json()
+                return data["data"][0]["embedding"]
+        except Exception as err:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    f"Azure OpenAI embedding call failed: {err}"
+                ) from err
+            return self._fallback_provider.embed(text)

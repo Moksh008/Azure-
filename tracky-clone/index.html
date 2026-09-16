@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trackly — A new project management tool you'll actually love</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F5F3;
+    --panel-dark:#151B31;
+    --panel-dark-2:#1F263E;
+    --ink:#151B31;
+    --muted:#6B6F75;
+    --coral:#FF5858;
+    --mint:#86E0C1;
+    --mint-deep:#3ED18B;
+    --yellow:#FEDF89;
+    --yellow-deep:#FFC01E;
+    --peach:#FFB07B;
+    --periwinkle:#A1AEDD;
+    --blue:#4A2CFE;
+    --card:#FFFFFF;
+    --border:#E5E5E5;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:700;margin:0;letter-spacing:-0.02em;}
+  a{text-decoration:none;color:inherit;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 40px;}
+  .banner{background:var(--yellow);text-align:center;font-weight:600;font-size:14px;padding:12px 40px;position:relative;}
+  .banner a{text-decoration:underline;}
+  .banner .close{position:absolute;right:20px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;background:none;border:none;}
+
+  header.nav{display:flex;align-items:center;justify-content:space-between;padding:28px 40px;max-width:1280px;margin:0 auto;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;}
+  .logo-badge{width:34px;height:34px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--ink);color:#fff;border:none;border-radius:10px;padding:14px 24px;font-weight:600;font-size:15px;cursor:pointer;font-family:'Inter',sans-serif;transition:transform .15s ease, opacity .15s ease;}
+  .btn:hover{transform:translateY(-2px);opacity:.92;}
+  .btn.light{background:#fff;color:var(--ink);border:1px solid var(--border);}
+
+  .hero{position:relative;text-align:center;padding:60px 40px 40px;max-width:1100px;margin:0 auto;}
+  .hero h1{font-size:clamp(36px,6vw,68px);line-height:1.05;}
+  .hero .icon-inline{display:inline-block;vertical-align:middle;width:.9em;height:.9em;background:var(--yellow);border-radius:50%;margin:0 6px;}
+  .hero-cta{display:flex;align-items:center;justify-content:center;gap:16px;margin:32px auto 20px;max-width:560px;background:#fff;border-radius:14px;padding:10px;box-shadow:0 10px 30px rgba(21,27,49,.06);}
+  .hero-cta .btn{flex:1;padding:16px;}
+  .timer{display:flex;align-items:center;gap:10px;padding:0 14px;font-weight:600;color:var(--muted);}
+  .play{width:34px;height:34px;border-radius:50%;background:var(--mint-deep);color:#fff;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;}
+  .hero .tagline{font-size:clamp(28px,4.5vw,44px);margin-top:8px;}
+  .hero .tagline .accent{color:var(--coral);}
+  .hero p.sub{color:var(--muted);max-width:520px;margin:18px auto 0;font-size:16px;}
+  .blob{position:absolute;opacity:.9;}
+
+  .showcase{background:var(--panel-dark);border-radius:28px;max-width:1200px;margin:70px auto;padding:40px;position:relative;}
+  .showcase-tabs{display:flex;gap:36px;justify-content:center;border-bottom:1px solid #2A314C;padding-bottom:18px;margin-bottom:30px;flex-wrap:wrap;}
+  .showcase-tabs button{background:none;border:none;color:#7B819A;font-size:16px;font-weight:600;cursor:pointer;padding:6px 2px;position:relative;font-family:'Inter',sans-serif;}
+  .showcase-tabs button.active{color:#fff;}
+  .showcase-tabs button.active::after{content:'';position:absolute;left:0;right:0;bottom:-19px;height:3px;background:var(--coral);border-radius:3px;}
+  .app-window{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+  .app-topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);}
+  .app-body{display:flex;min-height:340px;}
+  .app-sidebar{width:220px;border-right:1px solid var(--border);padding:18px;font-size:14px;color:var(--muted);}
+  .app-sidebar .item{padding:8px 10px;border-radius:8px;margin-bottom:4px;}
+  .app-sidebar .item.active{background:#F2F2F2;color:var(--ink);font-weight:600;}
+  .app-main{flex:1;padding:22px 26px;}
+  .app-main h3{font-size:18px;margin-bottom:14px;}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #F0F0F0;font-size:14px;}
+  .pill{background:#F2F2F2;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--muted);}
+
+  .section-title{text-align:center;max-width:640px;margin:110px auto 50px;}
+  .section-title h2{font-size:clamp(28px,4vw,42px);}
+  .section-title p{color:var(--muted);margin-top:12px;font-size:16px;}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1200px;margin:0 auto;padding:0 40px;}
+  .feature-card{background:var(--card);border-radius:var(--radius);padding:30px;border:1px solid var(--border);}
+  .feature-card.highlight{background:#EFEFEF;}
+  .feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;font-size:22px;}
+  .feature-card h4{font-family:'Space Grotesk',sans-serif;font-size:19px;margin-bottom:8px;}
+  .feature-card p{color:var(--muted);font-size:14px;line-height:1.55;margin:0;}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:50px;max-width:1200px;margin:110px auto;padding:0 40px;align-items:center;}
+  .split.reverse .art{order:2;}
+  .art{background:#fff;border-radius:20px;border:1px solid var(--border);padding:26px;min-height:320px;display:flex;flex-direction:column;justify-content:center;gap:12px;box-shadow:0 16px 40px rgba(21,27,49,.06);}
+  .todo-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;}
+  .todo-item .check{width:18px;height:18px;border-radius:5px;border:2px solid var(--periwinkle);flex-shrink:0;}
+  .todo-item.done .check{background:var(--mint-deep);border-color:var(--mint-deep);}
+  .todo-item.done span{text-decoration:line-through;color:var(--muted);}
+  .split h3.eyebrow{font-size:14px;color:var(--coral);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;font-family:'Inter',sans-serif;font-weight:700;}
+  .split h2{font-size:clamp(24px,3.2vw,34px);margin-bottom:14px;}
+  .split p{color:var(--muted);font-size:16px;line-height:1.6;margin-bottom:24px;}
+  .badge-soon{display:inline-block;background:var(--yellow);color:var(--ink);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-bottom:14px;}
+
+  .table-mock{width:100%;border-collapse:collapse;font-size:13px;}
+  .table-mock th{text-align:left;color:var(--muted);font-weight:600;padding:8px;border-bottom:1px solid var(--border);}
+  .table-mock td{padding:10px 8px;border-bottom:1px solid #F3F3F3;}
+
+  .testimonials{max-width:1200px;margin:110px auto;padding:0 40px;text-align:center;}
+  .t-track{display:flex;gap:20px;overflow:hidden;margin-top:40px;}
+  .t-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;min-width:280px;text-align:left;flex-shrink:0;}
+  .t-card p{color:var(--ink);font-size:14px;line-height:1.6;margin:0 0 16px;}
+  .t-person{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+  .t-avatar{width:32px;height:32px;border-radius:50%;background:var(--periwinkle);}
+
+  .marquee{background:var(--ink);color:#fff;padding:22px 0;overflow:hidden;white-space:nowrap;margin:110px 0 0;}
+  .marquee-track{display:inline-block;animation:scroll 22s linear infinite;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
+  .marquee-track span{margin:0 24px;color:var(--coral);}
+  @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+  footer{max-width:1200px;margin:0 auto;padding:70px 40px 40px;text-align:center;}
+  footer h2{font-size:clamp(28px,4vw,44px);margin-bottom:26px;}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:70px;padding-top:24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;flex-wrap:wrap;gap:10px;}
+
+  @media(max-width:900px){
+    .grid3{grid-template-columns:1fr;}
+    .split{grid-template-columns:1fr;}
+    .split.reverse .art{order:0;}
+    .app-sidebar{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  🔥 We're raising funding! <a href="#">Let's talk →</a>
+  <button class="close" onclick="this.parentElement.style.display='none'">✕</button>
+</div>
+
+<header class="nav">
+  <div class="logo"><span class="logo-badge">👍</span> Trackly</div>
+  <button class="btn light">Login / Sign up</button>
+</header>
+
+<section class="hero">
+  <div class="blob" style="left:-60px;top:120px;width:40px;height:40px;background:var(--mint-deep);border-radius:60% 40% 55% 45%;"></div>
+  <div class="blob" style="right:-30px;top:60px;width:50px;height:50px;background:var(--blue);border-radius:50% 60% 40% 55%;"></div>
+  <h1>A new project <span class="icon-inline"></span> management</h1>
+  <div class="hero-cta">
+    <button class="btn">Get started</button>
+    <div class="timer">0:00:00
+      <button class="play">▶</button>
+    </div>
+  </div>
+  <div class="tagline">tool you'll <span class="accent">love</span></div>
+  <p class="sub">Functional and practical. Start tracking your progress in the most efficient way possible.</p>
+</section>
+
+<section class="showcase">
+  <div class="showcase-tabs">
+    <button class="active" data-tab="0">Tracking</button>
+    <button data-tab="1">Notebook</button>
+    <button data-tab="2">To-do's</button>
+    <button data-tab="3">Tasks</button>
+    <button data-tab="4">Tables</button>
+    <button data-tab="5">Invoicing</button>
+  </div>
+  <div class="app-window">
+    <div class="app-topbar">
+      <span>Tracking</span>
+      <span>Share live ↗</span>
+    </div>
+    <div class="app-body">
+      <div class="app-sidebar">
+        <div class="item active">Magic Flow — $324.98</div>
+        <div class="item">Overview</div>
+        <div class="item">Reports</div>
+        <div class="item">Archive</div>
+      </div>
+      <div class="app-main">
+        <h3>Magic Flow</h3>
+        <div class="row"><span>Landing page updates</span><span class="pill">00:21:54</span></div>
+        <div class="row"><span>Illustration assets for onboarding</span><span class="pill">00:20:00</span></div>
+        <div class="row"><span>Onboarding devs handoff</span><span class="pill">03:10:00</span></div>
+        <div class="row"><span>Trimming down the code</span><span class="pill">04:15:00</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-title wrap" style="padding:0;">
+  <h2>Freelancing has never been easier</h2>
+  <p>Let's have a sneak peek here to get the idea.</p>
+</div>
+
+<div class="section-title wrap" style="margin-top:0;padding:0;">
+  <h2 style="font-size:22px;">So what can you do with Trackly?</h2>
+  <p>Don't feel hectic with your work — see what you can achieve.</p>
+</div>
+
+<div class="grid3">
+  <div class="feature-card">
+    <div class="feature-icon" style="background:var(--yellow);">⏱️</div>
+    <h4>Track time</h4>
+    <p>Create your projects and start tracking time immediately, according to your wish.</p>
+  </div>
+  <div class="feature-card highlight">
+    <div class="feature-icon" style="background:var(--ink);color:#fff;">📈</div>
+    <h4>Measure your performance</h4>
+    <p>Manage your time on your tasks and increase your efficiency, create as many projects as you want.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon" style="background:var(--mint);">📊</div>
+    <h4>Reports</h4>
+    <p>Generate and export reports of your separate projects, at any range of time as you wish.</p>
+  </div>
+</div>
+
+<div class="split">
+  <div>
+    <div class="eyebrow" style="color:var(--coral);text-transform:uppercase;font-size:14px;font-weight:700;letter-spacing:.06em;margin-bottom:14px;">Set your priorities and go!</div>
+    <h2>Note your thoughts</h2>
+    <p>Keep what's important to you with you at all times. Plan ahead and get a head start to achieve your goals.</p>
+    <button class="btn">Try me</button>
+  </div>
+  <div class="art">
+    <strong style="font-family:'Space Grotesk',sans-serif;">Quick Notes</strong>
+    <div class="todo-item"><div class="check"></div><span>Sketch onboarding flow</span></div>
+    <div class="todo-item done"><div class="check"></div><span>Follow up with client</span></div>
+    <div class="todo-item"><div class="check"></div><span>Export June invoice</span></div>
+  </div>
+</div>
+
+<div class="split reverse">
+  <div class="art">
+    <strong style="font-family:'Space Grotesk',sans-serif;">List your To-Do's</strong>
+    <div class="todo-item done"><div class="check"></div><span>Get a coffee</span></div>
+    <div class="todo-item"><div class="check"></div><span>Start crossing them out!</span></div>
+    <div class="todo-item"><div class="check"></div><span>Review project brief</span></div>
+  </div>
+  <div>
+    <div class="eyebrow" style="color:var(--coral);text-transform:uppercase;font-size:14px;font-weight:700;letter-spacing:.06em;margin-bottom:14px;">Big fan of efficiency?</div>
+    <h2>List your To-Do's</h2>
+    <p>Life is packed with to-do's to handle and Trackly is here to make things easier.</p>
+    <button class="btn">Try me</button>
+  </div>
+</div>
+
+<div class="split">
+  <div>
+    <span class="badge-soon">Coming very soon</span>
+    <h2>Task management</h2>
+    <p>Manage your tasks and enjoy the fun ride of project management — simple and smooth. On track, finally at ease.</p>
+    <button class="btn">Try me</button>
+  </div>
+  <div class="art">
+    <strong style="font-family:'Space Grotesk',sans-serif;">On Track</strong>
+    <div class="row"><span>Design review</span><span class="pill">In progress</span></div>
+    <div class="row"><span>Client call</span><span class="pill">Today</span></div>
+    <div class="row"><span>Ship v1.2</span><span class="pill">Done</span></div>
+  </div>
+</div>
+
+<div class="split reverse">
+  <div class="art">
+    <table class="table-mock">
+      <tr><th>Activity</th><th>Hours</th><th>Amount</th></tr>
+      <tr><td>Landing page updates</td><td>2:15</td><td>$120</td></tr>
+      <tr><td>Client onboarding</td><td>1:40</td><td>$90</td></tr>
+      <tr><td>Invoice — June</td><td>—</td><td>$560</td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="eyebrow" style="color:var(--coral);text-transform:uppercase;font-size:14px;font-weight:700;letter-spacing:.06em;margin-bottom:14px;">Create tables &amp; invoices</div>
+    <h2>Tables &amp; Invoicing</h2>
+    <p>Create personalized worksheets to prioritize your work, then generate invoices and send them to clients fast. Gotta love this one.</p>
+    <button class="btn">Create Invoice</button>
+  </div>
+</div>
+
+<div class="testimonials">
+  <h2>Kind words from our customers</h2>
+  <div class="t-track" id="tTrack"></div>
+</div>
+
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<footer>
+  <h2>Let's give it a try, woof! 🐶</h2>
+  <button class="btn">Get started</button>
+  <div class="footer-bottom">
+    <span>© 2026 Trackly. All rights reserved.</span>
+    <span><a href="#">Contact us</a> &nbsp;·&nbsp; <a href="#">Privacy Policy</a></span>
+  </div>
+</footer>
+
+<script>
+  // Tab switching for the product showcase
+  const tabs = document.querySelectorAll('.showcase-tabs button');
+  const panelTitle = document.querySelector('.app-topbar span');
+  tabs.forEach(t=>t.addEventListener('click', ()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    panelTitle.textContent = t.textContent;
+  }));
+
+  // Timer demo
+  let seconds = 0, running = false, interval;
+  document.querySelector('.play').addEventListener('click', function(){
+    running = !running;
+    this.textContent = running ? '⏸' : '▶';
+    if(running){
+      interval = setInterval(()=>{
+        seconds++;
+        const h = String(Math.floor(seconds/3600)).padStart(1,'0');
+        const m = String(Math.floor((seconds%3600)/60)).padStart(2,'0');
+        const s = String(seconds%60).padStart(2,'0');
+        document.querySelector('.timer').firstChild.textContent = `${h}:${m}:${s} `;
+      },1000);
+    } else clearInterval(interval);
+  });
+
+  // Testimonials
+  const quotes = [
+    "Trackly replaced three separate apps I was juggling for client work.",
+    "The invoicing flow alone saved me hours every month.",
+    "Finally a to-do list that doesn't feel like a chore to open.",
+    "Clean, fast, and it just gets out of the way.",
+    "My reports look professional without any extra formatting.",
+    "Switched my whole freelance workflow over in a weekend."
+  ];
+  const tTrack = document.getElementById('tTrack');
+  quotes.forEach((q,i)=>{
+    tTrack.innerHTML += `<div class="t-card"><p>"${q}"</p><div class="t-person"><div class="t-avatar"></div> Freelancer #${i+1}</div></div>`;
+  });
+
+  // Marquee
+  const mq = document.getElementById('marqueeTrack');
+  let content = '';
+  for(let i=0;i<10;i++) content += "It's easy to Trackly <span>•</span> ";
+  mq.innerHTML = content + content;
+</script>
+
+</body>
+</html>
