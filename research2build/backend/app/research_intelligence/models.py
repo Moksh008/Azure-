@@ -102,6 +102,10 @@ class RecurringLimitation(BaseModel):
         default="unknown",
         description="Estimated severity: low | medium | high | unknown.",
     )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Original limitation statements collected from supporting papers.",
+    )
 
 
 # ---------------------------------------------------------------------------
