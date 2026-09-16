@@ -1,3 +1,5 @@
+import pytest
+
 from backend.app.agents.analyzer import PaperAnalyzer
 from shared.schemas import EvidenceChunk
 
@@ -6,19 +8,43 @@ class MockLLMService:
     def generate(self, prompt, system_prompt=None, temperature=0.0):
         return """
         {
-            "problem": "The paper addresses limited accuracy in image classification.",
-            "objective": "The study aims to improve image classification accuracy.",
-            "methodology": "The authors train and evaluate a convolutional neural network for image classification.",
-            "dataset": "The evaluation uses an image classification dataset.",
-            "models": "A convolutional neural network is used.",
+            "problem": {
+                "text": "The paper addresses limited accuracy in image classification.",
+                "evidence_ids": ["chunk-2"]
+            },
+            "objective": {
+                "text": "The study aims to improve image classification accuracy.",
+                "evidence_ids": ["chunk-2"]
+            },
+            "methodology": {
+                "text": "The authors train and evaluate a convolutional neural network for image classification.",
+                "evidence_ids": ["chunk-1"]
+            },
+            "dataset": {
+                "text": "The evaluation uses an image classification dataset.",
+                "evidence_ids": ["chunk-2"]
+            },
+            "models": {
+                "text": "A convolutional neural network is used.",
+                "evidence_ids": ["chunk-1"]
+            },
             "results": [
-                "The proposed approach improves classification accuracy."
+                {
+                    "text": "The proposed approach improves classification accuracy.",
+                    "evidence_ids": ["chunk-2"]
+                }
             ],
             "limitations": [
-                "The evaluation is limited to the selected dataset."
+                {
+                    "text": "The evaluation is limited to the selected dataset.",
+                    "evidence_ids": ["chunk-2"]
+                }
             ],
             "future_work": [
-                "The authors suggest evaluating the approach on additional datasets."
+                {
+                    "text": "The authors suggest evaluating the approach on additional datasets.",
+                    "evidence_ids": ["chunk-2"]
+                }
             ]
         }
         """
@@ -72,3 +98,76 @@ def test_paper_analyzer():
     assert len(result.future_work) == 1
 
     assert "classification" in result.methodology.text.lower()
+
+    assert result.methodology.citations[0].chunk_id == "chunk-1"
+    assert result.methodology.citations[0].section == "Methodology"
+    assert result.methodology.citations[0].page == 4
+
+    assert result.results[0].citations[0].chunk_id == "chunk-2"
+    assert result.results[0].citations[0].section == "Results"
+    assert result.results[0].citations[0].page == 7
+
+def test_paper_analyzer_rejects_unknown_evidence_id():
+    class BadLLMService:
+        def generate(self, prompt, system_prompt=None, temperature=0.0):
+            return """
+            {
+                "problem": {
+                    "text": "This claim is not supported.",
+                    "evidence_ids": ["fake-chunk"]
+                }
+            }
+            """
+
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            section="Introduction",
+            page=2,
+            text="The paper discusses image classification.",
+        )
+    ]
+
+    analyzer = PaperAnalyzer(BadLLMService())
+
+    with pytest.raises(ValueError, match="unknown evidence ID"):
+        analyzer.analyze(
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            evidence=evidence,
+        )
+
+
+def test_paper_analyzer_rejects_claim_without_evidence():
+    class BadLLMService:
+        def generate(self, prompt, system_prompt=None, temperature=0.0):
+            return """
+            {
+                "problem": {
+                    "text": "This claim has no citation.",
+                    "evidence_ids": []
+                }
+            }
+            """
+
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            section="Introduction",
+            page=2,
+            text="The paper discusses image classification.",
+        )
+    ]
+
+    analyzer = PaperAnalyzer(BadLLMService())
+
+    with pytest.raises(ValueError, match="no valid evidence citations"):
+        analyzer.analyze(
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            evidence=evidence,
+        )
