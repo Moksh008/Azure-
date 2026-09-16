@@ -1,91 +1,81 @@
-from dataclasses import dataclass
-from typing import Any
+import requests
 
-import httpx
-
-
-@dataclass
-class PaperMetadata:
-    paper_id: str | None
-    title: str | None
-    authors: list[str]
-    publication_year: int | None
-    doi: str | None
-    source_name: str | None
-    source_url: str | None
-    open_access: bool | None
-    abstract: str
+try:
+    from app.discovery.paper_models import Paper
+except ImportError:
+    from paper_models import Paper
 
 
-OPENALEX_API_URL = "https://api.openalex.org/works"
+class OpenAlexClient:
+    BASE_URL = "https://api.openalex.org/works"
 
+    def search_papers(
+        self,
+        query: str,
+        max_results: int = 20,
+    ) -> list[Paper]:
+        params = {
+            "search": query,
+            "per-page": max_results,
+        }
 
-async def search_papers(
-    topic: str,
-    per_page: int = 20,
-) -> list[dict[str, Any]]:
-    """
-    Search OpenAlex for research papers related to a topic.
+        response = requests.get(
+            self.BASE_URL,
+            params=params,
+            timeout=30,
+        )
 
-    Returns basic metadata for each paper.
-    """
-
-    params = {
-        "search": topic,
-        "per-page": per_page,
-        "select": (
-            "id,title,publication_year,doi,authorships,"
-            "primary_location,open_access,abstract_inverted_index"
-        ),
-    }
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(OPENALEX_API_URL, params=params)
         response.raise_for_status()
 
         data = response.json()
 
-    return data.get("results", [])
+        papers = []
 
+        for result in data.get("results", []):
+            abstract = self._extract_abstract(result)
 
-def reconstruct_abstract(inverted_index: dict[str, list[int]] | None) -> str:
-    if not inverted_index:
-        return ""
+            paper = Paper(
+                paper_id=result.get("id", ""),
+                title=result.get("title", ""),
+                abstract=abstract,
+                authors=self._extract_authors(result),
+                publication_year=result.get("publication_year"),
+                doi=result.get("doi"),
+                url=result.get("primary_location", {}).get("landing_page_url")
+                if result.get("primary_location")
+                else None,
+            )
 
-    words: list[str] = []
+            papers.append(paper)
 
-    for word, positions in inverted_index.items():
-        for position in positions:
-            while len(words) <= position:
-                words.append("")
-            words[position] = word
+        return papers
 
-    return " ".join(words)
+    @staticmethod
+    def _extract_authors(result: dict) -> list[str]:
+        authors = []
 
+        for author_entry in result.get("authorships", []):
+            author = author_entry.get("author", {})
+            display_name = author.get("display_name")
 
-def format_paper_metadata(paper: dict[str, Any]) -> PaperMetadata:
-    authors = []
+            if display_name:
+                authors.append(display_name)
 
-    for authorship in paper.get("authorships", []):
-        author = authorship.get("author", {})
-        name = author.get("display_name")
+        return authors
 
-        if name:
-            authors.append(name)
+    @staticmethod
+    def _extract_abstract(result: dict) -> str:
+        inverted_index = result.get("abstract_inverted_index")
 
-    primary_location = paper.get("primary_location") or {}
-    source = primary_location.get("source") or {}
+        if not inverted_index:
+            return ""
 
-    return PaperMetadata(
-        paper_id=paper.get("id"),
-        title=paper.get("title"),
-        authors=authors,
-        publication_year=paper.get("publication_year"),
-        doi=paper.get("doi"),
-        source_name=source.get("display_name"),
-        source_url=primary_location.get("landing_page_url"),
-        open_access=(paper.get("open_access") or {}).get("is_oa"),
-        abstract=reconstruct_abstract(
-            paper.get("abstract_inverted_index")
-        ),
-    )
+        words = []
+
+        for word, positions in inverted_index.items():
+            for position in positions:
+                words.append((position, word))
+
+        words.sort(key=lambda item: item[0])
+
+        return " ".join(word for _, word in words)
