@@ -1,5 +1,5 @@
 import logging
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, UploadFile, status
 
 from app.retrieval.factory import get_retriever
 from shared.schemas import (
@@ -8,6 +8,9 @@ from shared.schemas import (
     RetrievalRequest,
     RetrievalResult,
 )
+
+from .ingestion import IngestionError, ingest_pdf
+from .services.storage_service import InvalidUploadError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("research2build.api")
@@ -22,6 +25,15 @@ app = FastAPI(
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok", service="research2build-api")
+
+
+@app.post("/papers/upload", response_model=list[SchemaEvidenceChunk])
+async def upload_paper(file: UploadFile) -> list[SchemaEvidenceChunk]:
+    content = await file.read()
+    try:
+        return ingest_pdf(filename=file.filename, content=content)
+    except (InvalidUploadError, IngestionError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/retrieval/search", response_model=RetrievalResult)
