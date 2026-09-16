@@ -18,6 +18,7 @@ build/
 # Local data and uploads
 data/
 uploads/
+backend/storage/
 *.pdf
 
 # IDE/OS
