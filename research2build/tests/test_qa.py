@@ -153,3 +153,76 @@ def test_grounded_qa_rejects_sufficient_answer_without_citations():
             question="What dataset did the authors use?",
             evidence=evidence,
         )
+
+
+def test_grounded_qa_handles_insufficient_evidence():
+    class InsufficientLLMService:
+        def generate(self, prompt, system_prompt=None, temperature=0.0):
+            return """
+            {
+                "answer": "The provided evidence does not contain enough information to answer this question.",
+                "evidence_ids": [],
+                "evidence_sufficient": false
+            }
+            """
+
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            section="Introduction",
+            page=2,
+            text="The paper discusses image classification.",
+        )
+    ]
+
+    qa = GroundedQA(InsufficientLLMService())
+
+    result = qa.answer(
+        question="What was the exact training budget used by the authors?",
+        evidence=evidence,
+    )
+
+    assert result.evidence_sufficient is False
+    assert result.citations == []
+    assert "not contain enough information" in result.answer.lower()
+
+
+def test_qa_rejects_unknown_evidence_id():
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Paper",
+            section="Results",
+            page=5,
+            text="The model achieved 92 percent accuracy.",
+        )
+    ]
+
+    class MockLLMService:
+        def generate(
+            self,
+            prompt,
+            system_prompt=None,
+            temperature=0.0,
+        ):
+            return """
+            {
+                "answer": "The model achieved 95 percent accuracy.",
+                "evidence_ids": ["fake-chunk-999"],
+                "evidence_sufficient": true
+            }
+            """
+
+    qa = GroundedQA(MockLLMService())
+
+    with pytest.raises(
+        ValueError,
+        match="unknown evidence ID",
+    ):
+        qa.answer(
+            question="What accuracy did the model achieve?",
+            evidence=evidence,
+        )

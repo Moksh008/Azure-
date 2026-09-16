@@ -75,8 +75,9 @@ Rules:
         }
 
         citations = []
+        evidence_ids = data.get("evidence_ids", [])
 
-        for evidence_id in data.get("evidence_ids", []):
+        for evidence_id in evidence_ids:
             chunk = evidence_map.get(evidence_id)
 
             if chunk is None:
@@ -138,10 +139,4 @@ Rules:
 
     @staticmethod
     def _citation(chunk: EvidenceChunk) -> Citation:
-        return Citation(
-            chunk_id=chunk.chunk_id,
-            paper_id=chunk.paper_id,
-            paper_title=chunk.paper_title,
-            section=chunk.section,
-            page=chunk.page,
-        )
+        return Citation.from_chunk(chunk)

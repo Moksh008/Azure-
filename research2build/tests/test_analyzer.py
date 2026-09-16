@@ -171,3 +171,51 @@ def test_paper_analyzer_rejects_claim_without_evidence():
             paper_title="Test Research Paper",
             evidence=evidence,
         )
+
+
+def test_analyzer_rejects_unknown_evidence_id():
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Paper",
+            section="Methodology",
+            page=4,
+            text="The proposed method uses a transformer architecture.",
+        )
+    ]
+
+    class MockLLMService:
+        def generate(
+            self,
+            prompt,
+            system_prompt=None,
+            temperature=0.0,
+        ):
+            return """
+            {
+                "problem": {
+                    "text": "The paper studies a research problem.",
+                    "evidence_ids": ["fake-chunk-999"]
+                },
+                "objective": null,
+                "methodology": null,
+                "dataset": null,
+                "models": null,
+                "results": [],
+                "limitations": [],
+                "future_work": []
+            }
+            """
+
+    analyzer = PaperAnalyzer(MockLLMService())
+
+    with pytest.raises(
+        ValueError,
+        match="unknown evidence ID",
+    ):
+        analyzer.analyze(
+            paper_id="paper-1",
+            paper_title="Test Paper",
+            evidence=evidence,
+        )

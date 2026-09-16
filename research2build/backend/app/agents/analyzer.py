@@ -4,6 +4,14 @@ from backend.app.services.llm_service import LLMService
 from shared.schemas import (
     Citation,
     EvidenceChunk,
+    GroundedAnswer,
+)
+import json
+
+from backend.app.services.llm_service import LLMService
+from shared.schemas import (
+    Citation,
+    EvidenceChunk,
     GroundedClaim,
     PaperAnalysis,
 )
@@ -25,7 +33,6 @@ class PaperAnalyzer:
             raise ValueError("At least one evidence chunk is required")
 
         evidence_text = self._format_evidence(evidence)
-
         prompt = f"""
 Analyze the research paper using ONLY the evidence provided below.
 
@@ -40,44 +47,14 @@ For every claim, include the IDs of the evidence chunks that support it.
 Return ONLY valid JSON with this structure:
 
 {{
-  "problem": {{
-    "text": "string",
-    "evidence_ids": ["chunk-id"]
-  }},
-  "objective": {{
-    "text": "string",
-    "evidence_ids": ["chunk-id"]
-  }},
-  "methodology": {{
-    "text": "string",
-    "evidence_ids": ["chunk-id"]
-  }},
-  "dataset": {{
-    "text": "string",
-    "evidence_ids": ["chunk-id"]
-  }},
-  "models": {{
-    "text": "string",
-    "evidence_ids": ["chunk-id"]
-  }},
-  "results": [
-    {{
-      "text": "string",
-      "evidence_ids": ["chunk-id"]
-    }}
-  ],
-  "limitations": [
-    {{
-      "text": "string",
-      "evidence_ids": ["chunk-id"]
-    }}
-  ],
-  "future_work": [
-    {{
-      "text": "string",
-      "evidence_ids": ["chunk-id"]
-    }}
-  ]
+  "problem": {{"text": "string", "evidence_ids": ["chunk-id"]}},
+  "objective": {{"text": "string", "evidence_ids": ["chunk-id"]}},
+  "methodology": {{"text": "string", "evidence_ids": ["chunk-id"]}},
+  "dataset": {{"text": "string", "evidence_ids": ["chunk-id"]}},
+  "models": {{"text": "string", "evidence_ids": ["chunk-id"]}},
+  "results": [{{"text": "string", "evidence_ids": ["chunk-id"]}}],
+  "limitations": [{{"text": "string", "evidence_ids": ["chunk-id"]}}],
+  "future_work": [{{"text": "string", "evidence_ids": ["chunk-id"]}}]
 }}
 
 Rules:
@@ -95,52 +72,29 @@ Rules:
             ),
             temperature=0.0,
         )
-
         data = self._parse_response(response)
-
-        evidence_map = {
-            chunk.chunk_id: chunk
-            for chunk in evidence
-        }
+        evidence_map = {chunk.chunk_id: chunk for chunk in evidence}
 
         return PaperAnalysis(
             paper_id=paper_id,
             paper_title=paper_title,
             problem=self._claim(data.get("problem"), evidence_map),
             objective=self._claim(data.get("objective"), evidence_map),
-            methodology=self._claim(
-                data.get("methodology"),
-                evidence_map,
-            ),
+            methodology=self._claim(data.get("methodology"), evidence_map),
             dataset=self._claim(data.get("dataset"), evidence_map),
             models=self._claim(data.get("models"), evidence_map),
-            results=self._claims(
-                data.get("results"),
-                evidence_map,
-            ),
-            limitations=self._claims(
-                data.get("limitations"),
-                evidence_map,
-            ),
-            future_work=self._claims(
-                data.get("future_work"),
-                evidence_map,
-            ),
+            results=self._claims(data.get("results"), evidence_map),
+            limitations=self._claims(data.get("limitations"), evidence_map),
+            future_work=self._claims(data.get("future_work"), evidence_map),
         )
 
     @staticmethod
     def _format_evidence(evidence: list[EvidenceChunk]) -> str:
-        parts = []
-
-        for chunk in evidence:
-            parts.append(
-                f"[{chunk.chunk_id}] "
-                f"Section: {chunk.section or 'Unknown'} | "
-                f"Page: {chunk.page or 'Unknown'}\n"
-                f"{chunk.text}"
-            )
-
-        return "\n\n".join(parts)
+        return "\n\n".join(
+            f"[{chunk.chunk_id}] Section: {chunk.section or 'Unknown'} | "
+            f"Page: {chunk.page or 'Unknown'}\n{chunk.text}"
+            for chunk in evidence
+        )
 
     @staticmethod
     def _parse_response(response: str) -> dict:
@@ -151,20 +105,11 @@ Rules:
 
         if not isinstance(data, dict):
             raise ValueError("LLM response must be a JSON object")
-
         return data
 
     @staticmethod
-    def _citation(
-        chunk: EvidenceChunk,
-    ) -> Citation:
-        return Citation(
-            chunk_id=chunk.chunk_id,
-            paper_id=chunk.paper_id,
-            paper_title=chunk.paper_title,
-            section=chunk.section,
-            page=chunk.page,
-        )
+    def _citation(chunk: EvidenceChunk) -> Citation:
+        return Citation.from_chunk(chunk)
 
     @classmethod
     def _claim(
@@ -176,32 +121,22 @@ Rules:
             return None
 
         text = value.get("text")
-        evidence_ids = value.get("evidence_ids", [])
-
         if not text:
             return None
 
         citations = []
-
-        for evidence_id in evidence_ids:
+        for evidence_id in value.get("evidence_ids", []):
             chunk = evidence_map.get(evidence_id)
-
             if chunk is None:
                 raise ValueError(
                     f"LLM referenced unknown evidence ID: {evidence_id}"
                 )
-
             citations.append(cls._citation(chunk))
 
         if not citations:
-            raise ValueError(
-                f"Claim has no valid evidence citations: {text}"
-            )
+            raise ValueError(f"Claim has no valid evidence citations: {text}")
 
-        return GroundedClaim(
-            text=text,
-            citations=citations,
-        )
+        return GroundedClaim(claim=text, citations=citations)
 
     @classmethod
     def _claims(
