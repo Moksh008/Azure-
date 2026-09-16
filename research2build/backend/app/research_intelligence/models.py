@@ -189,3 +189,27 @@ class ProjectProposal(BaseModel):
         default="",
         description="Preliminary notes on feasibility and resource requirements.",
     )
+    problem_statement: str = Field(
+        default="",
+        description="Description of the core problem addressed by this project.",
+    )
+    technical_approach: list[str] = Field(
+        default_factory=list,
+        description="Key technical methodologies, frameworks, and tools.",
+    )
+    key_features: list[str] = Field(
+        default_factory=list,
+        description="Main buildable features and deliverables of the project.",
+    )
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of supporting papers traced through source opportunities.",
+    )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Preserved limitation evidence traced through source opportunities.",
+    )
+    novelty_confidence: str = Field(
+        default="Requires human validation",
+        description="Novelty validation disclaimer requiring human review.",
+    )
