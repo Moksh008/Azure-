@@ -4,6 +4,8 @@ These tests validate the M4 output models, interface contracts, and
 the service orchestration layer independently of M2/M3 data.
 """
 
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
@@ -933,3 +935,317 @@ class TestPipeline:
         assert "Data-Efficient" in result.opportunities[0].title
         assert len(result.proposals) >= 3
         assert any("Data-Efficient" in p.title for p in result.proposals)
+
+
+# ── Full End-to-End Pipeline Tests ──────────────────────────────────
+
+class TestEndToEndPipeline:
+    """End-to-end test suite for the complete M4 Research Intelligence pipeline.
+
+    Chains:
+        PaperAnalysis-like inputs
+            ↓ compare_papers()
+            ↓ find_recurring_limitations()
+            ↓ generate_opportunities()
+            ↓ generate_project_proposals()
+    """
+
+    @pytest.fixture
+    def realistic_rag_papers(self) -> list[dict[str, Any]]:
+        """Realistic PaperAnalysis-like test fixtures from the RAG research domain."""
+        return [
+            {
+                "paper_id": "paper_rag_dense",
+                "title": "Dense Passage Retrieval for Real-Time Open-Domain Question Answering",
+                "authors": ["K. Karpukhin", "B. Oguz", "S. Min"],
+                "abstract": (
+                    "We investigate dual-encoder dense retrieval architectures combined with "
+                    "sequence-to-sequence readers for open-domain QA. Dense representations "
+                    "outperform BM25 but suffer from substantial inference latency and memory overhead."
+                ),
+                "research_question": "Can dense passage embeddings replace sparse indexing while maintaining real-time latency?",
+                "methodology": ["Dual-encoder dense retrieval", "FAISS vector indexing", "In-batch negative cross-entropy"],
+                "datasets": ["Natural Questions", "TriviaQA", "MS-MARCO"],
+                "key_findings": [
+                    "Dense retrieval achieves 78.4% top-20 accuracy, exceeding BM25 by 9.2%.",
+                    "Inference latency increases significantly when index size exceeds GPU VRAM.",
+                ],
+                "limitations": [
+                    "High inference latency during peak traffic and multi-turn conversational queries.",
+                    "Prohibitive GPU memory requirements for indexing large document corpora.",
+                    "Susceptibility to hallucinations when retrieved passages contain conflicting facts.",
+                ],
+            },
+            {
+                "paper_id": "paper_rag_fusion",
+                "title": "Fusion-in-Decoder: Leveraging Diverse Retrieved Contexts for Knowledge Grounding",
+                "authors": ["G. Izacard", "E. Grave"],
+                "abstract": (
+                    "We propose Fusion-in-Decoder (FiD) where passages are processed independently in the "
+                    "encoder and fused in the decoder. FiD achieves state-of-the-art results but incurs heavy "
+                    "cross-attention compute cost."
+                ),
+                "research_question": "How can generation models attend to dozens of retrieved passages simultaneously?",
+                "methodology": ["Independent encoder chunking", "Fused cross-attention decoding", "Seq2Seq generation"],
+                "datasets": ["Natural Questions", "TriviaQA", "SQuAD 2.0"],
+                "key_findings": [
+                    "FiD scales to 100 retrieved passages, improving exact-match accuracy by 4.5%.",
+                    "Cross-attention compute scales linearly with passage count, dominating total runtime.",
+                ],
+                "limitations": [
+                    "High computational cost and GPU memory demand during multi-passage cross-attention.",
+                    "High inference latency and runtime overhead when scaling beyond 50 passages.",
+                    "Susceptibility to hallucinations when retrieved documents contain distractors.",
+                ],
+            },
+            {
+                "paper_id": "paper_rag_speculative",
+                "title": "Speculative Verification for Retrieval-Augmented Generation",
+                "authors": ["A. Leviathan", "M. Kalman", "Y. Matias"],
+                "abstract": (
+                    "We study draft-verification pipelines for RAG systems to accelerate token generation while "
+                    "maintaining faithfulness to evidence passages."
+                ),
+                "research_question": "Can speculative drafting accelerate generation without compromising factual grounding?",
+                "methodology": ["Speculative token drafting", "Evidence verification head", "KV-cache reuse"],
+                "datasets": ["Natural Questions", "HotpotQA"],
+                "key_findings": [
+                    "Speculative drafting achieves 2.1x speedup on answer generation with zero loss in factual precision.",
+                    "Draft acceptance rate degrades when context passages contain noisy evidence.",
+                ],
+                "limitations": [
+                    "High inference latency remains problematic during draft verification fallbacks.",
+                    "High computational cost for parallel draft model evaluation on consumer hardware.",
+                    "Occasional hallucinations when context passages exhibit domain shift.",
+                ],
+            },
+            {
+                "paper_id": "paper_rag_curation",
+                "title": "Active Curation and Noise Filtering for Evidence-Grounded Language Models",
+                "authors": ["S. Robertson", "H. Zaragoza"],
+                "abstract": (
+                    "We evaluate filtering and relevance thresholding on retrieved passages before sequence decoding. "
+                    "Pruning irrelevant passages reduces hallucination rate but introduces filtering latency."
+                ),
+                "research_question": "Does pre-filtering retrieved passages reduce downstream hallucination rates?",
+                "methodology": ["Classifier-guided passage filtering", "Confidence thresholding", "Contrastive training"],
+                "datasets": ["HotpotQA", "SQuAD 2.0"],
+                "key_findings": [
+                    "Relevance filtering eliminates 35% of distractor passages, cutting hallucination rate by 18%.",
+                    "Filtering latency partially offsets the downstream decoding speedup.",
+                ],
+                "limitations": [
+                    "High inference latency introduced by sequential passage relevance filtering.",
+                    "Susceptibility to hallucinations persists when ambiguous queries bypass the filter.",
+                    "High computational cost when running dense rerankers over hundreds of candidates.",
+                ],
+            },
+        ]
+
+    def test_complete_pipeline_sequential_execution(self, realistic_rag_papers):
+        """Execute the full pipeline stage-by-stage and verify contracts at each step."""
+        # Stage 1: Comparison
+        comparison = compare_papers(realistic_rag_papers)
+        assert isinstance(comparison, PaperComparison)
+        assert len(comparison.paper_ids) == 4
+        assert len(comparison.shared_themes) > 0
+        assert len(comparison.shared_datasets) > 0
+        assert "Natural Questions" in comparison.shared_datasets
+        assert len(comparison.common_limitations) >= 2
+
+        # Stage 2: Recurring Limitations
+        recurring_limitations = find_recurring_limitations(realistic_rag_papers)
+        assert isinstance(recurring_limitations, list)
+        assert len(recurring_limitations) >= 2
+        for rl in recurring_limitations:
+            assert isinstance(rl, RecurringLimitation)
+            # Each recurring limitation MUST reference at least 2 distinct papers
+            assert len(rl.paper_ids) >= 2
+            assert rl.frequency == len(rl.paper_ids)
+            assert len(rl.evidence) >= 2
+
+        # Stage 3: Potential Research Opportunities
+        opportunities = generate_opportunities(recurring_limitations)
+        assert isinstance(opportunities, list)
+        assert len(opportunities) >= 2
+        for opp in opportunities:
+            assert isinstance(opp, ResearchOpportunity)
+            assert len(opp.source_limitation_ids) >= 1
+            assert len(opp.paper_ids) >= 2
+            assert len(opp.evidence) >= 1
+            assert opp.novelty_confidence == "Requires human validation"
+
+        # Stage 4: Project Proposals
+        proposals = generate_project_proposals(opportunities)
+        assert isinstance(proposals, list)
+        # Proposal count MUST be between 3 and 5
+        assert 3 <= len(proposals) <= 5
+        for prop in proposals:
+            assert isinstance(prop, ProjectProposal)
+            assert len(prop.source_opportunity_ids) >= 1
+            assert len(prop.paper_ids) >= 2
+            assert len(prop.evidence) >= 1
+            assert prop.novelty_confidence == "Requires human validation"
+
+    def test_complete_pipeline_via_run_pipeline(self, realistic_rag_papers):
+        """Execute full pipeline via the orchestration service run_pipeline()."""
+        result = run_pipeline(realistic_rag_papers)
+        assert isinstance(result, PipelineResult)
+
+        assert isinstance(result.comparison, PaperComparison)
+        assert len(result.comparison.paper_ids) == 4
+
+        assert len(result.recurring_limitations) >= 2
+        assert len(result.opportunities) >= 2
+        assert 3 <= len(result.proposals) <= 5
+
+    def test_traceability_across_full_pipeline(self, realistic_rag_papers):
+        """Verify unbroken lineage: proposal → opportunity → recurring limitation → supporting papers."""
+        result = run_pipeline(realistic_rag_papers)
+
+        limitation_map = {rl.limitation_id: rl for rl in result.recurring_limitations}
+        opportunity_map = {opp.opportunity_id: opp for opp in result.opportunities}
+        paper_id_set = {p["paper_id"] for p in realistic_rag_papers}
+
+        for proposal in result.proposals:
+            assert len(proposal.source_opportunity_ids) >= 1
+            for opp_id in proposal.source_opportunity_ids:
+                assert opp_id in opportunity_map
+                opp = opportunity_map[opp_id]
+
+                # Trace from opportunity to source limitations
+                assert len(opp.source_limitation_ids) >= 1
+                for lim_id in opp.source_limitation_ids:
+                    assert lim_id in limitation_map
+                    lim = limitation_map[lim_id]
+
+                    # Trace from limitation to supporting papers
+                    assert len(lim.paper_ids) >= 2
+                    for pid in lim.paper_ids:
+                        assert pid in paper_id_set
+
+                    # Evidence should match paper origins
+                    for ev in lim.evidence:
+                        assert any(f"[{pid}]" in ev for pid in lim.paper_ids)
+
+    def test_responsible_ai_wording_throughout_pipeline(self, realistic_rag_papers):
+        """Verify strict absence of forbidden research gap and novelty claims."""
+        result = run_pipeline(realistic_rag_papers)
+
+        # Check recurring limitations
+        for rl in result.recurring_limitations:
+            assert "research gap" not in rl.description.lower()
+            assert "novelty" not in rl.description.lower()
+            assert "novel" not in rl.description.lower()
+
+        # Check opportunities
+        for opp in result.opportunities:
+            assert opp.novelty_confidence == "Requires human validation"
+            assert "research gap" not in opp.title.lower()
+            assert "research gap" not in opp.description.lower()
+            assert "novelty" not in opp.title.lower()
+            assert "discovered gap" not in opp.title.lower()
+
+        # Check proposals
+        for prop in result.proposals:
+            assert prop.novelty_confidence == "Requires human validation"
+            combined_text = f"{prop.title} {prop.summary} {prop.problem_statement}".lower()
+            assert "research gap" not in combined_text
+            assert "novelty" not in combined_text
+            assert "confirmed novel" not in combined_text
+            assert "discovered gap" not in combined_text
+            assert "guaranteed original" not in combined_text
+
+    def test_pipeline_deterministic_behavior(self, realistic_rag_papers):
+        """Executing the pipeline twice with identical inputs must produce identical outputs."""
+        run1 = run_pipeline(realistic_rag_papers)
+        run2 = run_pipeline(realistic_rag_papers)
+
+        # Comparison determinism
+        assert run1.comparison.paper_ids == run2.comparison.paper_ids
+        assert run1.comparison.shared_themes == run2.comparison.shared_themes
+        assert run1.comparison.methodological_overlaps == run2.comparison.methodological_overlaps
+        assert run1.comparison.shared_datasets == run2.comparison.shared_datasets
+        assert run1.comparison.common_limitations == run2.comparison.common_limitations
+        assert run1.comparison.all_limitations == run2.comparison.all_limitations
+
+        # Recurring limitations determinism
+        assert len(run1.recurring_limitations) == len(run2.recurring_limitations)
+        for rl1, rl2 in zip(run1.recurring_limitations, run2.recurring_limitations):
+            assert rl1.limitation_id == rl2.limitation_id
+            assert rl1.description == rl2.description
+            assert rl1.paper_ids == rl2.paper_ids
+            assert rl1.frequency == rl2.frequency
+            assert rl1.severity == rl2.severity
+            assert rl1.evidence == rl2.evidence
+
+        # Opportunities determinism
+        assert len(run1.opportunities) == len(run2.opportunities)
+        for o1, o2 in zip(run1.opportunities, run2.opportunities):
+            assert o1.opportunity_id == o2.opportunity_id
+            assert o1.title == o2.title
+            assert o1.description == o2.description
+            assert o1.source_limitation_ids == o2.source_limitation_ids
+            assert o1.keywords == o2.keywords
+            assert o1.paper_ids == o2.paper_ids
+            assert o1.evidence == o2.evidence
+            assert o1.novelty_confidence == o2.novelty_confidence
+
+        # Proposals determinism
+        assert len(run1.proposals) == len(run2.proposals)
+        for p1, p2 in zip(run1.proposals, run2.proposals):
+            assert p1.proposal_id == p2.proposal_id
+            assert p1.title == p2.title
+            assert p1.summary == p2.summary
+            assert p1.problem_statement == p2.problem_statement
+            assert p1.source_opportunity_ids == p2.source_opportunity_ids
+            assert p1.objectives == p2.objectives
+            assert p1.proposed_methods == p2.proposed_methods
+            assert p1.expected_outcomes == p2.expected_outcomes
+            assert p1.technical_approach == p2.technical_approach
+            assert p1.key_features == p2.key_features
+            assert p1.paper_ids == p2.paper_ids
+            assert p1.evidence == p2.evidence
+            assert p1.novelty_confidence == p2.novelty_confidence
+
+    def test_pipeline_edge_cases_empty_and_single(self):
+        """Pipeline must gracefully reject < 2 papers with ValueError."""
+        with pytest.raises(ValueError, match="At least two"):
+            run_pipeline([])
+
+        with pytest.raises(ValueError, match="At least two"):
+            run_pipeline([{"paper_id": "single", "limitations": ["x"]}])
+
+    def test_pipeline_edge_case_no_recurring_limitations(self):
+        """Two papers with completely disjoint, non-recurring limitations."""
+        disjoint_papers = [
+            {
+                "paper_id": "p_audio",
+                "title": "Audio Speech Processing",
+                "limitations": ["Microphone diaphragm resonance distortion"],
+            },
+            {
+                "paper_id": "p_sat",
+                "title": "Satellite Imagery Processing",
+                "limitations": ["Cloud shadow occlusion artifacts"],
+            },
+        ]
+        result = run_pipeline(disjoint_papers)
+        assert isinstance(result.comparison, PaperComparison)
+        # No limitation appeared in >= 2 papers
+        assert result.recurring_limitations == []
+        assert result.opportunities == []
+        assert result.proposals == []
+
+    def test_pipeline_edge_case_malformed_partial_inputs(self):
+        """Pipeline must handle minimal/sparse paper dictionaries safely."""
+        sparse_papers = [
+            {"paper_id": "sparse_1"},
+            {"paper_id": "sparse_2", "title": "Minimal Title"},
+        ]
+        result = run_pipeline(sparse_papers)
+        assert isinstance(result, PipelineResult)
+        assert result.comparison.paper_ids == ["sparse_1", "sparse_2"]
+        assert result.recurring_limitations == []
+        assert result.opportunities == []
+        assert result.proposals == []
