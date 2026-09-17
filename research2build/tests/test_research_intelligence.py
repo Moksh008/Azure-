@@ -1249,3 +1249,506 @@ class TestEndToEndPipeline:
         assert result.recurring_limitations == []
         assert result.opportunities == []
         assert result.proposals == []
+
+
+# ── M3 PaperAnalysis contract compatibility tests ────────────────────
+
+class TestM3PaperAnalysisContract:
+    """Focused tests that feed REAL M3 PaperAnalysis objects (with GroundedClaim
+    and Citation) into the M4 pipeline and verify correct extraction and
+    end-to-end traceability."""
+
+    # ------------------------------------------------------------------
+    # Shared fixtures
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _make_citation(paper_id: str, paper_title: str, quote: str, section: str = "Abstract") -> "Citation":
+        from shared.schemas import Citation
+        return Citation(
+            chunk_id=f"chunk-{paper_id}-{hash(quote) & 0xFFFF:04x}",
+            paper_id=paper_id,
+            paper_title=paper_title,
+            section=section,
+            page=1,
+            quote=quote,
+        )
+
+    @staticmethod
+    def _make_claim(claim_text: str, paper_id: str, paper_title: str, section: str = "Abstract") -> "GroundedClaim":
+        from shared.schemas import Citation, GroundedClaim
+        citation = Citation(
+            chunk_id=f"chunk-{paper_id}-{hash(claim_text) & 0xFFFF:04x}",
+            paper_id=paper_id,
+            paper_title=paper_title,
+            section=section,
+            page=1,
+            quote=claim_text[:120],
+        )
+        return GroundedClaim(claim=claim_text, citations=[citation])
+
+    @classmethod
+    def _build_three_papers(cls):
+        """Build 3 realistic PaperAnalysis objects with recurring limitations."""
+        from shared.schemas import PaperAnalysis, GroundedClaim, Citation
+
+        # ── Paper 1: RAG with small datasets ─────────────────────────
+        p1_id = "paper-rag-lora-2024"
+        p1_title = "Efficient RAG with LoRA Adapters"
+
+        p1 = PaperAnalysis(
+            paper_id=p1_id,
+            paper_title=p1_title,
+            problem=cls._make_claim(
+                "Retrieval-augmented generation systems suffer from high computational cost "
+                "when scaling to large corpora.",
+                p1_id, p1_title, "Introduction",
+            ),
+            methodology=cls._make_claim(
+                "We fine-tune a LLaMA-2 backbone with LoRA adapters combined with FAISS "
+                "vector index retrieval.",
+                p1_id, p1_title, "Methodology",
+            ),
+            dataset=cls._make_claim(
+                "Experiments use SQuAD 2.0 and HotpotQA benchmarks.",
+                p1_id, p1_title, "Experiments",
+            ),
+            results=[
+                cls._make_claim(
+                    "LoRA-RAG achieves 4.2% higher F1 on SQuAD 2.0 compared to the full "
+                    "fine-tuning baseline.",
+                    p1_id, p1_title, "Results",
+                ),
+            ],
+            limitations=[
+                cls._make_claim(
+                    "Limited training data: the model was evaluated only on English benchmarks "
+                    "with a small dataset of domain-specific documents.",
+                    p1_id, p1_title, "Limitations",
+                ),
+                cls._make_claim(
+                    "High computational cost of inference with large FAISS indices remains "
+                    "a practical bottleneck.",
+                    p1_id, p1_title, "Limitations",
+                ),
+            ],
+            future_work=[
+                cls._make_claim(
+                    "Future work should explore multilingual datasets and reduced memory footprint.",
+                    p1_id, p1_title, "Conclusion",
+                ),
+            ],
+        )
+
+        # ── Paper 2: Prompt tuning for QA ────────────────────────────
+        p2_id = "paper-prompt-tuning-qa-2024"
+        p2_title = "Scalable QA via Prompt Tuning on Pre-trained LLMs"
+
+        p2 = PaperAnalysis(
+            paper_id=p2_id,
+            paper_title=p2_title,
+            problem=cls._make_claim(
+                "Current QA systems require expensive full fine-tuning, limiting accessibility.",
+                p2_id, p2_title, "Introduction",
+            ),
+            methodology=cls._make_claim(
+                "Soft prompt tokens are prepended to frozen GPT-4 weights; retrieval uses "
+                "BM25 sparse retrieval.",
+                p2_id, p2_title, "Methodology",
+            ),
+            dataset=cls._make_claim(
+                "TriviaQA, SQuAD 2.0, and WebQuestions are used as evaluation benchmarks.",
+                p2_id, p2_title, "Experiments",
+            ),
+            results=[
+                cls._make_claim(
+                    "Prompt-tuned models match full fine-tune accuracy while using 10× less GPU memory.",
+                    p2_id, p2_title, "Results",
+                ),
+            ],
+            limitations=[
+                cls._make_claim(
+                    "Small dataset availability for low-resource languages severely limits "
+                    "generalization to non-English QA tasks.",
+                    p2_id, p2_title, "Limitations",
+                ),
+                cls._make_claim(
+                    "High computational cost of prompt search during soft-prompt optimization.",
+                    p2_id, p2_title, "Limitations",
+                ),
+                cls._make_claim(
+                    "Model interpretability is limited because soft prompts are opaque "
+                    "continuous embeddings with no natural language meaning.",
+                    p2_id, p2_title, "Limitations",
+                ),
+            ],
+            future_work=[
+                cls._make_claim(
+                    "Improving data efficiency and reducing annotation cost are key directions.",
+                    p2_id, p2_title, "Conclusion",
+                ),
+            ],
+        )
+
+        # ── Paper 3: Knowledge distillation for edge NLP ─────────────
+        p3_id = "paper-kd-edge-nlp-2024"
+        p3_title = "Knowledge Distillation for Edge NLP Inference"
+
+        p3 = PaperAnalysis(
+            paper_id=p3_id,
+            paper_title=p3_title,
+            problem=cls._make_claim(
+                "Deploying large language models on edge devices is prohibitively expensive "
+                "due to hardware constraints.",
+                p3_id, p3_title, "Introduction",
+            ),
+            methodology=cls._make_claim(
+                "Teacher-student distillation compresses BERT-large into a 6-layer student "
+                "using mean-squared-error knowledge transfer.",
+                p3_id, p3_title, "Methodology",
+            ),
+            dataset=cls._make_claim(
+                "GLUE benchmark suite and a proprietary customer-support dataset are used.",
+                p3_id, p3_title, "Experiments",
+            ),
+            results=[
+                cls._make_claim(
+                    "The distilled model retains 95% of teacher accuracy at 4× faster inference.",
+                    p3_id, p3_title, "Results",
+                ),
+            ],
+            limitations=[
+                cls._make_claim(
+                    "Insufficient training data for low-resource domains limits the student "
+                    "model performance in specialized settings.",
+                    p3_id, p3_title, "Limitations",
+                ),
+                cls._make_claim(
+                    "High computational cost of the distillation process itself requires "
+                    "multi-GPU clusters.",
+                    p3_id, p3_title, "Limitations",
+                ),
+                cls._make_claim(
+                    "Limited model interpretability: the black-box nature of the distilled "
+                    "network makes debugging difficult.",
+                    p3_id, p3_title, "Limitations",
+                ),
+            ],
+            future_work=[
+                cls._make_claim(
+                    "Exploring data-efficient distillation and hardware-aware pruning are "
+                    "promising future directions.",
+                    p3_id, p3_title, "Conclusion",
+                ),
+            ],
+        )
+
+        return [p1, p2, p3]
+
+    # ------------------------------------------------------------------
+    # Unit: _extract_claim_text with GroundedClaim
+    # ------------------------------------------------------------------
+
+    def test_extract_claim_text_from_grounded_claim(self):
+        """_extract_claim_text must return GroundedClaim.claim correctly."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+        from backend.app.research_intelligence.limitations import _extract_claim_text as lim_extract
+        from shared.schemas import GroundedClaim, Citation
+
+        cit = Citation(
+            chunk_id="c1", paper_id="p1", paper_title="T1",
+            section="Abstract", page=1, quote="Supporting quote.",
+        )
+        gc = GroundedClaim(claim="Small dataset limits generalization.", citations=[cit])
+
+        # comparison module
+        assert _extract_claim_text(gc) == "Small dataset limits generalization."
+        # limitations module
+        assert lim_extract(gc) == "Small dataset limits generalization."
+
+    def test_extract_claim_text_text_property(self):
+        """GroundedClaim.text property must also be accepted (alias for .claim)."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+        from shared.schemas import GroundedClaim, Citation
+
+        cit = Citation(
+            chunk_id="c2", paper_id="p2", paper_title="T2",
+            section="Body", page=2, quote="Quote text.",
+        )
+        gc = GroundedClaim(claim="High compute overhead is prohibitive.", citations=[cit])
+        # .text is a property that returns .claim
+        assert gc.text == gc.claim
+        assert _extract_claim_text(gc) == "High compute overhead is prohibitive."
+
+    def test_extract_claim_text_plain_string_still_works(self):
+        """Plain strings must still be returned unchanged."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+        assert _extract_claim_text("plain string") == "plain string"
+
+    def test_extract_claim_text_dict_still_works(self):
+        """Dicts with 'claim' key must still be handled."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+        assert _extract_claim_text({"claim": "dict claim text"}) == "dict claim text"
+        assert _extract_claim_text({"text": "dict text value"}) == "dict text value"
+
+    def test_extract_claim_text_none_returns_empty(self):
+        """None input must return empty string."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+        assert _extract_claim_text(None) == ""
+
+    # ------------------------------------------------------------------
+    # Unit: compare_papers with PaperAnalysis
+    # ------------------------------------------------------------------
+
+    def test_compare_papers_accepts_paper_analysis_objects(self):
+        """compare_papers must accept real PaperAnalysis objects."""
+        papers = self._build_three_papers()
+        result = compare_papers(papers)
+
+        assert isinstance(result, PaperComparison)
+        assert set(result.paper_ids) == {
+            "paper-rag-lora-2024",
+            "paper-prompt-tuning-qa-2024",
+            "paper-kd-edge-nlp-2024",
+        }
+
+    def test_compare_papers_extracts_paper_ids(self):
+        """paper_id fields from PaperAnalysis must be preserved in comparison."""
+        papers = self._build_three_papers()
+        result = compare_papers(papers)
+
+        assert "paper-rag-lora-2024" in result.paper_ids
+        assert "paper-prompt-tuning-qa-2024" in result.paper_ids
+        assert "paper-kd-edge-nlp-2024" in result.paper_ids
+
+    def test_compare_papers_grounded_claim_limitations_extracted(self):
+        """GroundedClaim.claim text must appear in all_limitations."""
+        papers = self._build_three_papers()
+        result = compare_papers(papers)
+
+        joined = " ".join(result.all_limitations)
+        assert "small dataset" in joined.lower() or "limited training data" in joined.lower() \
+            or "insufficient" in joined.lower()
+        assert "computational cost" in joined.lower() or "compute" in joined.lower()
+
+    def test_compare_papers_grounded_claim_methodology_extracted(self):
+        """GroundedClaim.claim from methodology field must appear in methodological results."""
+        papers = self._build_three_papers()
+        result = compare_papers(papers)
+
+        # methodology is a single GroundedClaim; its text should surface somewhere
+        all_method_text = " ".join(result.methodological_overlaps + result.methodological_differences)
+        assert len(all_method_text) > 0  # at least something was extracted
+
+    def test_compare_papers_dataset_grounded_claim_extracted(self):
+        """GroundedClaim.claim from dataset field contributes to dataset comparison."""
+        papers = self._build_three_papers()
+        result = compare_papers(papers)
+
+        all_ds = " ".join(result.shared_datasets + result.dataset_differences)
+        # SQuAD 2.0 appears in paper 1 and paper 2 dataset claims
+        assert "SQuAD" in all_ds
+
+    # ------------------------------------------------------------------
+    # Unit: find_recurring_limitations with PaperAnalysis
+    # ------------------------------------------------------------------
+
+    def test_find_recurring_limitations_accepts_paper_analysis(self):
+        """find_recurring_limitations must accept PaperAnalysis objects."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        assert isinstance(recurring, list)
+        assert all(isinstance(r, RecurringLimitation) for r in recurring)
+
+    def test_recurring_limitations_detected_from_grounded_claims(self):
+        """Recurring limitations must be detected from GroundedClaim.claim text."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        assert len(recurring) >= 1, "Expected at least one recurring limitation across 3 papers"
+
+        # All three papers mention 'data scarcity' / 'limited data'
+        descriptions = [r.description.lower() for r in recurring]
+        assert any(
+            "data" in d or "compute" in d or "computational" in d or "interpretab" in d
+            for d in descriptions
+        ), f"Expected a known recurring concept in: {descriptions}"
+
+    def test_recurring_limitations_minimum_two_papers(self):
+        """Every recurring limitation must appear in at least 2 distinct papers."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        for r in recurring:
+            assert r.frequency >= 2, (
+                f"Limitation '{r.description}' has frequency {r.frequency} < 2"
+            )
+            assert len(r.paper_ids) >= 2, (
+                f"Limitation '{r.description}' references only {len(r.paper_ids)} paper(s)"
+            )
+
+    def test_recurring_limitations_paper_ids_traceable(self):
+        """paper_ids on each recurring limitation must be valid paper IDs."""
+        papers = self._build_three_papers()
+        valid_ids = {"paper-rag-lora-2024", "paper-prompt-tuning-qa-2024", "paper-kd-edge-nlp-2024"}
+        recurring = find_recurring_limitations(papers)
+
+        for r in recurring:
+            for pid in r.paper_ids:
+                assert pid in valid_ids, (
+                    f"Unknown paper_id '{pid}' in limitation '{r.description}'"
+                )
+
+    def test_recurring_limitations_evidence_contains_paper_ids(self):
+        """Evidence strings must be prefixed with [paper_id]."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        for r in recurring:
+            for ev in r.evidence:
+                assert ev.startswith("["), f"Evidence missing [paper_id] prefix: {ev!r}"
+
+    def test_recurring_limitations_citations_not_invented(self):
+        """M4 must NOT add citations that were not in M3 GroundedClaim objects."""
+        # RecurringLimitation.evidence only contains text excerpts, no new citations
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        for r in recurring:
+            # evidence is plain text, not Citation objects
+            for ev in r.evidence:
+                assert isinstance(ev, str), (
+                    f"Evidence should be str, got {type(ev)} in '{r.description}'"
+                )
+
+    # ------------------------------------------------------------------
+    # Integration: full pipeline PaperAnalysis → proposals
+    # ------------------------------------------------------------------
+
+    def test_full_pipeline_with_paper_analysis_objects(self):
+        """Full pipeline must work end-to-end with PaperAnalysis inputs."""
+        papers = self._build_three_papers()
+
+        # Step 1: compare
+        comparison = compare_papers(papers)
+        assert isinstance(comparison, PaperComparison)
+
+        # Step 2: recurring limitations
+        recurring = find_recurring_limitations(papers)
+        assert isinstance(recurring, list)
+
+        # Step 3: opportunities
+        opportunities = generate_opportunities(recurring)
+        assert isinstance(opportunities, list)
+
+        # Step 4: proposals
+        proposals = generate_project_proposals(opportunities)
+        assert isinstance(proposals, list)
+
+    def test_pipeline_generates_opportunities_from_paper_analysis(self):
+        """Opportunities must be generated when recurring limitations exist."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+
+        if recurring:
+            opportunities = generate_opportunities(recurring)
+            assert len(opportunities) >= 1
+            for opp in opportunities:
+                assert isinstance(opp, ResearchOpportunity)
+
+    def test_pipeline_generates_proposals_from_paper_analysis(self):
+        """Project proposals must be generated when opportunities exist."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+        opportunities = generate_opportunities(recurring)
+
+        if opportunities:
+            proposals = generate_project_proposals(opportunities)
+            assert len(proposals) >= 1
+            for prop in proposals:
+                assert isinstance(prop, ProjectProposal)
+
+    def test_novelty_confidence_invariant(self):
+        """novelty_confidence must be exactly 'Requires human validation' throughout."""
+        papers = self._build_three_papers()
+        recurring = find_recurring_limitations(papers)
+        opportunities = generate_opportunities(recurring)
+        proposals = generate_project_proposals(opportunities)
+
+        for opp in opportunities:
+            assert opp.novelty_confidence == "Requires human validation", (
+                f"Opportunity '{opp.title}' has novelty_confidence={opp.novelty_confidence!r}"
+            )
+        for prop in proposals:
+            assert prop.novelty_confidence == "Requires human validation", (
+                f"Proposal '{prop.title}' has novelty_confidence={prop.novelty_confidence!r}"
+            )
+
+    def test_pipeline_paper_ids_traceable_in_comparison(self):
+        """All input paper IDs must survive into the comparison output."""
+        papers = self._build_three_papers()
+        comparison = compare_papers(papers)
+
+        input_ids = {p.paper_id for p in papers}
+        for pid in input_ids:
+            assert pid in comparison.paper_ids, (
+                f"paper_id '{pid}' lost during compare_papers()"
+            )
+
+    def test_pipeline_paper_ids_traceable_in_recurring_limitations(self):
+        """paper_ids in recurring limitations must be a subset of input paper IDs."""
+        papers = self._build_three_papers()
+        input_ids = {p.paper_id for p in papers}
+        recurring = find_recurring_limitations(papers)
+
+        for r in recurring:
+            for pid in r.paper_ids:
+                assert pid in input_ids, (
+                    f"Spurious paper_id '{pid}' appeared in recurring limitation '{r.description}'"
+                )
+
+    # ------------------------------------------------------------------
+    # Compatibility: existing input types still work alongside PaperAnalysis
+    # ------------------------------------------------------------------
+
+    def test_plain_string_and_paper_analysis_mixed_not_required(self):
+        """Alias / backwards-compat: plain-string papers still accepted by both
+        comparison and limitations helpers independently."""
+        from backend.app.research_intelligence.comparison import _extract_paper_record
+        from backend.app.research_intelligence.limitations import _extract_paper_limitations
+
+        # plain string
+        pid, lims = _extract_paper_limitations("a plain string paper", 0)
+        assert pid == "a plain string paper"
+        assert lims == []
+
+        rec = _extract_paper_record("another string", 1)
+        assert rec["paper_id"] == "another string"
+
+    def test_generic_object_with_claim_attribute(self):
+        """Generic objects with a .claim attribute must be handled by _extract_claim_text."""
+        from backend.app.research_intelligence.comparison import _extract_claim_text
+
+        class FakeClaim:
+            claim = "Fake claim from generic object."
+
+        assert _extract_claim_text(FakeClaim()) == "Fake claim from generic object."
+
+    def test_grounded_claim_in_list_via_to_string_list(self):
+        """_to_string_list must unwrap a list of GroundedClaim objects correctly."""
+        from backend.app.research_intelligence.comparison import _to_string_list
+        from shared.schemas import GroundedClaim, Citation
+
+        def _cit(n):
+            return Citation(
+                chunk_id=f"c{n}", paper_id="px", paper_title="TX",
+                section="S", page=1, quote=f"quote {n}",
+            )
+
+        claims = [
+            GroundedClaim(claim="First limitation claim.", citations=[_cit(1)]),
+            GroundedClaim(claim="Second limitation claim.", citations=[_cit(2)]),
+        ]
+        result = _to_string_list(claims)
+        assert result == ["First limitation claim.", "Second limitation claim."]

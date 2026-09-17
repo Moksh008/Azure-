@@ -258,6 +258,31 @@ def _get_field(paper: Any, *keys: str, default: Any = None) -> Any:
     return default
 
 
+def _extract_claim_text(item: Any) -> str:
+    """Extract string text from a GroundedClaim, dict, string, or generic object."""
+    if item is None:
+        return ""
+    if isinstance(item, str):
+        return item.strip()
+    claim = getattr(item, "claim", None)
+    if claim is not None and not callable(claim):
+        return str(claim).strip()
+    text = getattr(item, "text", None)
+    if text is not None and not callable(text):
+        return str(text).strip()
+    if isinstance(item, dict):
+        desc = (
+            item.get("claim")
+            or item.get("text")
+            or item.get("description")
+            or item.get("name")
+            or item.get("title")
+        )
+        if desc is not None:
+            return str(desc).strip()
+    return str(item).strip()
+
+
 def _to_string_list(val: Any) -> list[str]:
     """Convert any value to a clean, non-empty list of strings."""
     if val is None:
@@ -276,21 +301,13 @@ def _to_string_list(val: Any) -> list[str]:
     if isinstance(val, (list, tuple, set)):
         result: list[str] = []
         for item in val:
-            if isinstance(item, str):
-                s = item.strip()
-                if s:
-                    result.append(s)
-            elif isinstance(item, dict):
-                desc = item.get("description") or item.get("text") or item.get("name") or str(item)
-                s = str(desc).strip()
-                if s:
-                    result.append(s)
-            elif item is not None:
-                s = str(item).strip()
-                if s:
-                    result.append(s)
+            if item is None:
+                continue
+            s = _extract_claim_text(item)
+            if s:
+                result.append(s)
         return result
-    s = str(val).strip()
+    s = _extract_claim_text(val)
     return [s] if s else []
 
 
