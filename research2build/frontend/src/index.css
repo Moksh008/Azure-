@@ -1,1 +1,55 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+
+  --color-bg: #f5f5f3;
+  --color-ink: #151b31;
+  --color-panel-dark: #151b31;
+  --color-panel-dark-2: #1f263e;
+  --color-muted: #6b6f75;
+  --color-coral: #ff5858;
+  --color-mint: #86e0c1;
+  --color-mint-deep: #3ed18b;
+  --color-yellow: #fedf89;
+  --color-yellow-deep: #ffc01e;
+  --color-peach: #ffb07b;
+  --color-periwinkle: #a1aedd;
+  --color-blue: #4a2cfe;
+  --color-card: #ffffff;
+  --color-border: #e5e5e5;
+
+  /* Semantic tokens for internal panel chrome (replace raw hex previously
+     inlined in components) — kept distinct from --color-border, which is
+     used on light card surfaces. */
+  --color-panel-line: #2a314c; /* divider on the dark showcase panel */
+  --color-pill-bg: #f2f2f2; /* metadata pill / active sidebar row fill */
+  --color-row-border: #f0f0f0; /* divider between list rows on white */
+  --color-hairline: #f3f3f3; /* subtlest divider, e.g. table rows */
+  --color-tab-inactive: #9aa0b8; /* inactive tab label on --color-panel-dark, 6.6:1 contrast */
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+}
