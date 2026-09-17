@@ -1,0 +1,215 @@
+"""M4-owned Pydantic models for Research Intelligence outputs.
+
+These models define M4's output contracts only.
+The upstream PaperAnalysis schema is owned by M2/M3 and will be
+integrated once their contract is finalised.
+"""
+
+from __future__ import annotations
+
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
+
+
+# ---------------------------------------------------------------------------
+# Paper Comparison
+# ---------------------------------------------------------------------------
+
+class PaperComparison(BaseModel):
+    """Result of comparing multiple paper analyses.
+
+    Captures shared themes, methodological overlaps, contradictions,
+    and a list of common limitations surfaced across the compared papers.
+    """
+
+    comparison_id: str = Field(default_factory=lambda: uuid4().hex)
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of the papers that were compared.",
+    )
+    shared_themes: list[str] = Field(
+        default_factory=list,
+        description="Themes or topics that appear across multiple papers.",
+    )
+    methodological_overlaps: list[str] = Field(
+        default_factory=list,
+        description="Shared methodological approaches across the papers.",
+    )
+    methodological_differences: list[str] = Field(
+        default_factory=list,
+        description="Methodological approaches unique to specific papers.",
+    )
+    shared_datasets: list[str] = Field(
+        default_factory=list,
+        description="Datasets used across multiple papers.",
+    )
+    dataset_differences: list[str] = Field(
+        default_factory=list,
+        description="Datasets unique to individual papers.",
+    )
+    key_findings: list[str] = Field(
+        default_factory=list,
+        description="Preserved key findings from the compared papers.",
+    )
+    common_limitations: list[str] = Field(
+        default_factory=list,
+        description="Limitations mentioned in more than one paper.",
+    )
+    all_limitations: list[str] = Field(
+        default_factory=list,
+        description="All limitations preserved from each paper.",
+    )
+    agreements: list[str] = Field(
+        default_factory=list,
+        description="Points of agreement or consensus across papers.",
+    )
+    differences: list[str] = Field(
+        default_factory=list,
+        description="Areas where papers differ in methodology, datasets, or focus.",
+    )
+    contradictions: list[str] = Field(
+        default_factory=list,
+        description="Contradictory findings or claims between papers.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Recurring Limitation
+# ---------------------------------------------------------------------------
+
+class RecurringLimitation(BaseModel):
+    """A limitation that appears across multiple papers.
+
+    Tracks which papers mention it and how frequently it recurs.
+    """
+
+    limitation_id: str = Field(default_factory=lambda: uuid4().hex)
+    description: str = Field(
+        ...,
+        description="Human-readable description of the recurring limitation.",
+    )
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of papers where this limitation was observed.",
+    )
+    frequency: int = Field(
+        default=0,
+        ge=0,
+        description="Number of papers in which this limitation recurs.",
+    )
+    severity: str = Field(
+        default="unknown",
+        description="Estimated severity: low | medium | high | unknown.",
+    )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Original limitation statements collected from supporting papers.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Research Opportunity
+# ---------------------------------------------------------------------------
+
+class ResearchOpportunity(BaseModel):
+    """A *potential* research opportunity derived from recurring limitations.
+
+    Important: the system does NOT claim verified novelty.
+    `novelty_confidence` defaults to a disclaimer requiring human review.
+    """
+
+    opportunity_id: str = Field(default_factory=lambda: uuid4().hex)
+    title: str = Field(
+        ...,
+        description="Short title for the potential research opportunity.",
+    )
+    description: str = Field(
+        ...,
+        description="Explanation of why this may be a worthwhile direction.",
+    )
+    source_limitation_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of RecurringLimitations that motivated this opportunity.",
+    )
+    novelty_confidence: str = Field(
+        default="Requires human validation",
+        description=(
+            "Confidence statement about novelty. "
+            "The system never claims verified novelty; human review is required."
+        ),
+    )
+    keywords: list[str] = Field(
+        default_factory=list,
+        description="Relevant keywords for discoverability.",
+    )
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of supporting papers from source limitations.",
+    )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Preserved limitation evidence excerpts from supporting papers.",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Project Proposal
+# ---------------------------------------------------------------------------
+
+class ProjectProposal(BaseModel):
+    """A buildable project proposal generated from a research opportunity."""
+
+    proposal_id: str = Field(default_factory=lambda: uuid4().hex)
+    title: str = Field(
+        ...,
+        description="Concise project title.",
+    )
+    summary: str = Field(
+        ...,
+        description="High-level summary of the proposed project.",
+    )
+    source_opportunity_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of ResearchOpportunities that inspired this proposal.",
+    )
+    objectives: list[str] = Field(
+        default_factory=list,
+        description="Key objectives the project aims to achieve.",
+    )
+    proposed_methods: list[str] = Field(
+        default_factory=list,
+        description="Suggested methods or approaches.",
+    )
+    expected_outcomes: list[str] = Field(
+        default_factory=list,
+        description="Anticipated deliverables or results.",
+    )
+    feasibility_notes: str = Field(
+        default="",
+        description="Preliminary notes on feasibility and resource requirements.",
+    )
+    problem_statement: str = Field(
+        default="",
+        description="Description of the core problem addressed by this project.",
+    )
+    technical_approach: list[str] = Field(
+        default_factory=list,
+        description="Key technical methodologies, frameworks, and tools.",
+    )
+    key_features: list[str] = Field(
+        default_factory=list,
+        description="Main buildable features and deliverables of the project.",
+    )
+    paper_ids: list[str] = Field(
+        default_factory=list,
+        description="IDs of supporting papers traced through source opportunities.",
+    )
+    evidence: list[str] = Field(
+        default_factory=list,
+        description="Preserved limitation evidence traced through source opportunities.",
+    )
+    novelty_confidence: str = Field(
+        default="Requires human validation",
+        description="Novelty validation disclaimer requiring human review.",
+    )
