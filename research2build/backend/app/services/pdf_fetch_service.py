@@ -31,7 +31,19 @@ class PdfDownloadError(Exception):
     """Raised when a remote PDF can't be downloaded within our limits."""
 
 
+class _TransientDownloadError(PdfDownloadError):
+    """A timeout / dropped connection — worth one more try, unlike a 404 or
+    an oversized file, which would fail the same way again."""
+
+
 def download_pdf(url: str) -> bytes:
+    try:
+        return _download_once(url)
+    except _TransientDownloadError:
+        return _download_once(url)
+
+
+def _download_once(url: str) -> bytes:
     limit_mb = MAX_FETCHED_PDF_BYTES // (1024 * 1024)
     too_large = PdfDownloadError(f"PDF is larger than the {limit_mb}MB limit.")
 
@@ -60,6 +72,8 @@ def download_pdf(url: str) -> bytes:
                         f"Download took longer than {TOTAL_DEADLINE_SECONDS}s."
                     )
                 parts.append(part)
+    except (requests.Timeout, requests.ConnectionError) as exc:
+        raise _TransientDownloadError(str(exc)) from exc
     except requests.RequestException as exc:
         raise PdfDownloadError(str(exc)) from exc
 
