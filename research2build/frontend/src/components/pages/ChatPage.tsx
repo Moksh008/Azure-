@@ -3,7 +3,7 @@ import { ApiError, fetchFullText, sendChatMessage, uploadPaper } from "../../lib
 import { useAppData } from "../../lib/AppDataContext";
 import type { ChatMessage as ChatMessageType, OpenAlexPaper } from "../../types";
 import AnalysisCard from "../shared/AnalysisCard";
-import { CitationList, CitationModalProvider } from "../shared/Citation";
+import { CitationList, CitationModalProvider, EvidencePanel } from "../shared/Citation";
 import ErrorState from "../shared/ErrorState";
 import LoadingState from "../shared/LoadingState";
 import PaperCard from "../shared/PaperCard";
@@ -243,6 +243,7 @@ export default function ChatPage() {
                         </p>
                       )}
                       <CitationList citations={turn.answer.citations} />
+                      <EvidencePanel citations={turn.answer.citations} />
                     </div>
                   );
                 }

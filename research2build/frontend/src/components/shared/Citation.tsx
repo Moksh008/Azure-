@@ -59,6 +59,35 @@ export function CitationList({ citations }: { citations: CitationType[] }) {
   );
 }
 
+/** Shows the exact passages returned by retrieval behind an answer. */
+export function EvidencePanel({ citations }: { citations: CitationType[] }) {
+  if (!citations.length) return null;
+
+  return (
+    <section className="mt-5 border-t border-border pt-4" aria-label="Retrieved evidence">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-3">
+        Retrieved evidence
+      </p>
+      <div className="space-y-3">
+        {citations.map((citation, index) => (
+          <article key={`${citation.chunk_id}-${index}`} className="rounded-[10px] border border-border bg-pill-bg/40 p-4">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+              <span className="font-semibold text-ink">Evidence {index + 1}</span>
+              <span>{citation.paper_title}</span>
+              {citation.section && <span>Section: {citation.section}</span>}
+              {citation.page && <span>Page: {citation.page}</span>}
+              <span>Chunk: {citation.chunk_id}</span>
+            </div>
+            <blockquote className="mt-3 border-l-2 border-mint-deep pl-3 text-sm leading-relaxed text-ink">
+              “{citation.quote}”
+            </blockquote>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function CitationModal({ citation, onClose }: { citation: CitationType; onClose: () => void }) {
   return (
     <div

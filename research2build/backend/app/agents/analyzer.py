@@ -1,4 +1,5 @@
 import json
+import logging
 
 from backend.app.services.llm_service import LLMService
 from shared.schemas import (
@@ -17,6 +18,9 @@ from shared.schemas import (
 )
 
 
+logger = logging.getLogger("research2build.analyzer")
+
+
 class PaperAnalyzer:
     """Analyze a research paper using retrieved evidence."""
 
@@ -33,6 +37,14 @@ class PaperAnalyzer:
             raise ValueError("At least one evidence chunk is required")
 
         evidence_text = self._format_evidence(evidence)
+        logger.info(
+            "Analyzer evidence: paper_id=%s chunks=%d evidence_chars=%d "
+            "approx_evidence_tokens=%d",
+            paper_id,
+            len(evidence),
+            len(evidence_text),
+            (len(evidence_text) + 3) // 4,
+        )
         prompt = f"""
 Analyze the research paper using ONLY the evidence provided below.
 
@@ -63,6 +75,12 @@ Rules:
 3. Every claim must reference at least one supplied evidence ID.
 4. Never create an evidence ID that was not supplied.
 """
+        logger.info(
+            "Analyzer prompt: paper_id=%s prompt_chars=%d approx_prompt_tokens=%d",
+            paper_id,
+            len(prompt),
+            (len(prompt) + 3) // 4,
+        )
 
         response = self.llm_service.generate(
             prompt=prompt,

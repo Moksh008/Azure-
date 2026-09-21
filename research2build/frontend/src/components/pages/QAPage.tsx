@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ApiError, askQuestionRetrieved } from "../../lib/api";
 import type { GroundedAnswer } from "../../types";
-import { CitationList, CitationModalProvider } from "../shared/Citation";
+import { CitationList, CitationModalProvider, EvidencePanel } from "../shared/Citation";
 import ErrorState from "../shared/ErrorState";
 import LoadingState from "../shared/LoadingState";
 import PageShell from "../PageShell";
@@ -69,6 +69,7 @@ export default function QAPage() {
                 </p>
               )}
               <CitationList citations={entry.answer.citations} />
+              <EvidencePanel citations={entry.answer.citations} />
             </div>
           ))}
         </div>
