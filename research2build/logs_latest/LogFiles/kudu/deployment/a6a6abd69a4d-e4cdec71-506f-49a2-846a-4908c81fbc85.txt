@@ -1,0 +1,158 @@
+2026-09-18T05:33:22  Fetching changes.
+2026-09-18T05:33:22    Starting  LocalZipHandler
+2026-09-18T05:33:22    Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/57d63e95-0a05-45dc-ad13-24a2bca54e2e.zip (0.08 MB) to /tmp/zipdeploy/extracted
+2026-09-18T05:33:25  Updating submodules.
+2026-09-18T05:33:25  Preparing deployment for commit id '7be06f5c-d'.
+2026-09-18T05:33:26  PreDeployment: context.CleanOutputPath False
+2026-09-18T05:33:26  PreDeployment: context.OutputPath /home/site/wwwroot
+2026-09-18T05:33:26  Repository path is /tmp/zipdeploy/extracted
+2026-09-18T05:33:26  Running oryx build...
+2026-09-18T05:33:26    Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform python --platform-version 3.12 -p virtualenv_name=antenv --log-file /tmp/build-debug.log  -i /tmp/8df15465cfa6559 --compress-destination-dir | tee /tmp/oryx-build.log
+2026-09-18T05:33:29    Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2026-09-18T05:33:29    You can report issues at https://github.com/Microsoft/Oryx/issues
+2026-09-18T05:33:29    
+2026-09-18T05:33:29    Oryx Version: 0.2.20260728.2+203b718c5847f8ff2fa0f9aaeb1987e6b1bd30d7, Commit: 203b718c5847f8ff2fa0f9aaeb1987e6b1bd30d7, ReleaseTagName: 20260728.2
+2026-09-18T05:33:29    
+2026-09-18T05:33:29    Build Operation ID: 55410c74a3e3c0d8
+2026-09-18T05:33:29    Repository Commit : 7be06f5c-db98-49cc-83a1-6e01af7b7a5f
+2026-09-18T05:33:29    OS Type           : bookworm
+2026-09-18T05:33:29    Image Type        : githubactions
+2026-09-18T05:33:29    
+2026-09-18T05:33:29    Primary SDK Storage URL: https://oryx-cdn.microsoft.io
+2026-09-18T05:33:29    Backup SDK Storage URL: 
+2026-09-18T05:33:29    ACR SDK Registry URL: (not set)
+2026-09-18T05:33:29    SDK provider status:
+2026-09-18T05:33:29      External ACR SDK provider: Enabled
+2026-09-18T05:33:29      External SDK provider: Enabled
+2026-09-18T05:33:29      Direct ACR SDK provider: Disabled
+2026-09-18T05:33:30      Blob SDK provider: Enabled
+2026-09-18T05:33:30    External ACR SDK provider is enabled. Only using user-specified platform: python
+2026-09-18T05:33:30    Detecting platforms...
+2026-09-18T05:33:30    External ACR provider resolved version '3.12.13' for python.
+2026-09-18T05:33:30    Version resolved using external ACR SDK provider.
+2026-09-18T05:33:30    Detected following platforms:
+2026-09-18T05:33:30      python: 3.12.13
+2026-09-18T05:33:31    Requesting SDK from ACR via external provider: python 3.12.13 (bookworm)
+2026-09-18T05:33:37    Successfully pulled SDK from ACR via external provider: python 3.12.13
+2026-09-18T05:33:37    SDK for 'python' version '3.12.13' fetched via external ACR provider.
+2026-09-18T05:33:37    Version '3.12.13' of platform 'python' is not installed. Generating script to install it...
+2026-09-18T05:33:38    
+2026-09-18T05:33:38    Using intermediate directory '/tmp/8df15465cfa6559'.
+2026-09-18T05:33:38    
+2026-09-18T05:33:38    Copying files to the intermediate directory...
+2026-09-18T05:33:38    Copying files to intermediate directory done in 0 sec(s).
+2026-09-18T05:33:38    
+2026-09-18T05:33:38    Source directory     : /tmp/8df15465cfa6559
+2026-09-18T05:33:38    Destination directory: /home/site/wwwroot
+2026-09-18T05:33:38    
+2026-09-18T05:33:38    Installing platform...
+2026-09-18T05:33:38    
+2026-09-18T05:33:38    Downloading and extracting 'python' version '3.12.13' to '/tmp/oryx/platforms/python/3.12.13'...
+2026-09-18T05:33:38    Detected image debian flavor: bookworm.
+2026-09-18T05:33:38    SDK binary download was skipped. Looking for cached tarball...
+2026-09-18T05:33:38    Found tarball at /var/OryxAcrSdks/python/python-bookworm-3.12.13.tar.gz
+2026-09-18T05:34:02    Successfully extracted python version 3.12.13 from cached tarball.
+2026-09-18T05:34:02    
+2026-09-18T05:34:02    Platform installation done in 24 sec(s).
+2026-09-18T05:34:07    Running build script snippets...
+2026-09-18T05:34:07    Python Version: /tmp/oryx/platforms/python/3.12.13/bin/python3.12
+2026-09-18T05:34:07    Creating directory for command manifest file if it does not exist
+2026-09-18T05:34:07    Removing existing manifest file
+2026-09-18T05:34:08    Python Virtual Environment: antenv
+2026-09-18T05:34:08    Creating virtual environment...
+2026-09-18T05:34:08    Executing: /tmp/oryx/platforms/python/3.12.13/bin/python3.12 -m venv antenv --copies --system-site-packages
+2026-09-18T05:34:23    Activating virtual environment...
+2026-09-18T05:34:23    Fast build is enabled
+2026-09-18T05:34:23    Installing uv...
+2026-09-18T05:34:28    Collecting uv
+2026-09-18T05:34:28      Using cached uv-0.12.16-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+2026-09-18T05:34:28    Using cached uv-0.12.16-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (20.3 MB)
+2026-09-18T05:34:29    Installing collected packages: uv
+2026-09-18T05:34:30    Successfully installed uv-0.12.16
+2026-09-18T05:34:32    
+2026-09-18T05:34:32    [notice] A new release of pip is available: 25.0.1 -> 26.2.1
+2026-09-18T05:34:32    [notice] To update, run: pip install --upgrade pip
+2026-09-18T05:34:32    Running uv pip install...
+2026-09-18T05:34:56    Using Python 3.12.13 environment at: antenv
+2026-09-18T05:34:56    Resolved 39 packages in 1.38s
+2026-09-18T05:34:56    Downloading uvloop (4.2MiB)
+2026-09-18T05:34:56    Downloading pygments (1.2MiB)
+2026-09-18T05:34:56    Downloading cryptography (4.5MiB)
+2026-09-18T05:34:56    Downloading pydantic-core (2.0MiB)
+2026-09-18T05:34:56     Downloaded pygments
+2026-09-18T05:34:56     Downloaded pydantic-core
+2026-09-18T05:34:56     Downloaded cryptography
+2026-09-18T05:34:56     Downloaded uvloop
+2026-09-18T05:34:56    Prepared 39 packages in 2.37s
+2026-09-18T05:34:56    Installed 39 packages in 212ms
+2026-09-18T05:34:56    Bytecode compiled 1364 files in 18.91s
+2026-09-18T05:34:56     + annotated-doc==0.0.5
+2026-09-18T05:34:57     + annotated-types==0.8.0
+2026-09-18T05:34:57     + anyio==4.15.1
+2026-09-18T05:34:57     + azure-core==1.41.0
+2026-09-18T05:34:57     + azure-storage-blob==12.30.2
+2026-09-18T05:34:57     + certifi==2026.7.22
+2026-09-18T05:34:57     + cffi==2.1.1
+2026-09-18T05:34:57     + charset-normalizer==3.5.1
+2026-09-18T05:34:57     + click==8.5.0
+2026-09-18T05:34:57     + cryptography==50.0.1
+2026-09-18T05:34:57     + fastapi==0.141.1
+2026-09-18T05:34:57     + h11==0.16.0
+2026-09-18T05:34:57     + httpcore==1.0.9
+2026-09-18T05:34:57     + httptools==0.8.0
+2026-09-18T05:34:57     + httpx==0.28.1
+2026-09-18T05:34:57     + idna==3.20
+2026-09-18T05:34:57     + iniconfig==2.3.0
+2026-09-18T05:34:57     + isodate==0.7.2
+2026-09-18T05:34:57     + packaging==26.3
+2026-09-18T05:34:57     + pluggy==1.6.0
+2026-09-18T05:34:58     + pycparser==3.0
+2026-09-18T05:34:58     + pydantic==2.13.5
+2026-09-18T05:34:58     + pydantic-core==2.46.5
+2026-09-18T05:34:58     + pydantic-settings==2.15.0
+2026-09-18T05:34:58     + pygments==2.21.0
+2026-09-18T05:34:58     + pypdf==6.19.0
+2026-09-18T05:34:58     + pytest==9.1.1
+2026-09-18T05:34:58     + python-dotenv==1.2.3
+2026-09-18T05:34:58     + python-multipart==0.0.32
+2026-09-18T05:34:58     + pyyaml==6.0.3
+2026-09-18T05:34:58     + requests==2.34.2
+2026-09-18T05:34:58     + starlette==1.6.0
+2026-09-18T05:34:58     + typing-extensions==4.16.0
+2026-09-18T05:34:58     + typing-inspection==0.4.4
+2026-09-18T05:34:58     + urllib3==2.8.0
+2026-09-18T05:34:58     + uvicorn==0.53.0
+2026-09-18T05:34:58     + uvloop==0.22.1
+2026-09-18T05:34:58     + watchfiles==1.2.0
+2026-09-18T05:34:59     + websockets==17.1
+2026-09-18T05:34:59    uv pip install done in 32 sec(s).
+2026-09-18T05:34:59    Not a vso image, so not writing build commands
+2026-09-18T05:34:59    
+2026-09-18T05:34:59    Copying 'requirements.txt' to destination directory...
+2026-09-18T05:34:59    Done copying requirements.txt to destination directory.
+2026-09-18T05:34:59    Build script snippets done in 50 sec(s).
+2026-09-18T05:34:59    Preparing output...
+2026-09-18T05:34:59    Compressing source directory directly to destination (optimized path)...
+2026-09-18T05:34:59    Using zstd for compression
+2026-09-18T05:35:09    Copied the compressed output to '/home/site/wwwroot'
+2026-09-18T05:35:09    Direct compression with zstd done in 12 sec(s).
+2026-09-18T05:35:09    
+2026-09-18T05:35:09    Removing existing manifest file
+2026-09-18T05:35:09    Creating a manifest file...
+2026-09-18T05:35:09    Manifest file created.
+2026-09-18T05:35:09    Generating .ostype from DEBIAN_FLAVOR environment variable.
+2026-09-18T05:35:09    
+2026-09-18T05:35:09    Total execution done in 91 sec(s).
+2026-09-18T05:35:09  Running post deployment command(s)...
+2026-09-18T05:35:10  
+2026-09-18T05:35:10  Generating summary of Oryx build
+2026-09-18T05:35:10  Parsing the build logs
+2026-09-18T05:35:10  Found 0 issue(s)
+2026-09-18T05:35:10  
+2026-09-18T05:35:10  Build Summary :
+2026-09-18T05:35:10  ===============
+2026-09-18T05:35:11  Errors (0)
+2026-09-18T05:35:11  Warnings (0)
+2026-09-18T05:35:11  
+2026-09-18T05:35:11  Triggering container recycle for OneDeploy by adding/updating restartTrigger.txt to the site root path
+2026-09-18T05:35:11  Deployment successful. deployer = OneDeploy deploymentPath = OneDeploy

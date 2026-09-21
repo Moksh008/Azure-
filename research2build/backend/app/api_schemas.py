@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from backend.app.agents.feasibility import FeasibilityAssessment, FeasibilityConstraints
 from backend.app.research_intelligence.models import ProjectProposal, ResearchOpportunity
-from shared.schemas import PaperAnalysis
+from shared.schemas import EvidenceChunk, GroundedAnswer, PaperAnalysis
 
 
 class DiscoveryRequest(BaseModel):
@@ -33,6 +33,13 @@ class DiscoveredPaper(BaseModel):
     year: int | None = None
     abstract: str | None = None
     url: str | None = None
+    pdf_url: str | None = None  # direct OA PDF link, when OpenAlex has one
+
+
+class FetchFullTextRequest(BaseModel):
+    paper_id: str
+    title: str
+    pdf_url: str
 
 
 class CompareRequest(BaseModel):
@@ -56,3 +63,37 @@ class PRDRequest(BaseModel):
     proposal: ProjectProposal
     opportunity: ResearchOpportunity | None = None
     feasibility: FeasibilityAssessment | None = None
+
+
+# -- unified chat workflow ---------------------------------------------------
+#
+# Stateless like everything else here: the frontend is the source of truth
+# for the paper library and selection, and sends the relevant slice on every
+# call. `library` is metadata-only (cheap to send/route on); `evidence` is
+# scoped to whatever the caller currently has selected.
+
+
+class ChatMessage(BaseModel):
+    role: str  # "user" | "assistant"
+    content: str
+
+
+class LibraryPaperRef(BaseModel):
+    paper_id: str
+    title: str
+    source: str  # "upload" | "discovery"
+
+
+class ChatRequest(BaseModel):
+    message: str
+    history: list[ChatMessage] = Field(default_factory=list)
+    library: list[LibraryPaperRef] = Field(default_factory=list)
+    evidence: list[EvidenceChunk] = Field(default_factory=list)
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    action: str  # "search" | "analyze" | "ask" | "chat"
+    discovered_papers: list[DiscoveredPaper] | None = None
+    analyses: list[PaperAnalysis] | None = None  # "analyze" — one or more papers
+    answer: GroundedAnswer | None = None

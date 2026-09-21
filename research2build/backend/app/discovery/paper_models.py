@@ -11,3 +11,4 @@ class Paper:
     publication_year: Optional[int] = None
     doi: Optional[str] = None
     url: Optional[str] = None
+    pdf_url: Optional[str] = None

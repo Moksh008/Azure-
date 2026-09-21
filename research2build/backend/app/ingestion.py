@@ -59,17 +59,29 @@ def extract_pages(pdf_bytes: bytes) -> list[PageText]:
     return pages
 
 
-def ingest_pdf(filename: str, content: bytes, paper_title: str | None = None) -> list[EvidenceChunk]:
+def ingest_pdf(
+    filename: str,
+    content: bytes,
+    paper_title: str | None = None,
+    paper_id_override: str | None = None,
+    max_bytes: int = storage_service.MAX_UPLOAD_BYTES,
+) -> list[EvidenceChunk]:
     """Validate, store, extract, and chunk one uploaded PDF.
 
     Returns the list of EvidenceChunk objects for this paper. The PDF is
     persisted to local storage (storage_service) before parsing so a bad
     parse doesn't lose the original upload.
-    """
-    storage_service.validate_pdf_upload(filename, content)
 
-    paper_id = storage_service.generate_paper_id()
-    storage_service.save_pdf(paper_id, content)
+    `paper_id_override` lets a caller pin the chunks' logical paper_id to
+    one it already knows (e.g. an OpenAlex work id for a discovered paper
+    whose full text is being fetched after the fact) — storage still uses
+    its own filesystem-safe id internally, since an OpenAlex id contains
+    characters ("/", ":") that aren't valid in a file path.
+    """
+    storage_service.validate_pdf_upload(filename, content, max_bytes=max_bytes)
+
+    storage_id = storage_service.generate_paper_id()
+    storage_service.save_pdf(storage_id, content)
 
     pages = extract_pages(content)
     if not pages:
@@ -79,4 +91,5 @@ def ingest_pdf(filename: str, content: bytes, paper_title: str | None = None) ->
         )
 
     title = paper_title or filename.rsplit(".", 1)[0]
+    paper_id = paper_id_override or storage_id
     return chunk_pages(pages, paper_id=paper_id, paper_title=title)

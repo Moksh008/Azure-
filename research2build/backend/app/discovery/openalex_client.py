@@ -1,9 +1,12 @@
 import requests
 
 try:
-    from app.discovery.paper_models import Paper
+    from backend.app.discovery.paper_models import Paper
 except ImportError:
-    from paper_models import Paper
+    try:
+        from app.discovery.paper_models import Paper
+    except ImportError:
+        from paper_models import Paper
 
 
 class OpenAlexClient:
@@ -44,11 +47,58 @@ class OpenAlexClient:
                 url=result.get("primary_location", {}).get("landing_page_url")
                 if result.get("primary_location")
                 else None,
+                pdf_url=self._extract_pdf_url(result),
             )
 
             papers.append(paper)
 
         return papers
+
+    def pdf_candidates(self, work_id: str, limit: int = 5) -> list[str]:
+        """Every distinct PDF link OpenAlex knows for one work (publisher
+        copy, arXiv, PMC, repositories, ...), for when the first fails.
+
+        Best-effort: any lookup failure just yields no extra candidates.
+        """
+        short_id = work_id.rstrip("/").rsplit("/", 1)[-1]
+        try:
+            response = requests.get(f"{self.BASE_URL}/{short_id}", timeout=15)
+            response.raise_for_status()
+            work = response.json()
+        except (requests.RequestException, ValueError):
+            return []
+
+        urls: list[str] = []
+        locations = [work.get("best_oa_location"), work.get("primary_location")]
+        locations += work.get("locations") or []
+        for location in locations:
+            pdf_url = (location or {}).get("pdf_url")
+            if pdf_url and pdf_url not in urls:
+                urls.append(pdf_url)
+
+        oa_url = (work.get("open_access") or {}).get("oa_url")
+        if oa_url and oa_url not in urls:
+            urls.append(oa_url)
+
+        return urls[:limit]
+
+    @staticmethod
+    def _extract_pdf_url(result: dict) -> str | None:
+        """Best available direct PDF link, when this work is open access.
+
+        Not every paper has one — paywalled works simply have no usable
+        location here, and callers must fall back to abstract-only.
+        """
+        for location_key in ("best_oa_location", "primary_location"):
+            location = result.get(location_key)
+            if location and location.get("pdf_url"):
+                return location["pdf_url"]
+
+        open_access = result.get("open_access") or {}
+        if open_access.get("is_oa") and open_access.get("oa_url"):
+            return open_access["oa_url"]
+
+        return None
 
     @staticmethod
     def _extract_authors(result: dict) -> list[str]:

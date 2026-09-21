@@ -3,7 +3,9 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 httpx
+requests
 python-dotenv
 pytest
 python-multipart
 pypdf
+azure-storage-blob

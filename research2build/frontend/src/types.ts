@@ -142,4 +142,43 @@ export interface OpenAlexPaper {
   year: number | null;
   abstract: string | null;
   url: string | null;
+  pdf_url: string | null;
+}
+
+// -- unified chat workflow --------------------------------------------------
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface LibraryPaperRef {
+  paper_id: string;
+  title: string;
+  source: "upload" | "discovery";
+}
+
+/** One paper in the shared workspace, from either upload or discovery. */
+export interface LibraryPaper {
+  paper_id: string;
+  title: string;
+  source: "upload" | "discovery";
+  abstract?: string | null;
+  /** Uploaded papers carry real chunked text; discovery papers carry one
+   * synthetic chunk built from their abstract, so ask/analyze can treat
+   * both uniformly — until fullText is fetched (see below). */
+  evidence: EvidenceChunk[];
+  /** Direct OA PDF link for a discovery paper, when OpenAlex has one. */
+  pdf_url?: string | null;
+  /** True once /papers/fetch-fulltext has replaced the abstract-only
+   * evidence with real page-by-page extracted text. */
+  fullTextFetched?: boolean;
+}
+
+export interface ChatResponse {
+  reply: string;
+  action: "search" | "analyze" | "ask" | "chat";
+  discovered_papers?: OpenAlexPaper[] | null;
+  analyses?: PaperAnalysis[] | null;
+  answer?: GroundedAnswer | null;
 }

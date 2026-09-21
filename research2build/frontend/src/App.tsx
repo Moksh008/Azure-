@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppDataProvider } from "./lib/AppDataContext";
 import LandingPage from "./components/LandingPage";
+import ChatPage from "./components/pages/ChatPage";
 import ComparisonPage from "./components/pages/ComparisonPage";
 import DeliverablesPage from "./components/pages/DeliverablesPage";
 import FeasibilityDashboardPage from "./components/pages/FeasibilityDashboardPage";
@@ -17,6 +18,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/discover" element={<TopicDiscoveryPage />} />
           <Route path="/analysis" element={<PaperAnalysisPage />} />

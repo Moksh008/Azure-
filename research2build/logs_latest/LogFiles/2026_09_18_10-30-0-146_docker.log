@@ -1,0 +1,278 @@
+2026-09-18T04:56:04.6028849Z State: Starting, Action: EstablishingSiteNetworks, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: , DetailsLevel: INFO
+2026-09-18T04:56:05.2548672Z State: Starting, Action: StartingSiteContainers, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: , DetailsLevel: INFO
+2026-09-18T04:56:05.2554254Z Container start method called.
+2026-09-18T04:56:05.2588193Z State: Starting, Action: PullingImage, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:05.2595524Z Establishing network.
+2026-09-18T04:56:05.2603430Z Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:56:05.5434533Z Container is starting.
+2026-09-18T04:56:05.5435368Z State: Starting, Action: MountingVolumes, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:05.5436009Z Establishing user namespace if not established already.
+2026-09-18T04:56:05.5436737Z Establishing network if not established already.
+2026-09-18T04:56:05.5442686Z Mounting volumes.
+2026-09-18T04:56:05.5446951Z Nested mountpoint 
+2026-09-18T04:56:05.5483106Z Nested mountpoint volatile/logs
+2026-09-18T04:56:05.5525516Z Nested mountpoint 
+2026-09-18T04:56:05.5596330Z Nested mountpoint 
+2026-09-18T04:56:05.5603517Z Nested mountpoint 
+2026-09-18T04:56:05.5616920Z Nested mountpoint 
+2026-09-18T04:56:05.6589404Z State: Starting, Action: CreatingContainer, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:56:05.6602109Z Creating container.
+2026-09-18T04:56:05.6611366Z Creating pipes for streaming container io.
+2026-09-18T04:56:05.6618926Z Creating stdout named pipe at /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6621566Z Successfully created stdout named pipe at: /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6622583Z Opening named pipe /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6 for reading in non-blocking mode.
+2026-09-18T04:56:05.6623761Z Successfully opened named pipe: /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6624992Z Successfully removed non-blocking flag from /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6652671Z Creating stderr named pipe at /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6662931Z Successfully created stderr named pipe at: /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6663730Z Opening named pipe /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2 for reading in non-blocking mode.
+2026-09-18T04:56:05.6672945Z Successfully opened named pipe: /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6674201Z Successfully removed non-blocking flag from /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6707114Z Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:56:06.0530502Z Starting container: e35648039f60_api-r2b-moksh.
+2026-09-18T04:56:06.0782111Z Starting watchers and probes.
+2026-09-18T04:56:06.0790802Z Starting metrics collection.
+2026-09-18T04:56:06.0796652Z Container is running.
+2026-09-18T04:56:06.0804647Z State: Starting, Action: CreatingContainer, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:06.1281126Z Container start method finished after 872 ms.
+2026-09-18T04:56:06.1285055Z State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:06.1359901Z State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:56:16.1589452Z Container has finished running with exit code: 1.
+2026-09-18T04:56:16.1633249Z Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:56:16.1911001Z Stop and delete container. Retry count = 0
+2026-09-18T04:56:16.1924751Z Stopping container: e35648039f60_api-r2b-moksh.
+2026-09-18T04:56:16.2315623Z Deleting container: e35648039f60_api-r2b-moksh. Retry count = 0
+2026-09-18T04:56:17.7230055Z Container spec TerminationMessagePolicy  path 
+2026-09-18T04:56:17.7251710Z Container is terminated. Total time elapsed: 1558 ms.
+2026-09-18T04:56:17.7252854Z Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:56:17.7263777Z State: Stopping, Action: CancellingStartup, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:17.9598766Z Site startup probe failed after 11.8080784 seconds.
+2026-09-18T04:56:18.2301290Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2372494Z Failed to start site. Revert by stopping site.
+2026-09-18T04:56:18.2461144Z State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2528210Z State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2539951Z Site: api-r2b-moksh stopped.
+2026-09-18T04:56:18.2721630Z State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.4080370Z State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.4709375Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:18.7988447Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.0547756Z State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.2910639Z State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.2911587Z Container start method called.
+2026-09-18T04:56:25.2912091Z State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:25.2912689Z Establishing network.
+2026-09-18T04:56:25.2913295Z Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:56:25.4787158Z Container is starting.
+2026-09-18T04:56:25.4788014Z State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:25.4788817Z Establishing user namespace if not established already.
+2026-09-18T04:56:25.4789538Z Establishing network if not established already.
+2026-09-18T04:56:25.4790486Z Mounting volumes.
+2026-09-18T04:56:25.4791972Z Nested mountpoint 
+2026-09-18T04:56:25.4873903Z Nested mountpoint volatile/logs
+2026-09-18T04:56:25.4955076Z Nested mountpoint 
+2026-09-18T04:56:25.4964567Z Nested mountpoint 
+2026-09-18T04:56:25.4975110Z Nested mountpoint 
+2026-09-18T04:56:25.5046337Z Nested mountpoint 
+2026-09-18T04:56:25.6452245Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:56:25.6455546Z Creating container.
+2026-09-18T04:56:25.6459622Z Creating pipes for streaming container io.
+2026-09-18T04:56:25.6464005Z Creating stdout named pipe at /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6475279Z Successfully created stdout named pipe at: /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6480127Z Opening named pipe /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1 for reading in non-blocking mode.
+2026-09-18T04:56:25.6485191Z Successfully opened named pipe: /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6487642Z Successfully removed non-blocking flag from /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6503845Z Creating stderr named pipe at /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6514814Z Successfully created stderr named pipe at: /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6521164Z Opening named pipe /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1 for reading in non-blocking mode.
+2026-09-18T04:56:25.6525577Z Successfully opened named pipe: /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6529708Z Successfully removed non-blocking flag from /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6535759Z Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:56:25.8682047Z Starting container: 292db315a029_api-r2b-moksh.
+2026-09-18T04:56:25.8904709Z Starting watchers and probes.
+2026-09-18T04:56:25.8906761Z Starting metrics collection.
+2026-09-18T04:56:25.8907868Z Container is running.
+2026-09-18T04:56:25.8908749Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:25.9210383Z Container start method finished after 629 ms.
+2026-09-18T04:56:25.9211672Z State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:25.9211942Z State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:56:34.7763607Z Container has finished running with exit code: 1.
+2026-09-18T04:56:34.7764624Z Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:56:34.7768032Z Stop and delete container. Retry count = 0
+2026-09-18T04:56:34.7768654Z Stopping container: 292db315a029_api-r2b-moksh.
+2026-09-18T04:56:34.8207755Z Deleting container: 292db315a029_api-r2b-moksh. Retry count = 0
+2026-09-18T04:56:35.6955734Z Container spec TerminationMessagePolicy  path 
+2026-09-18T04:56:35.6956986Z Container is terminated. Total time elapsed: 919 ms.
+2026-09-18T04:56:35.6958595Z Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:56:35.6959466Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7006637Z Site startup probe failed after 9.7789462 seconds.
+2026-09-18T04:56:35.7891645Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7902205Z Failed to start site. Revert by stopping site.
+2026-09-18T04:56:35.7903952Z State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7905620Z State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7905803Z Site: api-r2b-moksh stopped.
+2026-09-18T04:56:35.8089008Z State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.9400684Z State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:36.0008468Z Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:57:36
+2026-09-18T04:56:36.0013340Z State: Blocked, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:36.0105200Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:36 (UTC), DetailsLevel: WARN
+2026-09-18T04:56:36.3861083Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:36 (UTC), DetailsLevel: WARN
+2026-09-18T04:56:41.4392048Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:41.4392452Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:46.5020074Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:46.5020371Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:51.5851646Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:51.5851938Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:56.6377544Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:56.6377788Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:01.7484297Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:01.7484537Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:06.9010078Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:06.9010338Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:12.0045531Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:12.0122645Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:17.4825332Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:17.4825576Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:22.6705377Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:22.6707283Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:27.7323681Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:27.7323945Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:32.7687683Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:32.7687976Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:36.0025682Z Site: api-r2b-moksh is unblocked.
+2026-09-18T04:57:37.8343024Z State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:38.3062096Z State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:38.3062929Z Container start method called.
+2026-09-18T04:57:38.3063395Z State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:57:38.3064145Z Establishing network.
+2026-09-18T04:57:38.3064950Z Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:57:38.5570550Z Container is starting.
+2026-09-18T04:57:38.5571475Z State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:57:38.5572079Z Establishing user namespace if not established already.
+2026-09-18T04:57:38.5572840Z Establishing network if not established already.
+2026-09-18T04:57:38.5573730Z Mounting volumes.
+2026-09-18T04:57:38.5576765Z Nested mountpoint 
+2026-09-18T04:57:38.5610227Z Nested mountpoint volatile/logs
+2026-09-18T04:57:38.5644856Z Nested mountpoint 
+2026-09-18T04:57:38.5676194Z Nested mountpoint 
+2026-09-18T04:57:38.5698179Z Nested mountpoint 
+2026-09-18T04:57:38.5793557Z Nested mountpoint 
+2026-09-18T04:57:38.6972571Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:57:38.6973461Z Creating container.
+2026-09-18T04:57:38.6974964Z Creating pipes for streaming container io.
+2026-09-18T04:57:38.6976696Z Creating stdout named pipe at /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6978435Z Successfully created stdout named pipe at: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6979085Z Opening named pipe /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239 for reading in non-blocking mode.
+2026-09-18T04:57:38.6979838Z Successfully opened named pipe: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6980368Z Successfully removed non-blocking flag from /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6990253Z Creating stderr named pipe at /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7001487Z Successfully created stderr named pipe at: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7002329Z Opening named pipe /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1 for reading in non-blocking mode.
+2026-09-18T04:57:38.7027073Z Successfully opened named pipe: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7028481Z Successfully removed non-blocking flag from /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7031087Z Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:57:38.8780707Z Starting container: 1a75de6a4d03_api-r2b-moksh.
+2026-09-18T04:57:38.9026092Z Starting watchers and probes.
+2026-09-18T04:57:38.9054473Z Starting metrics collection.
+2026-09-18T04:57:38.9055779Z Container is running.
+2026-09-18T04:57:38.9056645Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:57:38.9458450Z Container start method finished after 639 ms.
+2026-09-18T04:57:38.9460078Z State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:57:38.9460344Z State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:57:50.1827359Z Container has finished running with exit code: 1.
+2026-09-18T04:57:50.1828245Z Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:57:50.1832131Z Stop and delete container. Retry count = 0
+2026-09-18T04:57:50.1832579Z Stopping container: 1a75de6a4d03_api-r2b-moksh.
+2026-09-18T04:57:50.2014727Z Deleting container: 1a75de6a4d03_api-r2b-moksh. Retry count = 0
+2026-09-18T04:57:50.5809757Z Container spec TerminationMessagePolicy  path 
+2026-09-18T04:57:50.5810926Z Container is terminated. Total time elapsed: 398 ms.
+2026-09-18T04:57:50.5811742Z Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:57:50.5812778Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.5869738Z Site startup probe failed after 11.6405549 seconds.
+2026-09-18T04:57:50.6487040Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6498581Z Failed to start site. Revert by stopping site.
+2026-09-18T04:57:50.6501041Z State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6503079Z State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6503285Z Site: api-r2b-moksh stopped.
+2026-09-18T04:57:50.6564180Z State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.7751088Z State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.8192062Z Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:58:50
+2026-09-18T04:57:50.8192796Z State: Blocked, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:57:50.8195686Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:57:50 (UTC), DetailsLevel: WARN
+2026-09-18T04:57:51.0800121Z State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:57:50 (UTC), DetailsLevel: WARN
+2026-09-18T04:57:56.1254567Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:57:56.1255147Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:01.1923285Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:01.1923573Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:06.3329525Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:06.3329979Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:11.3767504Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:11.3767805Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:16.4243790Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:16.4244046Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:21.4782609Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:21.4782978Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:26.6010471Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:26.6010769Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:31.6756512Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:31.6756794Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:36.7151585Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:36.7151813Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:41.7636894Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:41.7637147Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:46.8135426Z State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:46.8135608Z Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:50.8177929Z Site: api-r2b-moksh is unblocked.
+2026-09-18T04:58:51.8736105Z State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:52.2026051Z State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:52.2026739Z Container start method called.
+2026-09-18T04:58:52.2027124Z State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:58:52.2029363Z Establishing network.
+2026-09-18T04:58:52.2030076Z Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:58:52.7144299Z Container is starting.
+2026-09-18T04:58:52.7147009Z State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:58:52.7149502Z Establishing user namespace if not established already.
+2026-09-18T04:58:52.7150987Z Establishing network if not established already.
+2026-09-18T04:58:52.7151808Z Mounting volumes.
+2026-09-18T04:58:52.8601086Z Nested mountpoint 
+2026-09-18T04:58:52.8638666Z Nested mountpoint volatile/logs
+2026-09-18T04:58:52.8684376Z Nested mountpoint 
+2026-09-18T04:58:52.8690299Z Nested mountpoint 
+2026-09-18T04:58:52.8740767Z Nested mountpoint 
+2026-09-18T04:58:52.8755078Z Nested mountpoint 
+2026-09-18T04:58:53.2814952Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:58:53.2815750Z Creating container.
+2026-09-18T04:58:53.2816383Z Creating pipes for streaming container io.
+2026-09-18T04:58:53.2817003Z Creating stdout named pipe at /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2818527Z Successfully created stdout named pipe at: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2819264Z Opening named pipe /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8 for reading in non-blocking mode.
+2026-09-18T04:58:53.2819950Z Successfully opened named pipe: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2820852Z Successfully removed non-blocking flag from /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2822137Z Creating stderr named pipe at /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2823305Z Successfully created stderr named pipe at: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2823980Z Opening named pipe /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118 for reading in non-blocking mode.
+2026-09-18T04:58:53.2824725Z Successfully opened named pipe: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2825564Z Successfully removed non-blocking flag from /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2826936Z Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:58:53.6667866Z Starting container: d233b7a97e70_api-r2b-moksh.
+2026-09-18T04:58:53.6978914Z Starting watchers and probes.
+2026-09-18T04:58:53.6981383Z Starting metrics collection.
+2026-09-18T04:58:53.6982643Z Container is running.
+2026-09-18T04:58:53.6983615Z State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:58:53.7330843Z Container start method finished after 1529 ms.
+2026-09-18T04:58:53.7332372Z State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:58:53.7332610Z State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:59:02.7153032Z Container has finished running with exit code: 1.
+2026-09-18T04:59:02.7154093Z Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:59:02.8001022Z Stop and delete container. Retry count = 0
+2026-09-18T04:59:02.8002097Z Stopping container: d233b7a97e70_api-r2b-moksh.
+2026-09-18T04:59:03.0055041Z Deleting container: d233b7a97e70_api-r2b-moksh. Retry count = 0
+2026-09-18T04:59:04.2825461Z Container spec TerminationMessagePolicy  path 
+2026-09-18T04:59:04.2827385Z Container is terminated. Total time elapsed: 1567 ms.
+2026-09-18T04:59:04.2828446Z Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:59:04.2829358Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4221487Z Site startup probe failed after 10.6882522 seconds.
+2026-09-18T04:59:04.4771460Z State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4797204Z Failed to start site. Revert by stopping site.
+2026-09-18T04:59:04.4798676Z State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4800181Z State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4800856Z Site: api-r2b-moksh stopped.

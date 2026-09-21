@@ -1,0 +1,654 @@
+========== New Cold Start Attempt (2026-09-18T04:56:04.6028849+00:00) ==========
+2026-09-18T04:56:04.6028849+00:00 ContainerStatus: State: Starting, Action: EstablishingSiteNetworks, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: , DetailsLevel: INFO
+2026-09-18T04:56:05.2548672+00:00 ContainerStatus: State: Starting, Action: StartingSiteContainers, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: , DetailsLevel: INFO
+2026-09-18T04:56:05.2554254+00:00 ContainerStatus: Container start method called.
+2026-09-18T04:56:05.2588193+00:00 ContainerStatus: State: Starting, Action: PullingImage, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:05.2595524+00:00 ContainerStatus: Establishing network.
+2026-09-18T04:56:05.2603430+00:00 ContainerStatus: Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:56:05.5434533+00:00 ContainerStatus: Container is starting.
+2026-09-18T04:56:05.5435368+00:00 ContainerStatus: State: Starting, Action: MountingVolumes, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:05.5436009+00:00 ContainerStatus: Establishing user namespace if not established already.
+2026-09-18T04:56:05.5436737+00:00 ContainerStatus: Establishing network if not established already.
+2026-09-18T04:56:05.5442686+00:00 ContainerStatus: Mounting volumes.
+2026-09-18T04:56:05.5446951+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:05.5483106+00:00 ContainerStatus: Nested mountpoint volatile/logs
+2026-09-18T04:56:05.5525516+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:05.5596330+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:05.5603517+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:05.5616920+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:05.6589404+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:56:05.6602109+00:00 ContainerStatus: Creating container.
+2026-09-18T04:56:05.6611366+00:00 ContainerStatus: Creating pipes for streaming container io.
+2026-09-18T04:56:05.6618926+00:00 ContainerStatus: Creating stdout named pipe at /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6621566+00:00 ContainerStatus: Successfully created stdout named pipe at: /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6622583+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6 for reading in non-blocking mode.
+2026-09-18T04:56:05.6623761+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6624992+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/e35648039f60_api-r2b-moksh/stdout_d8347661295c4542aa403c3bf1cf5be6.
+2026-09-18T04:56:05.6652671+00:00 ContainerStatus: Creating stderr named pipe at /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6662931+00:00 ContainerStatus: Successfully created stderr named pipe at: /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6663730+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2 for reading in non-blocking mode.
+2026-09-18T04:56:05.6672945+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6674201+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/e35648039f60_api-r2b-moksh/stderr_e744d5e946e4446aaaee7fa9a09dfcb2.
+2026-09-18T04:56:05.6707114+00:00 ContainerStatus: Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:56:06.0530502+00:00 ContainerStatus: Starting container: e35648039f60_api-r2b-moksh.
+2026-09-18T04:56:06.0782111+00:00 ContainerStatus: Starting watchers and probes.
+2026-09-18T04:56:06.0790802+00:00 ContainerStatus: Starting metrics collection.
+2026-09-18T04:56:06.0796652+00:00 ContainerStatus: Container is running.
+2026-09-18T04:56:06.0804647+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:06.1281126+00:00 ContainerStatus: Container start method finished after 872 ms.
+2026-09-18T04:56:06.1285055+00:00 ContainerStatus: State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:06.1359901+00:00 ContainerStatus: State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:56:06.2173396+00:00 ContainerStream:    _____                               
+2026-09-18T04:56:06.2178597+00:00 ContainerStream:   /  _  \ __________ _________   ____  
+2026-09-18T04:56:06.2178692+00:00 ContainerStream:  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2026-09-18T04:56:06.2178727+00:00 ContainerStream: /    |    \/    /|  |  /|  | \/\  ___/ 
+2026-09-18T04:56:06.2178762+00:00 ContainerStream: \____|__  /_____ \____/ |__|    \___  >
+2026-09-18T04:56:06.2178824+00:00 ContainerStream:         \/      \/                  \/ 
+2026-09-18T04:56:06.2178859+00:00 ContainerStream: A P P   S E R V I C E   O N   L I N U X
+2026-09-18T04:56:06.2178920+00:00 ContainerStream: 
+2026-09-18T04:56:06.2178960+00:00 ContainerStream: Documentation     : https://aka.ms/webapp-linux
+2026-09-18T04:56:06.2179000+00:00 ContainerStream: Python quickstart : https://aka.ms/python-qs
+2026-09-18T04:56:06.2179033+00:00 ContainerStream: Python version    : 3.12.13
+2026-09-18T04:56:06.2179064+00:00 ContainerStream: Instance name     : 10-30-0-146
+2026-09-18T04:56:06.2179107+00:00 ContainerStream: Instance id       : 852031a12e914fdae2e8d2c29c2c87244949e182080eff6b24e6b2582e3e9b5b
+2026-09-18T04:56:06.2179138+00:00 ContainerStream: 
+2026-09-18T04:56:06.2179243+00:00 ContainerStream: App port          : 8000
+2026-09-18T04:56:06.2179285+00:00 ContainerStream: Port selected by  : Default for this image
+2026-09-18T04:56:06.2179325+00:00 ContainerStream: (Learn more about the PORT appsetting https://aka.ms/webapp-python-settings)
+2026-09-18T04:56:06.2179369+00:00 ContainerStream: 
+2026-09-18T04:56:06.2179405+00:00 ContainerStream: Note: Any data outside '/home' is not persisted
+2026-09-18T04:56:06.2179437+00:00 ContainerStream: 
+2026-09-18T04:56:06.2179493+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:56:06.2179545+00:00 ContainerStream:  Run 'apphelp' for available commands and aliases.
+2026-09-18T04:56:06.2179579+00:00 ContainerStream:  Run 'install-nettools' to install networking utilities.
+2026-09-18T04:56:06.2179622+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:56:07.0692539+00:00 ContainerStream: Starting OpenBSD Secure Shell server: sshd.
+2026-09-18T04:56:07.0857701+00:00 ContainerStream: WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-09-18T04:56:07.1174068+00:00 ContainerStream: Updating certificates in /etc/ssl/certs...
+2026-09-18T04:56:11.9760051+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-09-18T04:56:11.9770381+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-09-18T04:56:12.0562359+00:00 ContainerStream: rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2026-09-18T04:56:12.0779636+00:00 ContainerStream: 4 added, 0 removed; done.
+2026-09-18T04:56:12.0780787+00:00 ContainerStream: Running hooks in /etc/ca-certificates/update.d...
+2026-09-18T04:56:12.0838543+00:00 ContainerStream: done.
+2026-09-18T04:56:12.0900685+00:00 ContainerStream: CA certificates copied and updated successfully.
+2026-09-18T04:56:12.1463769+00:00 ContainerStream: Site's appCommandLine: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+2026-09-18T04:56:12.3263036+00:00 ContainerStream: Starting periodic command scheduler: cron.
+2026-09-18T04:56:12.3266723+00:00 ContainerStream: Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000'
+2026-09-18T04:56:12.3918894+00:00 ContainerStream: Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-09-18T04:56:12.3932636+00:00 ContainerStream: Build Operation ID: 9d20ff2e608aac0d
+2026-09-18T04:56:12.3941264+00:00 ContainerStream: Oryx Version: 0.2.20260710.1, Commit: 079b5b6294eb97d462d8f96bfa3243e9b85251da, ReleaseTagName: 20260710.1
+2026-09-18T04:56:12.3943811+00:00 ContainerStream: Output is compressed. Extracting it...
+2026-09-18T04:56:12.4000985+00:00 ContainerStream: Found zstd-compressed tarball.
+2026-09-18T04:56:12.4007743+00:00 ContainerStream: Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8df15410b23d177'...
+2026-09-18T04:56:12.4007901+00:00 ContainerStream: Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-09-18T04:56:14.6800380+00:00 ContainerStream: zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8df15410b23d177'
+2026-09-18T04:56:14.6815133+00:00 ContainerStream: App path is set to '/tmp/8df15410b23d177'
+2026-09-18T04:56:15.1953512+00:00 ContainerStream: Writing output script to '/opt/startup/startup.sh'
+2026-09-18T04:56:15.4697694+00:00 ContainerStream: Using packages from virtual environment antenv located at /tmp/8df15410b23d177/antenv.
+2026-09-18T04:56:15.4698303+00:00 ContainerStream: Updated PYTHONPATH to '/home/site/wwwroot:/home/site/wwwroot/backend:/opt/startup/app_logs:/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages'
+2026-09-18T04:56:16.0570982+00:00 ContainerStream: Traceback (most recent call last):
+2026-09-18T04:56:16.0573155+00:00 ContainerStream:   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-09-18T04:56:16.0573255+00:00 ContainerStream:   File "<frozen runpy>", line 88, in _run_code
+2026-09-18T04:56:16.0573316+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/__main__.py", line 4, in <module>
+2026-09-18T04:56:16.0573539+00:00 ContainerStream:     uvicorn.main()
+2026-09-18T04:56:16.0573751+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+2026-09-18T04:56:16.0578320+00:00 ContainerStream:     return self.main(*args, **kwargs)
+2026-09-18T04:56:16.0578673+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0578720+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+2026-09-18T04:56:16.0601533+00:00 ContainerStream:     rv = self.invoke(ctx)
+2026-09-18T04:56:16.0602835+00:00 ContainerStream:          ^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0602878+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+2026-09-18T04:56:16.0602921+00:00 ContainerStream:     return ctx.invoke(self.callback, **ctx.params)
+2026-09-18T04:56:16.0602958+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0602998+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+2026-09-18T04:56:16.0603964+00:00 ContainerStream:     return callback(*args, **kwargs)
+2026-09-18T04:56:16.0604033+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0604071+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 448, in main
+2026-09-18T04:56:16.0611567+00:00 ContainerStream:     run(
+2026-09-18T04:56:16.0611672+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 620, in run
+2026-09-18T04:56:16.0611817+00:00 ContainerStream:     config.load_app()
+2026-09-18T04:56:16.0611861+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/config.py", line 434, in load_app
+2026-09-18T04:56:16.0611899+00:00 ContainerStream:     return import_from_string(self.app)
+2026-09-18T04:56:16.0611960+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0612000+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 22, in import_from_string
+2026-09-18T04:56:16.0612035+00:00 ContainerStream:     raise exc from None
+2026-09-18T04:56:16.0612975+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+2026-09-18T04:56:16.0613110+00:00 ContainerStream:     module = importlib.import_module(module_str)
+2026-09-18T04:56:16.0613150+00:00 ContainerStream:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0613206+00:00 ContainerStream:   File "/opt/python/3.12.13/lib/python3.12/importlib/__init__.py", line 90, in import_module
+2026-09-18T04:56:16.0631724+00:00 ContainerStream:     return _bootstrap._gcd_import(name[level:], package, level)
+2026-09-18T04:56:16.0631835+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:16.0631871+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:16.0631901+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:16.0631969+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:56:16.0632004+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:56:16.0632055+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:16.0632084+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:16.0632114+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:56:16.0632146+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:56:16.0632174+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:16.0632203+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:16.0632245+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+2026-09-18T04:56:16.0632274+00:00 ContainerStream: ModuleNotFoundError: No module named 'backend'
+2026-09-18T04:56:16.1589452+00:00 ContainerStatus: Container has finished running with exit code: 1.
+2026-09-18T04:56:16.1633249+00:00 ContainerStatus: Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:56:16.1911001+00:00 ContainerStatus: Stop and delete container. Retry count = 0
+2026-09-18T04:56:16.1924751+00:00 ContainerStatus: Stopping container: e35648039f60_api-r2b-moksh.
+2026-09-18T04:56:16.2315623+00:00 ContainerStatus: Deleting container: e35648039f60_api-r2b-moksh. Retry count = 0
+2026-09-18T04:56:17.7230055+00:00 ContainerStatus: Container spec TerminationMessagePolicy  path 
+2026-09-18T04:56:17.7251710+00:00 ContainerStatus: Container is terminated. Total time elapsed: 1558 ms.
+2026-09-18T04:56:17.7252854+00:00 ContainerStatus: Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:56:17.7263777+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: , LastErrorTimestamp: 01/01/0001 00:00:00, LastErrorDetails: , Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:17.9598766+00:00 ContainerStatus: Site startup probe failed after 11.8080784 seconds.
+2026-09-18T04:56:18.2301290+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2372494+00:00 ContainerStatus: Failed to start site. Revert by stopping site.
+2026-09-18T04:56:18.2461144+00:00 ContainerStatus: State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2528210+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.2539951+00:00 ContainerStatus: Site: api-r2b-moksh stopped.
+========== New Cold Start Attempt (2026-09-18T04:56:18.2721630+00:00) ==========
+2026-09-18T04:56:18.2721630+00:00 ContainerStatus: State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.4080370+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:18.4709375+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:18.7988447+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.0547756+00:00 ContainerStatus: State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.2910639+00:00 ContainerStatus: State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:18 (UTC), DetailsLevel: ERR
+2026-09-18T04:56:25.2911587+00:00 ContainerStatus: Container start method called.
+2026-09-18T04:56:25.2912091+00:00 ContainerStatus: State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:25.2912689+00:00 ContainerStatus: Establishing network.
+2026-09-18T04:56:25.2913295+00:00 ContainerStatus: Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:56:25.4787158+00:00 ContainerStatus: Container is starting.
+2026-09-18T04:56:25.4788014+00:00 ContainerStatus: State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:56:25.4788817+00:00 ContainerStatus: Establishing user namespace if not established already.
+2026-09-18T04:56:25.4789538+00:00 ContainerStatus: Establishing network if not established already.
+2026-09-18T04:56:25.4790486+00:00 ContainerStatus: Mounting volumes.
+2026-09-18T04:56:25.4791972+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:25.4873903+00:00 ContainerStatus: Nested mountpoint volatile/logs
+2026-09-18T04:56:25.4955076+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:25.4964567+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:25.4975110+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:25.5046337+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:56:25.6452245+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:56:25.6455546+00:00 ContainerStatus: Creating container.
+2026-09-18T04:56:25.6459622+00:00 ContainerStatus: Creating pipes for streaming container io.
+2026-09-18T04:56:25.6464005+00:00 ContainerStatus: Creating stdout named pipe at /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6475279+00:00 ContainerStatus: Successfully created stdout named pipe at: /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6480127+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1 for reading in non-blocking mode.
+2026-09-18T04:56:25.6485191+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6487642+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/292db315a029_api-r2b-moksh/stdout_cf9619a076704261b5f5c3a05f2569b1.
+2026-09-18T04:56:25.6503845+00:00 ContainerStatus: Creating stderr named pipe at /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6514814+00:00 ContainerStatus: Successfully created stderr named pipe at: /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6521164+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1 for reading in non-blocking mode.
+2026-09-18T04:56:25.6525577+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6529708+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/292db315a029_api-r2b-moksh/stderr_604b2e0416f943d0afe1ea7627f7cfa1.
+2026-09-18T04:56:25.6535759+00:00 ContainerStatus: Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:56:25.8682047+00:00 ContainerStatus: Starting container: 292db315a029_api-r2b-moksh.
+2026-09-18T04:56:25.8904709+00:00 ContainerStatus: Starting watchers and probes.
+2026-09-18T04:56:25.8906761+00:00 ContainerStatus: Starting metrics collection.
+2026-09-18T04:56:25.8907868+00:00 ContainerStatus: Container is running.
+2026-09-18T04:56:25.8908749+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:25.9210383+00:00 ContainerStatus: Container start method finished after 629 ms.
+2026-09-18T04:56:25.9211672+00:00 ContainerStatus: State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:56:25.9211942+00:00 ContainerStatus: State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:56:25.9455105+00:00 ContainerStream:    _____                               
+2026-09-18T04:56:25.9455276+00:00 ContainerStream:   /  _  \ __________ _________   ____  
+2026-09-18T04:56:25.9455311+00:00 ContainerStream:  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2026-09-18T04:56:25.9455338+00:00 ContainerStream: /    |    \/    /|  |  /|  | \/\  ___/ 
+2026-09-18T04:56:25.9455363+00:00 ContainerStream: \____|__  /_____ \____/ |__|    \___  >
+2026-09-18T04:56:25.9455388+00:00 ContainerStream:         \/      \/                  \/ 
+2026-09-18T04:56:25.9455414+00:00 ContainerStream: A P P   S E R V I C E   O N   L I N U X
+2026-09-18T04:56:25.9455438+00:00 ContainerStream: 
+2026-09-18T04:56:25.9455465+00:00 ContainerStream: Documentation     : https://aka.ms/webapp-linux
+2026-09-18T04:56:25.9455515+00:00 ContainerStream: Python quickstart : https://aka.ms/python-qs
+2026-09-18T04:56:25.9455543+00:00 ContainerStream: Python version    : 3.12.13
+2026-09-18T04:56:25.9455570+00:00 ContainerStream: Instance name     : 10-30-0-146
+2026-09-18T04:56:25.9455604+00:00 ContainerStream: Instance id       : 852031a12e914fdae2e8d2c29c2c87244949e182080eff6b24e6b2582e3e9b5b
+2026-09-18T04:56:25.9455630+00:00 ContainerStream: 
+2026-09-18T04:56:25.9455656+00:00 ContainerStream: App port          : 8000
+2026-09-18T04:56:25.9455683+00:00 ContainerStream: Port selected by  : Default for this image
+2026-09-18T04:56:25.9456172+00:00 ContainerStream: (Learn more about the PORT appsetting https://aka.ms/webapp-python-settings)
+2026-09-18T04:56:25.9456208+00:00 ContainerStream: 
+2026-09-18T04:56:25.9456235+00:00 ContainerStream: Note: Any data outside '/home' is not persisted
+2026-09-18T04:56:25.9456258+00:00 ContainerStream: 
+2026-09-18T04:56:25.9456305+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:56:25.9456332+00:00 ContainerStream:  Run 'apphelp' for available commands and aliases.
+2026-09-18T04:56:25.9456377+00:00 ContainerStream:  Run 'install-nettools' to install networking utilities.
+2026-09-18T04:56:25.9456413+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:56:26.3395234+00:00 ContainerStream: Starting OpenBSD Secure Shell server: sshd.
+2026-09-18T04:56:26.3448123+00:00 ContainerStream: WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-09-18T04:56:26.3691725+00:00 ContainerStream: Updating certificates in /etc/ssl/certs...
+2026-09-18T04:56:30.2976964+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-09-18T04:56:30.2998295+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-09-18T04:56:30.4538598+00:00 ContainerStream: rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2026-09-18T04:56:30.4925650+00:00 ContainerStream: 4 added, 0 removed; done.
+2026-09-18T04:56:30.4938231+00:00 ContainerStream: Running hooks in /etc/ca-certificates/update.d...
+2026-09-18T04:56:30.5014773+00:00 ContainerStream: done.
+2026-09-18T04:56:30.5107421+00:00 ContainerStream: CA certificates copied and updated successfully.
+2026-09-18T04:56:30.5847733+00:00 ContainerStream: Site's appCommandLine: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+2026-09-18T04:56:30.7833644+00:00 ContainerStream: Starting periodic command scheduler: cron.
+2026-09-18T04:56:30.7915649+00:00 ContainerStream: Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000'
+2026-09-18T04:56:30.8358422+00:00 ContainerStream: Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-09-18T04:56:30.8390840+00:00 ContainerStream: Build Operation ID: 9d20ff2e608aac0d
+2026-09-18T04:56:30.8439555+00:00 ContainerStream: Output is compressed. Extracting it...
+2026-09-18T04:56:30.8440174+00:00 ContainerStream: Oryx Version: 0.2.20260710.1, Commit: 079b5b6294eb97d462d8f96bfa3243e9b85251da, ReleaseTagName: 20260710.1
+2026-09-18T04:56:30.8440205+00:00 ContainerStream: Found zstd-compressed tarball.
+2026-09-18T04:56:30.8440237+00:00 ContainerStream: Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8df15410b23d177'...
+2026-09-18T04:56:30.8440265+00:00 ContainerStream: Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-09-18T04:56:33.4392948+00:00 ContainerStream: zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8df15410b23d177'
+2026-09-18T04:56:33.4393512+00:00 ContainerStream: App path is set to '/tmp/8df15410b23d177'
+2026-09-18T04:56:33.9282084+00:00 ContainerStream: Writing output script to '/opt/startup/startup.sh'
+2026-09-18T04:56:34.5758027+00:00 ContainerStream: Using packages from virtual environment antenv located at /tmp/8df15410b23d177/antenv.
+2026-09-18T04:56:34.5758597+00:00 ContainerStream: Updated PYTHONPATH to '/home/site/wwwroot:/home/site/wwwroot/backend:/opt/startup/app_logs:/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages'
+2026-09-18T04:56:34.7186437+00:00 ContainerStream: Traceback (most recent call last):
+2026-09-18T04:56:34.7186796+00:00 ContainerStream:   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-09-18T04:56:34.7186830+00:00 ContainerStream:   File "<frozen runpy>", line 88, in _run_code
+2026-09-18T04:56:34.7186861+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/__main__.py", line 4, in <module>
+2026-09-18T04:56:34.7187113+00:00 ContainerStream:     uvicorn.main()
+2026-09-18T04:56:34.7196090+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+2026-09-18T04:56:34.7196230+00:00 ContainerStream:     return self.main(*args, **kwargs)
+2026-09-18T04:56:34.7196260+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7196288+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+2026-09-18T04:56:34.7196312+00:00 ContainerStream:     rv = self.invoke(ctx)
+2026-09-18T04:56:34.7196336+00:00 ContainerStream:          ^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7196388+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+2026-09-18T04:56:34.7206274+00:00 ContainerStream:     return ctx.invoke(self.callback, **ctx.params)
+2026-09-18T04:56:34.7206358+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7206387+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+2026-09-18T04:56:34.7212047+00:00 ContainerStream:     return callback(*args, **kwargs)
+2026-09-18T04:56:34.7214000+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7214061+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 448, in main
+2026-09-18T04:56:34.7218601+00:00 ContainerStream:     run(
+2026-09-18T04:56:34.7221530+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 620, in run
+2026-09-18T04:56:34.7225942+00:00 ContainerStream:     config.load_app()
+2026-09-18T04:56:34.7228312+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/config.py", line 434, in load_app
+2026-09-18T04:56:34.7238954+00:00 ContainerStream:     return import_from_string(self.app)
+2026-09-18T04:56:34.7239029+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7239062+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 22, in import_from_string
+2026-09-18T04:56:34.7239088+00:00 ContainerStream:     raise exc from None
+2026-09-18T04:56:34.7239117+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+2026-09-18T04:56:34.7239144+00:00 ContainerStream:     module = importlib.import_module(module_str)
+2026-09-18T04:56:34.7239170+00:00 ContainerStream:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7239199+00:00 ContainerStream:   File "/opt/python/3.12.13/lib/python3.12/importlib/__init__.py", line 90, in import_module
+2026-09-18T04:56:34.7239223+00:00 ContainerStream:     return _bootstrap._gcd_import(name[level:], package, level)
+2026-09-18T04:56:34.7239248+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:56:34.7239299+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:34.7239325+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:34.7239350+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:56:34.7239374+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:56:34.7239395+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:34.7239798+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:34.7239830+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:56:34.7239854+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:56:34.7239879+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:56:34.7239901+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:56:34.7239925+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+2026-09-18T04:56:34.7239947+00:00 ContainerStream: ModuleNotFoundError: No module named 'backend'
+2026-09-18T04:56:34.7763607+00:00 ContainerStatus: Container has finished running with exit code: 1.
+2026-09-18T04:56:34.7764624+00:00 ContainerStatus: Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:56:34.7768032+00:00 ContainerStatus: Stop and delete container. Retry count = 0
+2026-09-18T04:56:34.7768654+00:00 ContainerStatus: Stopping container: 292db315a029_api-r2b-moksh.
+2026-09-18T04:56:34.8207755+00:00 ContainerStatus: Deleting container: 292db315a029_api-r2b-moksh. Retry count = 0
+2026-09-18T04:56:35.6955734+00:00 ContainerStatus: Container spec TerminationMessagePolicy  path 
+2026-09-18T04:56:35.6956986+00:00 ContainerStatus: Container is terminated. Total time elapsed: 919 ms.
+2026-09-18T04:56:35.6958595+00:00 ContainerStatus: Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:56:35.6959466+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:18, LastErrorDetails: Container exited with exit code 1 during startup after 11.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7006637+00:00 ContainerStatus: Site startup probe failed after 9.7789462 seconds.
+2026-09-18T04:56:35.7891645+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7902205+00:00 ContainerStatus: Failed to start site. Revert by stopping site.
+2026-09-18T04:56:35.7903952+00:00 ContainerStatus: State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7905620+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.7905803+00:00 ContainerStatus: Site: api-r2b-moksh stopped.
+========== New Cold Start Attempt (2026-09-18T04:56:35.8089008+00:00) ==========
+2026-09-18T04:56:35.8089008+00:00 ContainerStatus: State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:35.9400684+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:56:36.0008468+00:00 ContainerStatus: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:57:36
+2026-09-18T04:56:36.0013340+00:00 ContainerStatus: State: Blocked, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:36.0105200+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:36 (UTC), DetailsLevel: WARN
+2026-09-18T04:56:36.3861083+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:56:36 (UTC), DetailsLevel: WARN
+2026-09-18T04:56:41.4392048+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:41.4392452+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:46.5020074+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:46.5020371+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:51.5851646+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:51.5851938+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:56:56.6377544+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:56:56.6377788+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:01.7484297+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:01.7484537+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:06.9010078+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:06.9010338+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:12.0045531+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:12.0122645+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:17.4825332+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:17.4825576+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:22.6705377+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:22.6707283+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:27.7323681+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:27.7323945+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:32.7687683+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:32.7687976+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:57:36.0025682+00:00 ContainerStatus: Site: api-r2b-moksh is unblocked.
+2026-09-18T04:57:37.8343024+00:00 ContainerStatus: State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:38.3062096+00:00 ContainerStatus: State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:57:36, DetailsLevel: WARN
+2026-09-18T04:57:38.3062929+00:00 ContainerStatus: Container start method called.
+2026-09-18T04:57:38.3063395+00:00 ContainerStatus: State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:57:38.3064145+00:00 ContainerStatus: Establishing network.
+2026-09-18T04:57:38.3064950+00:00 ContainerStatus: Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:57:38.5570550+00:00 ContainerStatus: Container is starting.
+2026-09-18T04:57:38.5571475+00:00 ContainerStatus: State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:57:38.5572079+00:00 ContainerStatus: Establishing user namespace if not established already.
+2026-09-18T04:57:38.5572840+00:00 ContainerStatus: Establishing network if not established already.
+2026-09-18T04:57:38.5573730+00:00 ContainerStatus: Mounting volumes.
+2026-09-18T04:57:38.5576765+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:57:38.5610227+00:00 ContainerStatus: Nested mountpoint volatile/logs
+2026-09-18T04:57:38.5644856+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:57:38.5676194+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:57:38.5698179+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:57:38.5793557+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:57:38.6972571+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:57:38.6973461+00:00 ContainerStatus: Creating container.
+2026-09-18T04:57:38.6974964+00:00 ContainerStatus: Creating pipes for streaming container io.
+2026-09-18T04:57:38.6976696+00:00 ContainerStatus: Creating stdout named pipe at /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6978435+00:00 ContainerStatus: Successfully created stdout named pipe at: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6979085+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239 for reading in non-blocking mode.
+2026-09-18T04:57:38.6979838+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6980368+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stdout_2c40f72ce5054cbbba328f75c9a9b239.
+2026-09-18T04:57:38.6990253+00:00 ContainerStatus: Creating stderr named pipe at /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7001487+00:00 ContainerStatus: Successfully created stderr named pipe at: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7002329+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1 for reading in non-blocking mode.
+2026-09-18T04:57:38.7027073+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7028481+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/1a75de6a4d03_api-r2b-moksh/stderr_130c9b7ae0c440cba0c6b8985856a1f1.
+2026-09-18T04:57:38.7031087+00:00 ContainerStatus: Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:57:38.8780707+00:00 ContainerStatus: Starting container: 1a75de6a4d03_api-r2b-moksh.
+2026-09-18T04:57:38.9026092+00:00 ContainerStatus: Starting watchers and probes.
+2026-09-18T04:57:38.9054473+00:00 ContainerStatus: Starting metrics collection.
+2026-09-18T04:57:38.9055779+00:00 ContainerStatus: Container is running.
+2026-09-18T04:57:38.9056645+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:57:38.9359197+00:00 ContainerStream:    _____                               
+2026-09-18T04:57:38.9359368+00:00 ContainerStream:   /  _  \ __________ _________   ____  
+2026-09-18T04:57:38.9359402+00:00 ContainerStream:  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2026-09-18T04:57:38.9359427+00:00 ContainerStream: /    |    \/    /|  |  /|  | \/\  ___/ 
+2026-09-18T04:57:38.9359452+00:00 ContainerStream: \____|__  /_____ \____/ |__|    \___  >
+2026-09-18T04:57:38.9359476+00:00 ContainerStream:         \/      \/                  \/ 
+2026-09-18T04:57:38.9359502+00:00 ContainerStream: A P P   S E R V I C E   O N   L I N U X
+2026-09-18T04:57:38.9359527+00:00 ContainerStream: 
+2026-09-18T04:57:38.9359552+00:00 ContainerStream: Documentation     : https://aka.ms/webapp-linux
+2026-09-18T04:57:38.9359579+00:00 ContainerStream: Python quickstart : https://aka.ms/python-qs
+2026-09-18T04:57:38.9359606+00:00 ContainerStream: Python version    : 3.12.13
+2026-09-18T04:57:38.9359632+00:00 ContainerStream: Instance name     : 10-30-0-146
+2026-09-18T04:57:38.9359660+00:00 ContainerStream: Instance id       : 852031a12e914fdae2e8d2c29c2c87244949e182080eff6b24e6b2582e3e9b5b
+2026-09-18T04:57:38.9359731+00:00 ContainerStream: 
+2026-09-18T04:57:38.9359758+00:00 ContainerStream: App port          : 8000
+2026-09-18T04:57:38.9359784+00:00 ContainerStream: Port selected by  : Default for this image
+2026-09-18T04:57:38.9359811+00:00 ContainerStream: (Learn more about the PORT appsetting https://aka.ms/webapp-python-settings)
+2026-09-18T04:57:38.9359834+00:00 ContainerStream: 
+2026-09-18T04:57:38.9359860+00:00 ContainerStream: Note: Any data outside '/home' is not persisted
+2026-09-18T04:57:38.9359882+00:00 ContainerStream: 
+2026-09-18T04:57:38.9359928+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:57:38.9359956+00:00 ContainerStream:  Run 'apphelp' for available commands and aliases.
+2026-09-18T04:57:38.9359984+00:00 ContainerStream:  Run 'install-nettools' to install networking utilities.
+2026-09-18T04:57:38.9360020+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:57:38.9458450+00:00 ContainerStatus: Container start method finished after 639 ms.
+2026-09-18T04:57:38.9460078+00:00 ContainerStatus: State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:57:38.9460344+00:00 ContainerStatus: State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:57:40.9609151+00:00 ContainerStream: Starting OpenBSD Secure Shell server: sshd.
+2026-09-18T04:57:40.9690452+00:00 ContainerStream: WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-09-18T04:57:40.9818433+00:00 ContainerStream: Updating certificates in /etc/ssl/certs...
+2026-09-18T04:57:45.7040274+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-09-18T04:57:45.7040964+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-09-18T04:57:45.7282389+00:00 ContainerStream: rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2026-09-18T04:57:45.7450088+00:00 ContainerStream: 4 added, 0 removed; done.
+2026-09-18T04:57:45.7450814+00:00 ContainerStream: Running hooks in /etc/ca-certificates/update.d...
+2026-09-18T04:57:45.7603558+00:00 ContainerStream: done.
+2026-09-18T04:57:45.7689609+00:00 ContainerStream: CA certificates copied and updated successfully.
+2026-09-18T04:57:46.1309212+00:00 ContainerStream: Site's appCommandLine: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+2026-09-18T04:57:46.2447928+00:00 ContainerStream: Starting periodic command scheduler: cron.
+2026-09-18T04:57:46.2465471+00:00 ContainerStream: Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000'
+2026-09-18T04:57:46.2651927+00:00 ContainerStream: Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-09-18T04:57:46.2689085+00:00 ContainerStream: Build Operation ID: 9d20ff2e608aac0d
+2026-09-18T04:57:46.2708559+00:00 ContainerStream: Oryx Version: 0.2.20260710.1, Commit: 079b5b6294eb97d462d8f96bfa3243e9b85251da, ReleaseTagName: 20260710.1
+2026-09-18T04:57:46.2722218+00:00 ContainerStream: Output is compressed. Extracting it...
+2026-09-18T04:57:46.2758940+00:00 ContainerStream: Found zstd-compressed tarball.
+2026-09-18T04:57:46.2763551+00:00 ContainerStream: Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8df15410b23d177'...
+2026-09-18T04:57:46.2763623+00:00 ContainerStream: Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-09-18T04:57:48.5129430+00:00 ContainerStream: zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8df15410b23d177'
+2026-09-18T04:57:48.5130782+00:00 ContainerStream: App path is set to '/tmp/8df15410b23d177'
+2026-09-18T04:57:49.0580149+00:00 ContainerStream: Writing output script to '/opt/startup/startup.sh'
+2026-09-18T04:57:49.8813471+00:00 ContainerStream: Using packages from virtual environment antenv located at /tmp/8df15410b23d177/antenv.
+2026-09-18T04:57:49.8813968+00:00 ContainerStream: Updated PYTHONPATH to '/home/site/wwwroot:/home/site/wwwroot/backend:/opt/startup/app_logs:/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages'
+2026-09-18T04:57:50.1330196+00:00 ContainerStream: Traceback (most recent call last):
+2026-09-18T04:57:50.1330543+00:00 ContainerStream:   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-09-18T04:57:50.1330581+00:00 ContainerStream:   File "<frozen runpy>", line 88, in _run_code
+2026-09-18T04:57:50.1330613+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/__main__.py", line 4, in <module>
+2026-09-18T04:57:50.1359200+00:00 ContainerStream:     uvicorn.main()
+2026-09-18T04:57:50.1359295+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+2026-09-18T04:57:50.1359324+00:00 ContainerStream:     return self.main(*args, **kwargs)
+2026-09-18T04:57:50.1359347+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1359373+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+2026-09-18T04:57:50.1359396+00:00 ContainerStream:     rv = self.invoke(ctx)
+2026-09-18T04:57:50.1359420+00:00 ContainerStream:          ^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1359446+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+2026-09-18T04:57:50.1359490+00:00 ContainerStream:     return ctx.invoke(self.callback, **ctx.params)
+2026-09-18T04:57:50.1359520+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1359547+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+2026-09-18T04:57:50.1359571+00:00 ContainerStream:     return callback(*args, **kwargs)
+2026-09-18T04:57:50.1359596+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1360047+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 448, in main
+2026-09-18T04:57:50.1360074+00:00 ContainerStream:     run(
+2026-09-18T04:57:50.1360103+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 620, in run
+2026-09-18T04:57:50.1360128+00:00 ContainerStream:     config.load_app()
+2026-09-18T04:57:50.1360156+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/config.py", line 434, in load_app
+2026-09-18T04:57:50.1360182+00:00 ContainerStream:     return import_from_string(self.app)
+2026-09-18T04:57:50.1360207+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1360237+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 22, in import_from_string
+2026-09-18T04:57:50.1360273+00:00 ContainerStream:     raise exc from None
+2026-09-18T04:57:50.1360302+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+2026-09-18T04:57:50.1360326+00:00 ContainerStream:     module = importlib.import_module(module_str)
+2026-09-18T04:57:50.1360353+00:00 ContainerStream:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1360379+00:00 ContainerStream:   File "/opt/python/3.12.13/lib/python3.12/importlib/__init__.py", line 90, in import_module
+2026-09-18T04:57:50.1360406+00:00 ContainerStream:     return _bootstrap._gcd_import(name[level:], package, level)
+2026-09-18T04:57:50.1360434+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:57:50.1360461+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:57:50.1360512+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:57:50.1360540+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:57:50.1360569+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:57:50.1360606+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:57:50.1360635+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:57:50.1360663+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:57:50.1360689+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:57:50.1360715+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:57:50.1360741+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:57:50.1360769+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+2026-09-18T04:57:50.1360794+00:00 ContainerStream: ModuleNotFoundError: No module named 'backend'
+2026-09-18T04:57:50.1827359+00:00 ContainerStatus: Container has finished running with exit code: 1.
+2026-09-18T04:57:50.1828245+00:00 ContainerStatus: Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:57:50.1832131+00:00 ContainerStatus: Stop and delete container. Retry count = 0
+2026-09-18T04:57:50.1832579+00:00 ContainerStatus: Stopping container: 1a75de6a4d03_api-r2b-moksh.
+2026-09-18T04:57:50.2014727+00:00 ContainerStatus: Deleting container: 1a75de6a4d03_api-r2b-moksh. Retry count = 0
+2026-09-18T04:57:50.5809757+00:00 ContainerStatus: Container spec TerminationMessagePolicy  path 
+2026-09-18T04:57:50.5810926+00:00 ContainerStatus: Container is terminated. Total time elapsed: 398 ms.
+2026-09-18T04:57:50.5811742+00:00 ContainerStatus: Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:57:50.5812778+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:56:35, LastErrorDetails: Container exited with exit code 1 during startup after 9.8s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.5869738+00:00 ContainerStatus: Site startup probe failed after 11.6405549 seconds.
+2026-09-18T04:57:50.6487040+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6498581+00:00 ContainerStatus: Failed to start site. Revert by stopping site.
+2026-09-18T04:57:50.6501041+00:00 ContainerStatus: State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6503079+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.6503285+00:00 ContainerStatus: Site: api-r2b-moksh stopped.
+========== New Cold Start Attempt (2026-09-18T04:57:50.6564180+00:00) ==========
+2026-09-18T04:57:50.6564180+00:00 ContainerStatus: State: Stopping, Action: UnmountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.7751088+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:57:50.8192062+00:00 ContainerStatus: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:58:50
+2026-09-18T04:57:50.8192796+00:00 ContainerStatus: State: Blocked, Action: StoppingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site: api-r2b-moksh will be blocked for 1 minutes till 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:57:50.8195686+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:57:50 (UTC), DetailsLevel: WARN
+2026-09-18T04:57:51.0800121+00:00 ContainerStatus: State: Stopped, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site stopped at 09/18/2026 04:57:50 (UTC), DetailsLevel: WARN
+2026-09-18T04:57:56.1254567+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:57:56.1255147+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:01.1923285+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:01.1923573+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:06.3329525+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:06.3329979+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:11.3767504+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:11.3767805+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:16.4243790+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:16.4244046+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:21.4782609+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:21.4782978+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:26.6010471+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:26.6010769+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:31.6756512+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:31.6756794+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:36.7151585+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:36.7151813+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:41.7636894+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:41.7637147+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:46.8135426+00:00 ContainerStatus: State: Blocked, Action: None, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:46.8135608+00:00 ContainerStatus: Start site prohibitted because the site is being blocked.
+2026-09-18T04:58:50.8177929+00:00 ContainerStatus: Site: api-r2b-moksh is unblocked.
+2026-09-18T04:58:51.8736105+00:00 ContainerStatus: State: Starting, Action: EstablishingSiteNetworks, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:52.2026051+00:00 ContainerStatus: State: Starting, Action: StartingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site is blocked due to multiple, consecutive cold start failures. Site scheduled to be unblocked at 09/18/2026 04:58:50, DetailsLevel: WARN
+2026-09-18T04:58:52.2026739+00:00 ContainerStatus: Container start method called.
+2026-09-18T04:58:52.2027124+00:00 ContainerStatus: State: Starting, Action: PullingImage, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Pulling image 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:58:52.2029363+00:00 ContainerStatus: Establishing network.
+2026-09-18T04:58:52.2030076+00:00 ContainerStatus: Pulling image: appsvc/python:3.12_20260910.3.tuxprod.
+2026-09-18T04:58:52.7144299+00:00 ContainerStatus: Container is starting.
+2026-09-18T04:58:52.7147009+00:00 ContainerStatus: State: Starting, Action: MountingVolumes, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Mounting volumes for api-r2b-moksh., DetailsLevel: INFO
+2026-09-18T04:58:52.7149502+00:00 ContainerStatus: Establishing user namespace if not established already.
+2026-09-18T04:58:52.7150987+00:00 ContainerStatus: Establishing network if not established already.
+2026-09-18T04:58:52.7151808+00:00 ContainerStatus: Mounting volumes.
+2026-09-18T04:58:52.8601086+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:58:52.8638666+00:00 ContainerStatus: Nested mountpoint volatile/logs
+2026-09-18T04:58:52.8684376+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:58:52.8690299+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:58:52.8740767+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:58:52.8755078+00:00 ContainerStatus: Nested mountpoint 
+2026-09-18T04:58:53.2814952+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Finished pulling container image and mounting volumes for api-r2b-moksh. Allocatinng the rest of the container resources to finish container creation., DetailsLevel: INFO
+2026-09-18T04:58:53.2815750+00:00 ContainerStatus: Creating container.
+2026-09-18T04:58:53.2816383+00:00 ContainerStatus: Creating pipes for streaming container io.
+2026-09-18T04:58:53.2817003+00:00 ContainerStatus: Creating stdout named pipe at /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2818527+00:00 ContainerStatus: Successfully created stdout named pipe at: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2819264+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8 for reading in non-blocking mode.
+2026-09-18T04:58:53.2819950+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2820852+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stdout_a388a57d0a3f4906833f5ce0895c07e8.
+2026-09-18T04:58:53.2822137+00:00 ContainerStatus: Creating stderr named pipe at /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2823305+00:00 ContainerStatus: Successfully created stderr named pipe at: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2823980+00:00 ContainerStatus: Opening named pipe /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118 for reading in non-blocking mode.
+2026-09-18T04:58:53.2824725+00:00 ContainerStatus: Successfully opened named pipe: /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2825564+00:00 ContainerStatus: Successfully removed non-blocking flag from /podr/container/pipe/d233b7a97e70_api-r2b-moksh/stderr_f9fd92f09c6142c6b0712eab36d1d118.
+2026-09-18T04:58:53.2826936+00:00 ContainerStatus: Creating container with image: appsvc/python:3.12_20260910.3.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/python:3.12_20260910.3.tuxprod
+2026-09-18T04:58:53.6667866+00:00 ContainerStatus: Starting container: d233b7a97e70_api-r2b-moksh.
+2026-09-18T04:58:53.6978914+00:00 ContainerStatus: Starting watchers and probes.
+2026-09-18T04:58:53.6981383+00:00 ContainerStatus: Starting metrics collection.
+2026-09-18T04:58:53.6982643+00:00 ContainerStatus: Container is running.
+2026-09-18T04:58:53.6983615+00:00 ContainerStatus: State: Starting, Action: CreatingContainer, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:58:53.7330843+00:00 ContainerStatus: Container start method finished after 1529 ms.
+2026-09-18T04:58:53.7332372+00:00 ContainerStatus: State: Starting, Action: InitiatingSiteWarmUpProbe, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Container api-r2b-moksh successfully created and is running., DetailsLevel: INFO
+2026-09-18T04:58:53.7332610+00:00 ContainerStatus: State: Starting, Action: WaitingForSiteWarmUpProbeSuccess, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Pinging warmup path to ensure container is ready to receive requests., DetailsLevel: INFO
+2026-09-18T04:58:53.7534905+00:00 ContainerStream:    _____                               
+2026-09-18T04:58:53.7535152+00:00 ContainerStream:   /  _  \ __________ _________   ____  
+2026-09-18T04:58:53.7535189+00:00 ContainerStream:  /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+2026-09-18T04:58:53.7535219+00:00 ContainerStream: /    |    \/    /|  |  /|  | \/\  ___/ 
+2026-09-18T04:58:53.7535245+00:00 ContainerStream: \____|__  /_____ \____/ |__|    \___  >
+2026-09-18T04:58:53.7535272+00:00 ContainerStream:         \/      \/                  \/ 
+2026-09-18T04:58:53.7535297+00:00 ContainerStream: A P P   S E R V I C E   O N   L I N U X
+2026-09-18T04:58:53.7535321+00:00 ContainerStream: 
+2026-09-18T04:58:53.7535346+00:00 ContainerStream: Documentation     : https://aka.ms/webapp-linux
+2026-09-18T04:58:53.7535372+00:00 ContainerStream: Python quickstart : https://aka.ms/python-qs
+2026-09-18T04:58:53.7535397+00:00 ContainerStream: Python version    : 3.12.13
+2026-09-18T04:58:53.7535423+00:00 ContainerStream: Instance name     : 10-30-0-146
+2026-09-18T04:58:53.7535453+00:00 ContainerStream: Instance id       : 852031a12e914fdae2e8d2c29c2c87244949e182080eff6b24e6b2582e3e9b5b
+2026-09-18T04:58:53.7535506+00:00 ContainerStream: 
+2026-09-18T04:58:53.7535535+00:00 ContainerStream: App port          : 8000
+2026-09-18T04:58:53.7535560+00:00 ContainerStream: Port selected by  : Default for this image
+2026-09-18T04:58:53.7535587+00:00 ContainerStream: (Learn more about the PORT appsetting https://aka.ms/webapp-python-settings)
+2026-09-18T04:58:53.7535611+00:00 ContainerStream: 
+2026-09-18T04:58:53.7535638+00:00 ContainerStream: Note: Any data outside '/home' is not persisted
+2026-09-18T04:58:53.7535662+00:00 ContainerStream: 
+2026-09-18T04:58:53.7535703+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:58:53.7535729+00:00 ContainerStream:  Run 'apphelp' for available commands and aliases.
+2026-09-18T04:58:53.7535755+00:00 ContainerStream:  Run 'install-nettools' to install networking utilities.
+2026-09-18T04:58:53.7535792+00:00 ContainerStream: ────────────────────────────────────────────────────────────────
+2026-09-18T04:58:54.5174192+00:00 ContainerStream: Starting OpenBSD Secure Shell server: sshd.
+2026-09-18T04:58:54.5265502+00:00 ContainerStream: WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-09-18T04:58:54.5489755+00:00 ContainerStream: Updating certificates in /etc/ssl/certs...
+2026-09-18T04:58:59.1861708+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-09-18T04:58:59.1862361+00:00 ContainerStream: rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-09-18T04:58:59.2351979+00:00 ContainerStream: rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2026-09-18T04:58:59.2490503+00:00 ContainerStream: 4 added, 0 removed; done.
+2026-09-18T04:58:59.2490994+00:00 ContainerStream: Running hooks in /etc/ca-certificates/update.d...
+2026-09-18T04:58:59.2518161+00:00 ContainerStream: done.
+2026-09-18T04:58:59.2578447+00:00 ContainerStream: CA certificates copied and updated successfully.
+2026-09-18T04:58:59.3063410+00:00 ContainerStream: Site's appCommandLine: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+2026-09-18T04:58:59.4224426+00:00 ContainerStream: Starting periodic command scheduler: cron.
+2026-09-18T04:58:59.4234717+00:00 ContainerStream: Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000'
+2026-09-18T04:58:59.4426350+00:00 ContainerStream: Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-09-18T04:58:59.4450402+00:00 ContainerStream: Build Operation ID: 9d20ff2e608aac0d
+2026-09-18T04:58:59.4459106+00:00 ContainerStream: Oryx Version: 0.2.20260710.1, Commit: 079b5b6294eb97d462d8f96bfa3243e9b85251da, ReleaseTagName: 20260710.1
+2026-09-18T04:58:59.4460171+00:00 ContainerStream: Output is compressed. Extracting it...
+2026-09-18T04:58:59.4486163+00:00 ContainerStream: Found zstd-compressed tarball.
+2026-09-18T04:58:59.4486267+00:00 ContainerStream: Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8df15410b23d177'...
+2026-09-18T04:58:59.4486303+00:00 ContainerStream: Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-09-18T04:59:01.4286872+00:00 ContainerStream: zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8df15410b23d177'
+2026-09-18T04:59:01.4287243+00:00 ContainerStream: App path is set to '/tmp/8df15410b23d177'
+2026-09-18T04:59:02.0071677+00:00 ContainerStream: Writing output script to '/opt/startup/startup.sh'
+2026-09-18T04:59:02.2939537+00:00 ContainerStream: Using packages from virtual environment antenv located at /tmp/8df15410b23d177/antenv.
+2026-09-18T04:59:02.2939899+00:00 ContainerStream: Updated PYTHONPATH to '/home/site/wwwroot:/home/site/wwwroot/backend:/opt/startup/app_logs:/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages'
+2026-09-18T04:59:02.6542171+00:00 ContainerStream: Traceback (most recent call last):
+2026-09-18T04:59:02.6543297+00:00 ContainerStream:   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-09-18T04:59:02.6543344+00:00 ContainerStream:   File "<frozen runpy>", line 88, in _run_code
+2026-09-18T04:59:02.6543377+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/__main__.py", line 4, in <module>
+2026-09-18T04:59:02.6544338+00:00 ContainerStream:     uvicorn.main()
+2026-09-18T04:59:02.6544394+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+2026-09-18T04:59:02.6547228+00:00 ContainerStream:     return self.main(*args, **kwargs)
+2026-09-18T04:59:02.6547641+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6547685+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+2026-09-18T04:59:02.6554244+00:00 ContainerStream:     rv = self.invoke(ctx)
+2026-09-18T04:59:02.6554314+00:00 ContainerStream:          ^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6554363+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+2026-09-18T04:59:02.6556710+00:00 ContainerStream:     return ctx.invoke(self.callback, **ctx.params)
+2026-09-18T04:59:02.6556769+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6556801+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+2026-09-18T04:59:02.6560074+00:00 ContainerStream:     return callback(*args, **kwargs)
+2026-09-18T04:59:02.6560651+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6560698+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 448, in main
+2026-09-18T04:59:02.6562034+00:00 ContainerStream:     run(
+2026-09-18T04:59:02.6562092+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/main.py", line 620, in run
+2026-09-18T04:59:02.6564332+00:00 ContainerStream:     config.load_app()
+2026-09-18T04:59:02.6565625+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/config.py", line 434, in load_app
+2026-09-18T04:59:02.6572243+00:00 ContainerStream:     return import_from_string(self.app)
+2026-09-18T04:59:02.6572316+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6572353+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 22, in import_from_string
+2026-09-18T04:59:02.6572381+00:00 ContainerStream:     raise exc from None
+2026-09-18T04:59:02.6572412+00:00 ContainerStream:   File "/tmp/8df15410b23d177/antenv/lib/python3.12/site-packages/uvicorn/importer.py", line 19, in import_from_string
+2026-09-18T04:59:02.6572439+00:00 ContainerStream:     module = importlib.import_module(module_str)
+2026-09-18T04:59:02.6572464+00:00 ContainerStream:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6572491+00:00 ContainerStream:   File "/opt/python/3.12.13/lib/python3.12/importlib/__init__.py", line 90, in import_module
+2026-09-18T04:59:02.6579017+00:00 ContainerStream:     return _bootstrap._gcd_import(name[level:], package, level)
+2026-09-18T04:59:02.6581934+00:00 ContainerStream:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-09-18T04:59:02.6582032+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:59:02.6582066+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:59:02.6582094+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:59:02.6582121+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:59:02.6582152+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:59:02.6582179+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:59:02.6582207+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+2026-09-18T04:59:02.6582233+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2026-09-18T04:59:02.6582262+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2026-09-18T04:59:02.6582292+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2026-09-18T04:59:02.6582322+00:00 ContainerStream:   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+2026-09-18T04:59:02.6582347+00:00 ContainerStream: ModuleNotFoundError: No module named 'backend'
+2026-09-18T04:59:02.7153032+00:00 ContainerStatus: Container has finished running with exit code: 1.
+2026-09-18T04:59:02.7154093+00:00 ContainerStatus: Container is terminating. Grace period: 5 seconds.
+2026-09-18T04:59:02.8001022+00:00 ContainerStatus: Stop and delete container. Retry count = 0
+2026-09-18T04:59:02.8002097+00:00 ContainerStatus: Stopping container: d233b7a97e70_api-r2b-moksh.
+2026-09-18T04:59:03.0055041+00:00 ContainerStatus: Deleting container: d233b7a97e70_api-r2b-moksh. Retry count = 0
+2026-09-18T04:59:04.2825461+00:00 ContainerStatus: Container spec TerminationMessagePolicy  path 
+2026-09-18T04:59:04.2827385+00:00 ContainerStatus: Container is terminated. Total time elapsed: 1567 ms.
+2026-09-18T04:59:04.2828446+00:00 ContainerStatus: Site container: api-r2b-moksh terminated during site startup.
+2026-09-18T04:59:04.2829358+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:57:50, LastErrorDetails: Container exited with exit code 1 during startup after 11.7s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4221487+00:00 ContainerStatus: Site startup probe failed after 10.6882522 seconds.
+2026-09-18T04:59:04.4771460+00:00 ContainerStatus: State: Stopping, Action: CancellingStartup, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4797204+00:00 ContainerStatus: Failed to start site. Revert by stopping site.
+2026-09-18T04:59:04.4798676+00:00 ContainerStatus: State: Stopping, Action: StoppingSite, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4800181+00:00 ContainerStatus: State: Stopping, Action: StoppingSiteContainers, LastError: ContainerStartupFailure, LastErrorTimestamp: 09/18/2026 04:59:04, LastErrorDetails: Container exited with exit code 1 during startup after 10.6s. Please inspect your container logs for more details., Details: Site container: api-r2b-moksh terminated during site startup. Cancelling site startup., DetailsLevel: ERR
+2026-09-18T04:59:04.4800856+00:00 ContainerStatus: Site: api-r2b-moksh stopped.

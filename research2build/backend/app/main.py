@@ -6,18 +6,23 @@ from fastapi import Depends, FastAPI, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.agents.analyzer import PaperAnalyzer
+from backend.app.agents.chat_router import LibrarySummaryEntry, classify_intent
 from backend.app.agents.deliverables import PRDDocument, generate_prd
 from backend.app.agents.feasibility import FeasibilityAssessment, score_feasibility
 from backend.app.agents.qa import GroundedQA
 from backend.app.api_schemas import (
+    ChatRequest,
+    ChatResponse,
     CompareRequest,
     DiscoveredPaper,
     DiscoveryRequest,
     FeasibilityRequest,
+    FetchFullTextRequest,
     OpportunitiesRequest,
     PRDRequest,
     ProposalsRequest,
 )
+from backend.app.discovery.multi_source import search_all_sources, search_core_first
 from backend.app.discovery.openalex_client import OpenAlexClient
 from backend.app.research_intelligence.comparison import compare_papers
 from backend.app.research_intelligence.limitations import find_recurring_limitations
@@ -28,7 +33,10 @@ from backend.app.research_intelligence.models import (
 )
 from backend.app.research_intelligence.opportunities import generate_opportunities
 from backend.app.research_intelligence.project_generator import generate_project_proposals
-from backend.app.services.llm_service import LLMService
+from backend.app.services.evidence_selection import select_evidence
+from backend.app.services.llm_factory import get_llm_service
+from backend.app.services.llm_service import AzureFoundryLLMService, LLMService
+from backend.app.services.pdf_fetch_service import PdfDownloadError, download_pdf
 from shared.schemas import (
     AnalysisRequest,
     EvidenceChunk as SchemaEvidenceChunk,
@@ -43,11 +51,21 @@ from shared.schemas import (
 
 from app.retrieval.factory import get_retriever
 from .ingestion import IngestionError, ingest_pdf
-from .services.storage_service import InvalidUploadError
+from .services.storage_service import MAX_FETCHED_PDF_BYTES, InvalidUploadError
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("research2build.api")
+
+LLMServiceDep = LLMService | AzureFoundryLLMService
+
+# Whole-paper analysis has no question to rank against, so rank chunks by the
+# aspects the analysis extracts.
+ANALYSIS_QUERY = (
+    "problem objective goal motivation methodology method approach dataset "
+    "data model architecture experiments results accuracy performance "
+    "limitations future work"
+)
 
 
 app = FastAPI(
@@ -56,31 +74,15 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Phase 1: frontend and backend run as separate local dev servers on
-# different ports (Vite default 5173, this repo's frontend on 5183), so
-# the browser needs an explicit CORS allowance. FRONTEND_ORIGINS lets a
-# deployed frontend origin be added via env var in later phases without
-# code changes.
-_default_dev_origins = [
-    "http://localhost:5173",
-    "http://localhost:5183",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5183",
-]
-_extra_origins = [o for o in os.environ.get("FRONTEND_ORIGINS", "").split(",") if o]
-
+# CORS configuration: Allow all origins so frontend on Static Web Apps or local dev can connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_default_dev_origins + _extra_origins,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
-
-
-def get_llm_service() -> LLMService:
-    raise RuntimeError(
-        "LLM service is not configured for this environment"
-    )
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -188,7 +190,7 @@ async def search_evidence(
 @app.post("/analysis", response_model=PaperAnalysis)
 def analyze_paper(
     request: AnalysisRequest,
-    llm_service: LLMService = Depends(get_llm_service),
+    llm_service: LLMServiceDep = Depends(get_llm_service),
 ) -> PaperAnalysis:
     try:
         analyzer = PaperAnalyzer(llm_service)
@@ -209,7 +211,7 @@ def analyze_paper(
 @app.post("/qa", response_model=GroundedAnswer)
 def answer_question(
     request: QARequest,
-    llm_service: LLMService = Depends(get_llm_service),
+    llm_service: LLMServiceDep = Depends(get_llm_service),
 ) -> GroundedAnswer:
     try:
         qa = GroundedQA(llm_service)
@@ -232,7 +234,7 @@ def answer_question(
 )
 async def answer_question_with_retrieval(
     request: RetrievedQARequest,
-    llm_service: LLMService = Depends(get_llm_service),
+    llm_service: LLMServiceDep = Depends(get_llm_service),
 ) -> GroundedAnswer:
     try:
         from backend.app.services.research_service import ResearchService
@@ -259,7 +261,7 @@ async def answer_question_with_retrieval(
 
 @app.post("/discovery/search", response_model=list[DiscoveredPaper])
 def discover_papers(request: DiscoveryRequest) -> list[DiscoveredPaper]:
-    """Search OpenAlex for papers matching a topic query."""
+    """Search OpenAlex (and CORE, when configured) for papers on a topic."""
     if not request.query.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -267,14 +269,14 @@ def discover_papers(request: DiscoveryRequest) -> list[DiscoveredPaper]:
         )
 
     try:
-        papers = OpenAlexClient().search_papers(
+        papers = search_all_sources(
             request.query,
             max_results=request.max_results,
         )
     except requests.RequestException as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"OpenAlex request failed: {exc}",
+            detail=f"Paper search failed: {exc}",
         ) from exc
 
     return [
@@ -285,9 +287,70 @@ def discover_papers(request: DiscoveryRequest) -> list[DiscoveredPaper]:
             year=paper.publication_year,
             abstract=paper.abstract or None,
             url=paper.url,
+            pdf_url=paper.pdf_url,
         )
         for paper in papers
     ]
+
+
+@app.post("/papers/fetch-fulltext", response_model=list[SchemaEvidenceChunk])
+def fetch_fulltext(request: FetchFullTextRequest) -> list[SchemaEvidenceChunk]:
+    """Download a discovered paper's open-access PDF and run it through the
+    same extraction pipeline as a manual upload, so it gets real full-text
+    evidence (page/section-grounded) instead of just its OpenAlex abstract.
+
+    Not every discovered paper has an OA PDF — callers only send this when
+    DiscoveredPaper.pdf_url was non-null. If that link fails (publisher
+    throttling, oversized file, not actually a PDF), the paper's other
+    open-access locations known to OpenAlex are tried before giving up.
+
+    Plain `def` on purpose: downloading is blocking, so FastAPI runs this in
+    its threadpool instead of freezing the event loop for every other request.
+    """
+    failures: list[str] = []
+    tried: set[str] = set()
+
+    def attempt(url: str) -> list[SchemaEvidenceChunk] | None:
+        tried.add(url)
+        try:
+            content = download_pdf(url)
+            return ingest_pdf(
+                filename="paper.pdf",
+                content=content,
+                paper_title=request.title,
+                paper_id_override=request.paper_id,
+                max_bytes=MAX_FETCHED_PDF_BYTES,
+            )
+        except (PdfDownloadError, InvalidUploadError, IngestionError) as exc:
+            logger.warning("Full-text fetch failed for %s: %s", url, exc)
+            failures.append(f"{url}: {exc}")
+            return None
+
+    chunks = attempt(request.pdf_url)
+    if chunks is not None:
+        return chunks
+
+    # Alternate locations come from OpenAlex, so they only exist for its ids
+    # (CORE-sourced papers have "core:<id>" ids and just the one link).
+    alternates = (
+        OpenAlexClient().pdf_candidates(request.paper_id)
+        if "openalex.org" in request.paper_id
+        else []
+    )
+    for alternate in alternates:
+        if alternate in tried:
+            continue
+        chunks = attempt(alternate)
+        if chunks is not None:
+            return chunks
+
+    raise HTTPException(
+        status_code=status.HTTP_502_BAD_GATEWAY,
+        detail=(
+            f"Could not get the full text ({len(tried)} open-access "
+            f"location(s) tried). First error: {failures[0]}"
+        ),
+    )
 
 
 @app.post("/research-intelligence/compare", response_model=PaperComparison)
@@ -322,4 +385,138 @@ def deliverables_prd(request: PRDRequest) -> PRDDocument:
         request.proposal,
         opportunity=request.opportunity,
         feasibility=request.feasibility,
+    )
+
+
+@app.post("/chat", response_model=ChatResponse)
+def chat(
+    request: ChatRequest,
+    llm_service: LLMServiceDep = Depends(get_llm_service),
+) -> ChatResponse:
+    """Unified chat workflow: classify intent, then reuse the same pipeline
+    functions the dedicated /discovery, /analysis, and /qa routes call.
+
+    Stateless like the rest of the API — the caller (frontend) supplies the
+    paper library and selected evidence on every call.
+    """
+    library_summary = [
+        LibrarySummaryEntry(paper_id=p.paper_id, title=p.title, source=p.source)
+        for p in request.library
+    ]
+    history_dicts = [{"role": m.role, "content": m.content} for m in request.history]
+
+    try:
+        parsed = classify_intent(
+            llm_service,
+            message=request.message,
+            history=history_dicts,
+            library=library_summary,
+            has_selected_evidence=bool(request.evidence),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Chat routing failed: {exc}",
+        ) from exc
+
+    if parsed.intent == "search":
+        query = (parsed.query or request.message).strip()
+        if not query:
+            return ChatResponse(reply="What topic should I search for?", action="chat")
+        try:
+            papers, source = search_core_first(query, max_results=10)
+        except requests.RequestException as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Paper search failed: {exc}",
+            ) from exc
+        discovered = [
+            DiscoveredPaper(
+                paper_id=paper.paper_id,
+                title=paper.title,
+                authors=paper.authors,
+                year=paper.publication_year,
+                abstract=paper.abstract or None,
+                url=paper.url,
+                pdf_url=paper.pdf_url,
+            )
+            for paper in papers
+        ]
+        reply = (
+            f"Found {len(discovered)} paper(s) for \"{query}\" via {source}. "
+            "Tick the ones you want to work with."
+            if discovered
+            else f"No papers found for \"{query}\". Try a different phrasing."
+        )
+        return ChatResponse(reply=reply, action="search", discovered_papers=discovered)
+
+    if parsed.intent == "analyze":
+        if not request.evidence:
+            return ChatResponse(
+                reply="I don't have evidence for any paper yet — select or upload one first.",
+                action="chat",
+            )
+
+        # A resolved paper_id means "just this one"; otherwise analyze
+        # every paper currently represented in the supplied evidence (i.e.
+        # every selected paper) rather than forcing a single-paper pick.
+        evidence_by_paper: dict[str, list] = {}
+        for chunk in request.evidence:
+            evidence_by_paper.setdefault(chunk.paper_id, []).append(chunk)
+
+        if parsed.paper_id:
+            if parsed.paper_id not in evidence_by_paper:
+                return ChatResponse(
+                    reply="I don't have evidence for that paper yet — select or upload it first.",
+                    action="chat",
+                )
+            target_ids = [parsed.paper_id]
+        else:
+            target_ids = list(evidence_by_paper.keys())
+
+        analyzer = PaperAnalyzer(llm_service)
+        analyses = []
+        try:
+            for paper_id in target_ids:
+                paper_evidence = evidence_by_paper[paper_id]
+                paper_title = paper_evidence[0].paper_title
+                analyses.append(
+                    analyzer.analyze(
+                        paper_id=paper_id,
+                        paper_title=paper_title,
+                        evidence=select_evidence(
+                            paper_evidence, ANALYSIS_QUERY, lead_chunks=1
+                        ),
+                    )
+                )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+        if len(analyses) == 1:
+            reply = f"Here's the structured analysis for \"{analyses[0].paper_title}\"."
+        else:
+            titles = ", ".join(f'"{a.paper_title}"' for a in analyses)
+            reply = f"Here's the structured analysis for {len(analyses)} papers: {titles}."
+        return ChatResponse(reply=reply, action="analyze", analyses=analyses)
+
+    if parsed.intent == "ask":
+        question = (parsed.question or request.message).strip()
+        if not request.evidence:
+            return ChatResponse(
+                reply="Select or upload at least one paper first, then ask me again.",
+                action="chat",
+            )
+        try:
+            qa = GroundedQA(llm_service)
+            answer = qa.answer(
+                question=question,
+                evidence=select_evidence(request.evidence, question),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return ChatResponse(reply=answer.answer, action="ask", answer=answer)
+
+    return ChatResponse(
+        reply=parsed.reply or "Tell me what you'd like to do — search, upload, or ask a question.",
+        action="chat",
     )

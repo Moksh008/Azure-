@@ -5,10 +5,13 @@
 // IDs the server would need a database to resolve.
 
 import type {
+  ChatMessage,
+  ChatResponse,
   EvidenceChunk,
   FeasibilityAssessment,
   FeasibilityConstraints,
   GroundedAnswer,
+  LibraryPaperRef,
   OpenAlexPaper,
   PRDDocument,
   PaperAnalysis,
@@ -53,6 +56,14 @@ export async function uploadPaper(file: File): Promise<EvidenceChunk[]> {
     throw new ApiError(detail || "Upload failed", res.status);
   }
   return res.json();
+}
+
+export async function fetchFullText(
+  paperId: string,
+  title: string,
+  pdfUrl: string,
+): Promise<EvidenceChunk[]> {
+  return postJSON("/papers/fetch-fulltext", { paper_id: paperId, title, pdf_url: pdfUrl });
 }
 
 // -- retrieval + analysis + Q&A --------------------------------------------
@@ -112,6 +123,17 @@ export function generatePRD(
   feasibility?: FeasibilityAssessment,
 ): Promise<PRDDocument> {
   return postJSON("/deliverables/prd", { proposal, opportunity, feasibility });
+}
+
+// -- unified chat workflow ---------------------------------------------------
+
+export function sendChatMessage(
+  message: string,
+  history: ChatMessage[],
+  library: LibraryPaperRef[],
+  evidence: EvidenceChunk[],
+): Promise<ChatResponse> {
+  return postJSON("/chat", { message, history, library, evidence });
 }
 
 export { ApiError };

@@ -167,8 +167,8 @@ function Nav() {
         </span>
         Research2Build
       </div>
-      <Link to="/upload">
-        <Button light>Upload a paper</Button>
+      <Link to="/chat">
+        <Button light>Start chatting</Button>
       </Link>
     </header>
   );
@@ -202,8 +202,8 @@ function Hero() {
       </h1>
 
       <div className="flex items-center justify-center gap-4 mx-auto mt-8 mb-5 max-w-[560px] bg-white rounded-2xl p-2.5 shadow-[0_10px_30px_rgba(21,27,49,0.06)]">
-        <Link to="/upload" className="flex-1">
-          <Button className="w-full py-4">Upload a paper</Button>
+        <Link to="/chat" className="flex-1">
+          <Button className="w-full py-4">Start chatting</Button>
         </Link>
         <div className="flex items-center gap-2.5 px-3.5 font-semibold text-muted">
           {citations} citations

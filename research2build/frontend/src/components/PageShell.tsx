@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const NAV_LINKS: { to: string; label: string }[] = [
+  { to: "/chat", label: "Chat" },
   { to: "/upload", label: "Upload" },
   { to: "/discover", label: "Discover" },
   { to: "/analysis", label: "Analysis" },
