@@ -40,6 +40,78 @@ class _TwoCallLLM:
         )
 
 
+class _MismatchedThenFixedLLM:
+    """First synthesis attempt swaps evidence IDs between papers; retry fixes it."""
+
+    def __init__(self):
+        self.calls: list[str] = []
+
+    def generate(self, prompt, system_prompt=None, temperature=0.0):
+        self.calls.append(prompt)
+        if "router for a research-paper assistant" in prompt:
+            return json.dumps({"intent": "analyze", "paper_id": None})
+
+        evidence_ids = re.findall(r"^\[([^\]]+)\]", prompt, flags=re.MULTILINE)
+        paper_ids = re.findall(r"^Paper ID: ([^\n]+)", prompt, flags=re.MULTILINE)
+        is_retry = "IMPORTANT CORRECTION" in prompt
+        assigned_ids = (
+            evidence_ids
+            if is_retry
+            else list(reversed(evidence_ids))
+        )
+        return json.dumps(
+            {
+                "overall_summary": "The papers use different retrieval architectures.",
+                "paper_analyses": [
+                    {
+                        "paper_id": paper_id,
+                        "paper_title": f"Paper {index}",
+                        "approach_architecture": "Retrieval architecture.",
+                        "key_difference": "A paper-specific design choice.",
+                        "evidence_ids": [assigned_ids[index - 1]],
+                    }
+                    for index, paper_id in enumerate(paper_ids, start=1)
+                ],
+                "comparison": {
+                    "common_patterns": ["Retrieval is used."],
+                    "architectural_differences": ["The architectures differ."],
+                },
+            }
+        )
+
+
+def test_cross_paper_synthesis_retries_once_after_evidence_paper_mismatch():
+    llm = _MismatchedThenFixedLLM()
+    app.dependency_overrides[get_llm_service] = lambda: llm
+    try:
+        papers = [_paper_chunks(number) for number in range(1, 3)]
+        response = TestClient(app).post(
+            "/chat",
+            json={
+                "message": "Compare the architectural differences across these papers.",
+                "library": [
+                    {
+                        "paper_id": chunk.paper_id,
+                        "title": chunk.paper_title,
+                        "source": "upload",
+                    }
+                    for chunk in papers
+                ],
+                "evidence": [chunk.model_dump() for chunk in papers],
+            },
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200, response.text
+    # router call + failed synthesis attempt + corrected retry
+    assert len(llm.calls) == 3
+    assert "IMPORTANT CORRECTION" in llm.calls[2]
+
+    citations = response.json()["analyses"][0]["problem"]["citations"]
+    assert {citation["paper_id"] for citation in citations} == {"paper-1", "paper-2"}
+
+
 def _paper_chunks(paper_number: int) -> EvidenceChunk:
     return EvidenceChunk(
         chunk_id=f"paper-{paper_number}-chunk-1",

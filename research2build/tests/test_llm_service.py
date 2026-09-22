@@ -91,8 +91,8 @@ def test_azure_foundry_llm_service_generate_uses_azure_url_and_headers(monkeypat
 
     assert result == "Azure Foundry response."
     assert captured["url"] == (
-        "https://my-resource.openai.azure.com/openai/deployments/gpt-4o"
-        "/chat/completions?api-version=2024-02-15-preview"
+        "https://my-resource.openai.azure.com/models/chat/completions"
+        "?api-version=2024-02-15-preview"
     )
     assert captured["headers"]["api-key"] == "azure-test-key"
     assert "Authorization" not in captured["headers"]
@@ -100,9 +100,9 @@ def test_azure_foundry_llm_service_generate_uses_azure_url_and_headers(monkeypat
         {"role": "system", "content": "You are a helpful AI assistant."},
         {"role": "user", "content": "Explain RAG."},
     ]
-    # Azure's payload has no top-level "model" field — the deployment is
-    # already fixed by the URL.
-    assert "model" not in captured["json"]
+    # The unified Foundry model-inference API takes the deployment/model
+    # name in the payload, not the URL.
+    assert captured["json"]["model"] == "gpt-4o"
 
 
 def test_azure_foundry_llm_service_raises_on_http_error(monkeypatch):

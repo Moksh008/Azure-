@@ -6,6 +6,7 @@ with graceful fallback to local disk storage under STORAGE_ROOT.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
 import uuid
@@ -29,6 +30,18 @@ class InvalidUploadError(ValueError):
 
 def generate_paper_id() -> str:
     return uuid.uuid4().hex[:12]
+
+
+def content_hash(content: bytes) -> str:
+    """Deterministic id for a PDF's raw bytes, so re-uploading the same
+    file resolves to the same paper_id instead of a fresh random one."""
+    return hashlib.sha256(content).hexdigest()[:12]
+
+
+def paper_manifest_path(paper_id: str) -> Path:
+    """Sidecar file caching a paper's already-computed EvidenceChunks, so
+    re-uploading the same PDF can skip re-extraction and re-embedding."""
+    return STORAGE_ROOT / f"{paper_id}.chunks.json"
 
 
 def validate_pdf_upload(

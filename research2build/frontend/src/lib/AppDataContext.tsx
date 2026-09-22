@@ -1,9 +1,12 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import type {
   EvidenceChunk,
+  FeasibilityAssessment,
   LibraryPaper,
   OpenAlexPaper,
   PaperAnalysis,
+  PaperComparison,
+  PRDDocument,
   ProjectProposal,
   ResearchOpportunity,
 } from "../types";
@@ -11,10 +14,17 @@ import type {
 interface AppDataValue {
   analyses: PaperAnalysis[];
   addAnalysis: (analysis: PaperAnalysis) => void;
+  addAnalyses: (analyses: PaperAnalysis[]) => void;
+  comparison: PaperComparison | null;
+  setComparison: (comparison: PaperComparison | null) => void;
   opportunities: ResearchOpportunity[];
   setOpportunities: (opportunities: ResearchOpportunity[]) => void;
   proposals: ProjectProposal[];
   setProposals: (proposals: ProjectProposal[]) => void;
+  feasibility: FeasibilityAssessment | null;
+  setFeasibility: (feasibility: FeasibilityAssessment | null) => void;
+  prd: PRDDocument | null;
+  setPrd: (prd: PRDDocument | null) => void;
 
   library: LibraryPaper[];
   addUploadedPaper: (chunks: EvidenceChunk[]) => void;
@@ -27,22 +37,13 @@ interface AppDataValue {
 
 const AppDataContext = createContext<AppDataValue | null>(null);
 
-/**
- * Session-only (in-memory, not persisted) store so pages can chain the
- * pipeline — analysis -> comparison -> opportunities -> proposals — without
- * a backend database. Matches the stateless design of the M4 modules: the
- * server never resolves IDs, callers always pass the objects they already
- * hold, and this context is just where the frontend keeps hold of them.
- *
- * `library`/`selectedPaperIds` extend this same pattern to the chat
- * workflow: every paper the user has uploaded or discovered lives here,
- * and the chunks of whichever ones are ticked are what gets sent to
- * /chat's ask/analyze intents.
- */
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const [analysesById, setAnalysesById] = useState<Record<string, PaperAnalysis>>({});
+  const [comparison, setComparison] = useState<PaperComparison | null>(null);
   const [opportunities, setOpportunities] = useState<ResearchOpportunity[]>([]);
   const [proposals, setProposals] = useState<ProjectProposal[]>([]);
+  const [feasibility, setFeasibility] = useState<FeasibilityAssessment | null>(null);
+  const [prd, setPrd] = useState<PRDDocument | null>(null);
 
   const [libraryById, setLibraryById] = useState<Record<string, LibraryPaper>>({});
   const [selectedPaperIds, setSelectedPaperIds] = useState<Set<string>>(new Set());
@@ -57,20 +58,59 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       analyses: Object.values(analysesById),
       addAnalysis: (analysis) =>
         setAnalysesById((prev) => ({ ...prev, [analysis.paper_id]: analysis })),
+      addAnalyses: (analysesList) =>
+        setAnalysesById((prev) => {
+          const next = { ...prev };
+          for (const a of analysesList) next[a.paper_id] = a;
+          return next;
+        }),
+      comparison,
+      setComparison,
       opportunities,
       setOpportunities,
       proposals,
       setProposals,
+      feasibility,
+      setFeasibility,
+      prd,
+      setPrd,
 
       library,
       addUploadedPaper: (chunks) => {
         if (chunks.length === 0) return;
-        const { paper_id, paper_title } = chunks[0];
-        setLibraryById((prev) => ({
-          ...prev,
-          [paper_id]: { paper_id, title: paper_title, source: "upload", evidence: chunks },
-        }));
-        setSelectedPaperIds((prev) => new Set(prev).add(paper_id));
+        const chunksByPaper = new Map<string, { title: string; chunks: EvidenceChunk[] }>();
+        for (const chunk of chunks) {
+          const entry = chunksByPaper.get(chunk.paper_id);
+          if (entry) {
+            entry.chunks.push(chunk);
+          } else {
+            chunksByPaper.set(chunk.paper_id, {
+              title: chunk.paper_title,
+              chunks: [chunk],
+            });
+          }
+        }
+
+        setLibraryById((prev) => {
+          const next = { ...prev };
+          for (const [paperId, info] of chunksByPaper.entries()) {
+            next[paperId] = {
+              paper_id: paperId,
+              title: info.title,
+              source: "upload",
+              evidence: info.chunks,
+            };
+          }
+          return next;
+        });
+
+        setSelectedPaperIds((prev) => {
+          const next = new Set(prev);
+          for (const paperId of chunksByPaper.keys()) {
+            next.add(paperId);
+          }
+          return next;
+        });
       },
       addDiscoveredPapers: (papers) => {
         setLibraryById((prev) => {
@@ -119,7 +159,16 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           };
         }),
     };
-  }, [analysesById, opportunities, proposals, libraryById, selectedPaperIds]);
+  }, [
+    analysesById,
+    comparison,
+    opportunities,
+    proposals,
+    feasibility,
+    prd,
+    libraryById,
+    selectedPaperIds,
+  ]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

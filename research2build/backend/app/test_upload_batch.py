@@ -2,7 +2,9 @@
 
 import io
 import sys
+import uuid
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -63,3 +65,60 @@ def test_upload_batch_rejects_invalid_file_without_partial_ingest():
 def test_upload_batch_rejects_empty_request():
     response = _upload([])
     assert response.status_code == 422
+
+
+def _upload_single(name: str, content: bytes):
+    return client.post(
+        "/papers/upload",
+        files={"file": (name, io.BytesIO(content), "application/pdf")},
+    )
+
+
+def test_reuploading_same_pdf_skips_reextraction_and_reembedding():
+    """Same content -> same content-hash paper_id -> cached chunks returned
+    without a second extraction or vector-store write (CLAUDE.md: process
+    each paper once, never re-run extraction or embedding on every query)."""
+    content = _pdf_bytes([f"Introduction\nRepeated upload body text {uuid.uuid4().hex}."])
+
+    with patch("app.main.ingest_pdf", wraps=None) as mock_ingest:
+        from app.ingestion import ingest_pdf as real_ingest_pdf
+
+        mock_ingest.side_effect = real_ingest_pdf
+
+        first = _upload_single("dup.pdf", content)
+        assert first.status_code == 200
+        assert mock_ingest.call_count == 1
+
+        second = _upload_single("dup.pdf", content)
+        assert second.status_code == 200
+        assert mock_ingest.call_count == 1  # not called again — cache hit
+
+    first_chunks = first.json()
+    second_chunks = second.json()
+    assert {c["paper_id"] for c in first_chunks} == {c["paper_id"] for c in second_chunks}
+    assert first_chunks == second_chunks
+
+
+def test_batch_upload_skips_reembedding_for_already_ingested_files():
+    suffix = uuid.uuid4().hex
+    fresh_content = _pdf_bytes([f"Introduction\nA freshly seen paper body {suffix}."])
+    repeat_content = _pdf_bytes([f"Introduction\nRepeated upload body text {suffix}."])
+
+    # Seed the cache for repeat_content via a prior single upload.
+    seed = _upload_single("seed.pdf", repeat_content)
+    assert seed.status_code == 200
+
+    with patch("app.main.ingest_pdfs", wraps=None) as mock_ingest_pdfs:
+        from app.ingestion import ingest_pdfs as real_ingest_pdfs
+
+        mock_ingest_pdfs.side_effect = real_ingest_pdfs
+
+        response = _upload([("fresh.pdf", fresh_content), ("repeat.pdf", repeat_content)])
+
+    assert response.status_code == 200
+    # ingest_pdfs should only have been asked to process the fresh file.
+    ((processed_payloads,), _kwargs) = mock_ingest_pdfs.call_args
+    assert [name for name, _ in processed_payloads] == ["fresh.pdf"]
+
+    chunks = response.json()
+    assert {c["paper_title"] for c in chunks} == {"fresh", "seed"}

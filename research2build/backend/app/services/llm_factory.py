@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 
+from backend.app.services.azure_endpoints import resource_host
 from backend.app.services.llm_service import AzureFoundryLLMService, LLMService
 
 
@@ -27,10 +28,10 @@ def get_llm_service() -> LLMService | AzureFoundryLLMService:
 
     if azure_endpoint and azure_key and azure_deployment:
         return AzureFoundryLLMService(
-            endpoint=azure_endpoint,
+            endpoint=resource_host(azure_endpoint),
             api_key=azure_key,
             deployment=azure_deployment,
-            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview"),
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-05-01-preview"),
         )
 
     llm_endpoint = os.getenv("LLM_ENDPOINT")

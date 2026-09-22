@@ -1,4 +1,5 @@
 import json
+import logging
 
 from backend.app.services.llm_service import LLMService
 from shared.schemas import (
@@ -6,6 +7,8 @@ from shared.schemas import (
     EvidenceChunk,
     GroundedAnswer,
 )
+
+logger = logging.getLogger("research2build.qa")
 
 
 class GroundedQA:
@@ -58,22 +61,44 @@ Rules:
    is insufficient.
 """
 
-        response = self.llm_service.generate(
-            prompt,
-            system_prompt=(
-                "You are an evidence-based research assistant. "
-                "Answer only from the supplied evidence."
-            ),
-            temperature=0.0,
-        )
-
-        data = self._parse_response(response)
-
         evidence_map = {
             chunk.chunk_id: chunk
             for chunk in evidence
         }
+        system_prompt = (
+            "You are an evidence-based research assistant. "
+            "Answer only from the supplied evidence."
+        )
 
+        try:
+            response = self.llm_service.generate(
+                prompt, system_prompt=system_prompt, temperature=0.0
+            )
+            data = self._parse_response(response)
+            return self._build_answer(data, evidence_map)
+        except ValueError as exc:
+            logger.warning(
+                "Grounded Q&A validation failed, retrying once: %s", exc
+            )
+            retry_prompt = (
+                f"{prompt}\n\n"
+                "IMPORTANT CORRECTION: your previous answer was rejected because it "
+                f"failed this check: {exc}\n"
+                "Only use evidence IDs exactly as they appear in brackets above — "
+                "never invent, abbreviate, or renumber an evidence ID."
+            )
+            response = self.llm_service.generate(
+                prompt=retry_prompt, system_prompt=system_prompt, temperature=0.0
+            )
+            data = self._parse_response(response)
+            return self._build_answer(data, evidence_map)
+
+    @classmethod
+    def _build_answer(
+        cls,
+        data: dict,
+        evidence_map: dict[str, EvidenceChunk],
+    ) -> GroundedAnswer:
         citations = []
         evidence_ids = data.get("evidence_ids", [])
 
@@ -85,7 +110,7 @@ Rules:
                     f"LLM referenced unknown evidence ID: {evidence_id}"
                 )
 
-            citations.append(self._citation(chunk))
+            citations.append(cls._citation(chunk))
 
         answer = data.get("answer")
 

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { scoreFeasibility } from "../../lib/api";
+import { useAppData } from "../../lib/AppDataContext";
 import type { FeasibilityAssessment, FeasibilityConstraints, ProjectProposal } from "../../types";
 import ErrorState from "../shared/ErrorState";
 import LoadingState from "../shared/LoadingState";
+import PipelineWorkflowBanner from "../shared/PipelineWorkflowBanner";
 import Roadmap from "../shared/Roadmap";
 import ScoreCard from "../shared/ScoreCard";
 import PageShell from "../PageShell";
@@ -32,17 +34,23 @@ const SAMPLE_PROPOSAL: ProjectProposal = {
 export default function FeasibilityDashboardPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const proposal = (location.state as LocationState | null)?.proposal ?? SAMPLE_PROPOSAL;
+  const { proposals, feasibility: globalFeasibility, setFeasibility: setGlobalFeasibility } = useAppData();
+  
+  const passedProposal = (location.state as LocationState | null)?.proposal;
+  const initialProposal = passedProposal || (proposals.length > 0 ? proposals[0] : SAMPLE_PROPOSAL);
 
+  const [selectedProposal, setSelectedProposal] = useState<ProjectProposal>(initialProposal);
   const [constraints, setConstraints] = useState<FeasibilityConstraints>({
     team_size: 2,
     weeks_available: 8,
     budget_usd: 0,
-    skills: [],
+    skills: ["Python", "React", "PyTorch"],
   });
-  const [skillsInput, setSkillsInput] = useState("");
-  const [assessment, setAssessment] = useState<FeasibilityAssessment | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "error" | "done">("idle");
+  const [skillsInput, setSkillsInput] = useState("Python, React, PyTorch");
+  const [assessment, setAssessment] = useState<FeasibilityAssessment | null>(globalFeasibility);
+  const [status, setStatus] = useState<"idle" | "loading" | "error" | "done">(
+    globalFeasibility ? "done" : "idle"
+  );
   const [error, setError] = useState<string | null>(null);
 
   async function handleScore() {
@@ -50,8 +58,9 @@ export default function FeasibilityDashboardPage() {
     setError(null);
     const skills = skillsInput.split(",").map((s) => s.trim()).filter(Boolean);
     try {
-      const result = await scoreFeasibility(proposal, { ...constraints, skills });
+      const result = await scoreFeasibility(selectedProposal, { ...constraints, skills });
       setAssessment(result);
+      setGlobalFeasibility(result);
       setStatus("done");
     } catch {
       setError("Feasibility scoring failed.");
@@ -61,61 +70,78 @@ export default function FeasibilityDashboardPage() {
 
   return (
     <PageShell
-      title="Feasibility dashboard"
-      description="Score a project proposal against your team's real constraints and get a tailored roadmap."
+      title="Feasibility Scorer"
+      description="Score project proposals against your team's real constraints (team size, timeline, budget, skills) and synthesize realistic delivery roadmaps."
     >
-      {!(location.state as LocationState | null)?.proposal && (
-        <p className="text-sm text-muted mb-6">
-          No proposal was selected — scoring the sample proposal below. Start from{" "}
-          <button onClick={() => navigate("/projects")} className="underline font-semibold text-ink">
-            Project generator
-          </button>{" "}
-          to score your own.
-        </p>
+      <PipelineWorkflowBanner />
+
+      {proposals.length > 1 && (
+        <div className="bg-card border border-border p-4 mb-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+            Select Active Proposal ({proposals.length} Available)
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {proposals.map((p) => (
+              <button
+                key={p.proposal_id}
+                onClick={() => setSelectedProposal(p)}
+                className={`text-xs px-3 py-1.5 border transition-colors cursor-pointer ${
+                  selectedProposal.proposal_id === p.proposal_id
+                    ? "bg-[#FF6B2C] text-white border-[#FF6B2C] font-bold"
+                    : "bg-background text-foreground border-border hover:border-[#FF6B2C]"
+                }`}
+              >
+                {p.title}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <p className="font-display font-bold text-lg text-ink">{proposal.title}</p>
-        <p className="text-muted text-sm mt-1">{proposal.summary}</p>
+      <div className="bg-card border border-border p-5">
+        <div className="pb-3 mb-4 border-b border-border">
+          <p className="font-bold text-base text-foreground font-mono">{selectedProposal.title}</p>
+          <p className="text-muted-foreground text-xs mt-1">{selectedProposal.summary}</p>
+        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 mt-6">
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-ink">Team size</span>
+            <span className="text-xs font-bold uppercase text-foreground">Team size</span>
             <input
               type="number"
               min={1}
               value={constraints.team_size}
               onChange={(e) => setConstraints((c) => ({ ...c, team_size: Number(e.target.value) }))}
-              className="rounded-[10px] border border-border px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-mint-deep"
+              className="border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#FF6B2C]"
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-ink">Weeks available</span>
+            <span className="text-xs font-bold uppercase text-foreground">Weeks available</span>
             <input
               type="number"
               min={1}
               value={constraints.weeks_available}
               onChange={(e) => setConstraints((c) => ({ ...c, weeks_available: Number(e.target.value) }))}
-              className="rounded-[10px] border border-border px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-mint-deep"
+              className="border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#FF6B2C]"
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-ink">Budget (USD)</span>
+            <span className="text-xs font-bold uppercase text-foreground">Budget (USD)</span>
             <input
               type="number"
               min={0}
               value={constraints.budget_usd}
               onChange={(e) => setConstraints((c) => ({ ...c, budget_usd: Number(e.target.value) }))}
-              className="rounded-[10px] border border-border px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-mint-deep"
+              className="border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#FF6B2C]"
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-semibold text-ink">Team skills (comma-separated)</span>
+            <span className="text-xs font-bold uppercase text-foreground">Team skills (comma-separated)</span>
             <input
               value={skillsInput}
               onChange={(e) => setSkillsInput(e.target.value)}
               placeholder="Python, PyTorch, React"
-              className="rounded-[10px] border border-border px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-mint-deep"
+              className="border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[#FF6B2C]"
             />
           </label>
         </div>
@@ -123,27 +149,27 @@ export default function FeasibilityDashboardPage() {
         <button
           onClick={handleScore}
           disabled={status === "loading"}
-          className="mt-6 rounded-[10px] bg-ink text-white font-semibold px-6 py-3 cursor-pointer hover:opacity-90 disabled:opacity-40"
+          className="mt-5 bg-[#FF6B2C] text-white font-bold uppercase px-6 py-2.5 text-xs tracking-wider cursor-pointer hover:opacity-90 disabled:opacity-40 transition-opacity"
         >
-          {status === "loading" ? "Scoring…" : "Score feasibility"}
+          {status === "loading" ? "Scoring Feasibility…" : "Score Feasibility"}
         </button>
       </div>
 
-      {status === "loading" && <div className="mt-8"><LoadingState label="Scoring feasibility…" /></div>}
+      {status === "loading" && <div className="mt-6"><LoadingState label="Evaluating risk, skills & timeline feasibility…" /></div>}
       {status === "error" && error && (
-        <div className="mt-8">
+        <div className="mt-6">
           <ErrorState message={error} onRetry={handleScore} />
         </div>
       )}
-      {status === "done" && assessment && (
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
+      {assessment && (
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
           <ScoreCard assessment={assessment} />
           <Roadmap roadmap={assessment.roadmap} />
           <button
-            onClick={() => navigate("/deliverables", { state: { proposal, feasibility: assessment } })}
-            className="md:col-span-2 rounded-[10px] bg-ink text-white font-semibold px-6 py-3 cursor-pointer hover:opacity-90 justify-self-start"
+            onClick={() => navigate("/deliverables", { state: { proposal: selectedProposal, feasibility: assessment } })}
+            className="md:col-span-2 bg-[#FF6B2C] text-white font-bold uppercase px-6 py-3 text-xs tracking-wider cursor-pointer hover:opacity-90 justify-self-start font-mono transition-opacity"
           >
-            Generate PRD & scaffold
+            Generate PRD & MVP Scaffold &rarr;
           </button>
         </div>
       )}

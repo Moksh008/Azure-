@@ -125,18 +125,20 @@ class LLMService:
 
 class AzureFoundryLLMService:
     """
-    Chat completion client for Azure OpenAI / Azure AI Foundry model
-    deployments.
+    Chat completion client for Azure AI Foundry model deployments, via the
+    unified Foundry model-inference API (`/models/chat/completions`).
 
     Same public interface as LLMService (a single `generate()` method) so
     PaperAnalyzer and GroundedQA need no changes to use either provider —
     only the factory in llm_factory.py decides which one gets built, based
     on which environment variables are set.
 
-    Azure's request shape differs from plain OpenAI: the model deployment
-    is part of the URL (not the payload), auth uses an `api-key` header
-    instead of `Authorization: Bearer`, and requests carry an explicit
-    `api-version` query parameter.
+    Unlike the classic Azure OpenAI `/openai/deployments/{name}/...` route
+    (which 404s on Foundry-hub-based "AI Services" resources), the unified
+    route takes the deployment/model name in the JSON payload's `model`
+    field rather than the URL, and lives under `/models/chat/completions`
+    on the resource's `*.services.ai.azure.com` host. Auth still uses an
+    `api-key` header, and requests still carry an explicit `api-version`.
     """
 
     def __init__(
@@ -144,7 +146,7 @@ class AzureFoundryLLMService:
         endpoint: str,
         api_key: str,
         deployment: str,
-        api_version: str = "2024-02-15-preview",
+        api_version: str = "2024-05-01-preview",
         timeout: float = 60.0,
     ):
         self.endpoint = endpoint.rstrip("/")
@@ -172,11 +174,9 @@ class AzureFoundryLLMService:
             (total_chars + 3) // 4,
             self.timeout,
         )
-        url = (
-            f"{self.endpoint}/openai/deployments/{self.deployment}"
-            f"/chat/completions?api-version={self.api_version}"
-        )
+        url = f"{self.endpoint}/models/chat/completions?api-version={self.api_version}"
         payload = {
+            "model": self.deployment,
             "messages": _build_messages(prompt, system_prompt),
             "temperature": temperature,
         }

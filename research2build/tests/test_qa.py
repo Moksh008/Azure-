@@ -88,6 +88,49 @@ def test_grounded_qa_rejects_unknown_evidence_id():
         )
 
 
+def test_grounded_qa_retries_once_after_hallucinated_evidence_id():
+    """First attempt references a made-up evidence ID; the retry uses a
+    valid one. The answer should succeed without surfacing a 400."""
+
+    class FlakyLLMService:
+        def __init__(self):
+            self.calls: list[str] = []
+
+        def generate(self, prompt, system_prompt=None, temperature=0.0):
+            self.calls.append(prompt)
+            evidence_id = "chunk-2" if "IMPORTANT CORRECTION" in prompt else "66"
+            return f"""
+            {{
+                "answer": "The authors use an image classification dataset for evaluation.",
+                "evidence_ids": ["{evidence_id}"],
+                "evidence_sufficient": true
+            }}
+            """
+
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-2",
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            section="Dataset",
+            page=5,
+            text="The evaluation uses an image classification dataset.",
+        )
+    ]
+
+    llm = FlakyLLMService()
+    qa = GroundedQA(llm)
+
+    result = qa.answer(
+        question="What dataset did the authors use?",
+        evidence=evidence,
+    )
+
+    assert len(llm.calls) == 2
+    assert "IMPORTANT CORRECTION" in llm.calls[1]
+    assert result.citations[0].chunk_id == "chunk-2"
+
+
 def test_grounded_qa_rejects_empty_question():
     evidence = [
         EvidenceChunk(

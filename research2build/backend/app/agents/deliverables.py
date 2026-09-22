@@ -291,6 +291,88 @@ def health() -> dict:
 
     manifest["backend/app/__init__.py"] = ""
 
+    manifest["backend/app/api/__init__.py"] = (
+        '"""HTTP route handlers. Keep these thin — parse the request, call '
+        'an agent or service, return the response. No business logic here."""\n'
+    )
+    manifest["backend/app/agents/__init__.py"] = (
+        '"""One module per reasoning step (e.g. analysis, gap-finding, '
+        'scoring). Each agent is a plain function/class with a typed '
+        'input and output — no framework required for an MVP this size."""\n'
+    )
+    manifest["backend/app/rag/__init__.py"] = (
+        '"""Retrieval: chunking, embeddings, vector store, and the '
+        'query -> top-k-evidence function every grounded agent calls. '
+        'Keep this interface stable if you swap the underlying store."""\n'
+    )
+    manifest["backend/app/models/__init__.py"] = (
+        '"""Pydantic request/response schemas shared across routes and '
+        'agents. Structured LLM output goes here too — never regex-parse '
+        'free text when a schema will do."""\n'
+    )
+    manifest["backend/app/services/__init__.py"] = (
+        '"""External integrations (LLM provider, storage, third-party '
+        'APIs) behind a small interface, so a provider swap only touches '
+        'one file."""\n'
+    )
+
+    manifest["database/README.md"] = (
+        "# Database\n\n"
+        "This starter has no database wired in yet — the reference "
+        "pipeline this was generated from is stateless by design "
+        "(every request carries the objects it needs). Add one here "
+        "only once you actually need to persist state between requests "
+        "(e.g. user accounts, saved projects).\n\n"
+        "If/when you do:\n"
+        "- Put your schema (SQL, or an ORM's models) in this directory.\n"
+        "- Keep migrations here too, versioned alongside the schema.\n"
+    )
+
+    manifest["tests/test_health.py"] = '''"""Starter test — replace with real coverage as routes are built."""
+
+from fastapi.testclient import TestClient
+
+from backend.app.main import app
+
+client = TestClient(app)
+
+
+def test_health_ok():
+    response = client.get("/health")
+    assert response.status_code == 200
+'''
+
+    manifest["docker-compose.yml"] = f"""services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - backend/.env.example
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - frontend/.env.example
+    volumes:
+      - ./frontend:/app
+
+# TODO: add a database service here once {slug} actually needs one
+# (see database/README.md) — Postgres is a reasonable default:
+#
+#   db:
+#     image: postgres:16
+#     environment:
+#       POSTGRES_DB: {slug}
+#       POSTGRES_PASSWORD: changeme
+#     ports:
+#       - "5432:5432"
+"""
+
     manifest["frontend/package.json"] = f"""{{
   "name": "{slug}-frontend",
   "private": true,
@@ -319,6 +401,18 @@ def health() -> dict:
     manifest["frontend/src/App.stub.txt"] = (
         "TODO: implement the App component for the primary user flow:\n"
         + features_md
+    )
+
+    manifest["frontend/src/components/.gitkeep"] = (
+        "# Reusable UI components go here.\n"
+    )
+    manifest["frontend/src/pages/.gitkeep"] = (
+        "# One file per screen/route.\n"
+    )
+    manifest["frontend/src/services/.gitkeep"] = (
+        "# Typed API client(s) for talking to the backend go here — mirror\n"
+        "# the shape of backend/app/api/ routes so a route rename is easy\n"
+        "# to trace on both sides.\n"
     )
 
     return manifest

@@ -50,6 +50,30 @@ class TestScoreFeasibility:
         assert result.skill_coverage == 1.0
         assert result.risks == []
 
+    def test_components_breakdown_present_and_bounded(self):
+        proposal = _proposal()
+        constraints = FeasibilityConstraints(
+            team_size=3,
+            weeks_available=10,
+            budget_usd=100,
+            skills=["Python", "PyTorch", "BitsAndBytes", "ONNX Runtime"],
+        )
+        result = score_feasibility(proposal, constraints)
+
+        labels = {c.label for c in result.components}
+        assert labels == {
+            "Implementation Time",
+            "Team Skill Fit",
+            "Budget / Hardware Fit",
+            "Technical Complexity",
+        }
+        for component in result.components:
+            assert 0 <= component.score <= 100
+            assert component.explanation
+
+        skill_component = next(c for c in result.components if c.label == "Team Skill Fit")
+        assert skill_component.score == 100  # full skill coverage in this fixture
+
     def test_mismatched_team_scores_low_with_risks(self):
         proposal = _proposal()
         constraints = FeasibilityConstraints(

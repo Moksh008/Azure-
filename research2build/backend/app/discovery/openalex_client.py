@@ -1,3 +1,7 @@
+import hashlib
+import threading
+import time
+
 import requests
 
 try:
@@ -9,6 +13,27 @@ except ImportError:
         from paper_models import Paper
 
 
+# Module-level cache, keyed by a hash of the normalized query + result
+# count, so identical searches (e.g. repeated by the same or different
+# users within the TTL window) don't burn OpenAlex's rate limit again.
+# Process-local and unbounded-but-short-lived by design — this is a single
+# Container-Apps instance for a class project, not a multi-node deployment.
+_CACHE_TTL_SECONDS = 3600
+_cache_lock = threading.Lock()
+_search_cache: dict[str, tuple[float, list[Paper]]] = {}
+
+
+def _cache_key(query: str, max_results: int) -> str:
+    normalized = " ".join(query.strip().lower().split())
+    return hashlib.sha256(f"{normalized}|{max_results}".encode("utf-8")).hexdigest()
+
+
+def clear_search_cache() -> None:
+    """Test seam — drop all cached OpenAlex results."""
+    with _cache_lock:
+        _search_cache.clear()
+
+
 class OpenAlexClient:
     BASE_URL = "https://api.openalex.org/works"
 
@@ -17,6 +42,14 @@ class OpenAlexClient:
         query: str,
         max_results: int = 20,
     ) -> list[Paper]:
+        cache_key = _cache_key(query, max_results)
+        with _cache_lock:
+            cached = _search_cache.get(cache_key)
+        if cached is not None:
+            cached_at, papers = cached
+            if time.monotonic() - cached_at < _CACHE_TTL_SECONDS:
+                return list(papers)
+
         params = {
             "search": query,
             "per-page": max_results,
@@ -51,6 +84,9 @@ class OpenAlexClient:
             )
 
             papers.append(paper)
+
+        with _cache_lock:
+            _search_cache[cache_key] = (time.monotonic(), list(papers))
 
         return papers
 

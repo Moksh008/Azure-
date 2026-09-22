@@ -36,7 +36,23 @@ def test_returns_azure_foundry_service_when_azure_vars_set(monkeypatch):
     assert isinstance(service, AzureFoundryLLMService)
     assert service.endpoint == "https://my-resource.openai.azure.com"
     assert service.deployment == "gpt-4o"
-    assert service.api_version == "2024-02-15-preview"
+    assert service.api_version == "2024-05-01-preview"
+
+
+def test_project_endpoint_path_is_stripped_to_resource_host(monkeypatch):
+    _clear_llm_env(monkeypatch)
+    monkeypatch.setenv(
+        "AZURE_OPENAI_ENDPOINT",
+        "https://my-resource.services.ai.azure.com/api/projects/my-project",
+    )
+    monkeypatch.setenv("AZURE_OPENAI_API_KEY", "azure-key")
+    monkeypatch.setenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4.1-nano")
+
+    service = get_llm_service()
+
+    assert isinstance(service, AzureFoundryLLMService)
+    assert service.endpoint == "https://my-resource.services.ai.azure.com"
+    assert service.deployment == "gpt-4.1-nano"
 
 
 def test_azure_api_version_env_var_overrides_default(monkeypatch):

@@ -45,6 +45,7 @@ def get_embedding_provider() -> EmbeddingProvider:
             endpoint=azure_endpoint,
             api_key=azure_key,
             deployment=azure_deployment,
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-05-01-preview"),
         )
 
     if os.getenv("OLLAMA_BASE_URL") or os.getenv("OLLAMA_EMBEDDING_MODEL"):

@@ -118,7 +118,11 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
 
 class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
     """
-    Production embedding provider targeting Azure OpenAI Service.
+    Production embedding provider targeting Azure AI Foundry's unified
+    model-inference API (`/models/embeddings`) — the deployment/model name
+    goes in the JSON payload rather than the URL, unlike the classic Azure
+    OpenAI `/openai/deployments/{name}/embeddings` route, which 404s on
+    Foundry-hub-based "AI Services" resources.
     Falls back to HashEmbeddingProvider if RETRIEVAL_ALLOW_LOCAL_FALLBACK is enabled.
     """
 
@@ -128,10 +132,14 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
         api_key: Optional[str] = None,
         deployment: Optional[str] = None,
         allow_fallback: Optional[bool] = None,
+        api_version: str = "2024-05-01-preview",
     ):
-        self.endpoint = endpoint
+        from backend.app.services.azure_endpoints import resource_host
+
+        self.endpoint = resource_host(endpoint) if endpoint else endpoint
         self.api_key = api_key
         self.deployment = deployment
+        self.api_version = api_version
 
         if allow_fallback is None:
             allow_fallback = (
@@ -141,6 +149,21 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
         self.allow_fallback = allow_fallback
         self._fallback_provider = HashEmbeddingProvider()
 
+    def _embed_remote(self, inputs: list[str]) -> list[list[float]]:
+        import httpx
+
+        url = f"{self.endpoint}/models/embeddings?api-version={self.api_version}"
+        headers = {
+            "api-key": self.api_key,
+            "Content-Type": "application/json",
+        }
+        payload = {"model": self.deployment, "input": inputs}
+        with httpx.Client(timeout=30.0) as client:
+            res = client.post(url, json=payload, headers=headers)
+            res.raise_for_status()
+            data = res.json()
+        return [item["embedding"] for item in data["data"]]
+
     def embed(self, text: str) -> list[float]:
         if not self.endpoint or not self.api_key or not self.deployment:
             if not self.allow_fallback:
@@ -149,26 +172,30 @@ class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
                 )
             return self._fallback_provider.embed(text)
 
-        import httpx
-
         try:
-            url = (
-                f"{self.endpoint.rstrip('/')}/openai/deployments/"
-                f"{self.deployment}/embeddings?api-version=2023-05-15"
-            )
-            headers = {
-                "api-key": self.api_key,
-                "Content-Type": "application/json",
-            }
-            payload = {"input": text}
-            with httpx.Client(timeout=10.0) as client:
-                res = client.post(url, json=payload, headers=headers)
-                res.raise_for_status()
-                data = res.json()
-                return data["data"][0]["embedding"]
+            return self._embed_remote([text])[0]
         except Exception as err:
             if not self.allow_fallback:
                 raise RuntimeError(
                     f"Azure OpenAI embedding call failed: {err}"
                 ) from err
             return self._fallback_provider.embed(text)
+
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        if not self.endpoint or not self.api_key or not self.deployment:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    "Azure OpenAI embedding credentials missing and local fallback disabled."
+                )
+            return self._fallback_provider.embed_batch(texts)
+
+        try:
+            return self._embed_remote(texts)
+        except Exception as err:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    f"Azure OpenAI embedding call failed: {err}"
+                ) from err
+            return self._fallback_provider.embed_batch(texts)

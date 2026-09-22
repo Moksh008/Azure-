@@ -77,6 +77,14 @@ class Roadmap(BaseModel):
     milestones: list[Milestone] = Field(default_factory=list)
 
 
+class FeasibilityComponent(BaseModel):
+    """One axis of the feasibility breakdown, for a component-bar display."""
+
+    label: str
+    score: int = Field(..., ge=0, le=100)
+    explanation: str
+
+
 class FeasibilityAssessment(BaseModel):
     """Structured feasibility verdict for a ProjectProposal."""
 
@@ -88,6 +96,14 @@ class FeasibilityAssessment(BaseModel):
     risks: list[str] = Field(default_factory=list)
     constraint_notes: list[str] = Field(default_factory=list)
     roadmap: Roadmap
+    components: list[FeasibilityComponent] = Field(
+        default_factory=list,
+        description=(
+            "Per-axis breakdown of the overall score (time fit, team skill "
+            "fit, budget/hardware fit, technical complexity), for a "
+            "component-level display rather than a single opaque number."
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -160,6 +176,15 @@ def score_feasibility(
     skill_score = skill_coverage * 100
     budget_penalty = 20 if _budget_notes(proposal, constraints) else 0
     budget_score = max(0, 100 - budget_penalty)
+    # Complexity is the inverse of the same "surface area" units effort is
+    # estimated from — more objectives/features/tools named, the harder the
+    # scope is to execute well in a fixed window.
+    surface_area = (
+        len(proposal.objectives)
+        + len(proposal.key_features)
+        + len(proposal.technical_approach)
+    )
+    complexity_score = max(0, round(100 - max(surface_area, 3) * 8))
 
     # Time fit matters most for a fixed-deadline student project.
     score = round(0.5 * time_score + 0.3 * skill_score + 0.2 * budget_score)
@@ -198,6 +223,39 @@ def score_feasibility(
 
     roadmap = generate_roadmap(proposal, constraints, effort_weeks=effort_weeks)
 
+    components = [
+        FeasibilityComponent(
+            label="Implementation Time",
+            score=round(time_score),
+            explanation=(
+                f"~{effort_weeks:.1f} person-weeks of estimated effort vs. "
+                f"{capacity_weeks:.1f} person-weeks of available capacity."
+            ),
+        ),
+        FeasibilityComponent(
+            label="Team Skill Fit",
+            score=round(skill_score),
+            explanation=f"{round(skill_coverage * 100)}% of the proposal's named technologies are already covered by the team's listed skills.",
+        ),
+        FeasibilityComponent(
+            label="Budget / Hardware Fit",
+            score=round(budget_score),
+            explanation=(
+                constraint_notes[0]
+                if constraint_notes
+                else "No GPU-heavy work flagged against the given budget."
+            ),
+        ),
+        FeasibilityComponent(
+            label="Technical Complexity",
+            score=complexity_score,
+            explanation=(
+                f"Scope spans {surface_area} objectives/features/technical "
+                "approaches — more surface area lowers this score."
+            ),
+        ),
+    ]
+
     return FeasibilityAssessment(
         proposal_id=proposal.proposal_id,
         score=score,
@@ -207,6 +265,7 @@ def score_feasibility(
         risks=risks,
         constraint_notes=constraint_notes,
         roadmap=roadmap,
+        components=components,
     )
 
 

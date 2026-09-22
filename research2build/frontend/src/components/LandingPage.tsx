@@ -1,624 +1,682 @@
-import { useEffect, useState } from "react";
+import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import HoverStack, { type HoverStackCard } from "./HoverStack";
+import {
+  Activity,
+  ArrowRight,
+  BarChart,
+  Bird,
+  BookOpen,
+  ChevronRight,
+  Compass,
+  FileCheck,
+  FileText,
+  Layers,
+  Menu,
+  MessageSquare,
+  Plug,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Upload,
+  Zap,
+  LogOut,
+  User as UserIcon,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { motion, useAnimation, useInView } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "../lib/AuthContext";
 
-const TABS = ["Ingestion", "Analysis", "Q&A", "Opportunities", "Feasibility"];
+const navigationItems = [
+  { title: "ANALYSIS", href: "/analysis" },
+  { title: "Q&A", href: "/qa" },
+  { title: "OPPORTUNITIES", href: "/opportunities" },
+  { title: "ROADMAP", href: "/feasibility" },
+];
 
-function IconDocument({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
-      <path d="M14 3v5h5" />
-      <path d="M9 13h6M9 17h6M9 9h2" />
-    </svg>
-  );
-}
+const labels = [
+  { icon: Sparkles, label: "Predictive Analytics" },
+  { icon: Plug, label: "Machine Learning" },
+  { icon: Activity, label: "Natural Language Processing" },
+  { icon: FileCheck, label: "Evidence-Grounded Citations" },
+];
 
-function IconLink({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M9 15 15 9" />
-      <path d="M11 6.5 12.5 5a4 4 0 1 1 5.5 5.5L16.5 12" />
-      <path d="M13 17.5 11.5 19A4 4 0 1 1 6 13.5L7.5 12" />
-    </svg>
-  );
-}
-
-function IconCompass({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="m14.5 9.5-1.8 4.7-4.7 1.8 1.8-4.7Z" />
-    </svg>
-  );
-}
-
-const FEATURES = [
+const features = [
   {
-    Icon: IconDocument,
-    iconBg: "bg-yellow text-ink",
-    title: "Ingest any paper",
-    body: "Upload PDFs and get clean, normalized text — chunked by section and page, ready for retrieval.",
-    highlight: false,
+    icon: BarChart,
+    label: "Advanced Analytics",
+    description:
+      "Deconstruct complex academic literature into structured findings, methodology comparisons, and limitation matrices.",
+    actionUrl: "/analysis",
+    actionLabel: "Explore Analysis",
   },
   {
-    Icon: IconLink,
-    iconBg: "bg-ink text-white",
-    title: "Every claim, cited",
-    body: "Q&A answers and analysis fields carry citations back to the exact paper, section, and page that support them.",
-    highlight: true,
+    icon: Zap,
+    label: "Intelligent Automation",
+    description:
+      "Transform recurring paper limitations into validated research opportunities and feasibility-scored project blueprints.",
+    actionUrl: "/opportunities",
+    actionLabel: "View Opportunities",
   },
   {
-    Icon: IconCompass,
-    iconBg: "bg-mint text-ink",
-    title: "From evidence to roadmap",
-    body: "Recurring limitations become potential opportunities, then feasibility-scored project proposals.",
-    highlight: false,
+    icon: Activity,
+    label: "Real-time Insights",
+    description:
+      "Ask nuanced questions across your research library with verified page & section citations and zero hallucinations.",
+    actionUrl: "/qa",
+    actionLabel: "Ask Library",
   },
 ];
 
-const CITATIONS = [
+const platformModules = [
   {
-    quote: "Latency remains the primary bottleneck in distributed training.",
-    paper: "Federated Learning at Scale",
-    section: "Limitations",
+    icon: Search,
+    title: "Multi-Source Discovery",
+    desc: "Search over 250M+ academic papers across OpenAlex and CORE with instant relevance filtering.",
+    href: "/discover",
+    tag: "OpenAlex & CORE",
+  },
+  {
+    icon: Upload,
+    title: "PDF Ingestion & Extraction",
+    desc: "Upload PDFs with automatic section detection, OCR fallback, and structured chunk indexing.",
+    href: "/upload",
+    tag: "ChromaDB / Azure",
+  },
+  {
+    icon: BookOpen,
+    title: "Paper Deep-Dive",
+    desc: "Extract problems, methodologies, key findings, limitations, and future directions automatically.",
+    href: "/analysis",
+    tag: "Structured JSON",
+  },
+  {
+    icon: Layers,
+    title: "Comparative Matrix",
+    desc: "Side-by-side comparative analysis of datasets, baselines, compute constraints, and trade-offs.",
+    href: "/compare",
+    tag: "Multi-Paper",
+  },
+  {
+    icon: MessageSquare,
+    title: "Grounded Q&A Engine",
+    desc: "Pose complex questions and receive synthesized answers with direct verbatim quotes and page numbers.",
+    href: "/qa",
+    tag: "Traceable Citations",
+  },
+  {
+    icon: Target,
+    title: "Opportunity Discovery",
+    desc: "Identify cross-paper research gaps, recurring roadblocks, and promising unexplored engineering avenues.",
+    href: "/opportunities",
+    tag: "Novelty Hedge",
+  },
+  {
+    icon: Compass,
+    title: "Feasibility Assessment",
+    desc: "Score project proposals against team size, timelines, budget, and required technical skills.",
+    href: "/feasibility",
+    tag: "Risk Matrix",
+  },
+  {
+    icon: FileText,
+    title: "PRD & Roadmap Generator",
+    desc: "Generate production-ready Product Requirement Documents and step-by-step engineering sprints.",
+    href: "/deliverables",
+    tag: "Export Ready",
+  },
+];
+
+const sampleCitations = [
+  {
+    quote:
+      "Latency and communication overhead remain the primary bottleneck in distributed LLM fine-tuning.",
+    paper: "Federated Learning at Scale: Communication-Efficient Algorithms",
+    section: "Limitations & Scaling Challenges",
     page: 7,
+    tag: "Verified Evidence",
   },
   {
-    quote: "We reduce communication overhead via gradient sparsification.",
-    paper: "Federated Learning at Scale",
-    section: "Method",
-    page: 4,
+    quote:
+      "We achieve 4.2x speedup by quantizing attention weights and caching intermediate KV activations.",
+    paper: "Efficient Cross-Attention with Low-Rank Approximation",
+    section: "Empirical Results",
+    page: 12,
+    tag: "Verified Evidence",
   },
   {
-    quote: "Accuracy drops by 2% under non-IID data splits.",
-    paper: "Edge Inference Survey",
-    section: "Results",
-    page: 6,
-  },
-  {
-    quote: "Cross-silo settings are left for future exploration.",
-    paper: "Privacy-Preserving ML",
-    section: "Future Work",
-    page: 11,
-  },
-  {
-    quote: "Evaluation only covers a single datacenter.",
-    paper: "Federated Learning at Scale",
-    section: "Limitations",
-    page: 9,
-  },
-  {
-    quote: "Our approach cuts inference latency by 38% on edge devices.",
-    paper: "Edge Inference Survey",
-    section: "Results",
+    quote:
+      "Current multimodal architectures fail to preserve topological constraints in spatial reasoning tasks.",
+    paper: "Multimodal Geospatial Reasoning & Tool-Augmented Agents",
+    section: "Discussion",
     page: 5,
+    tag: "Verified Evidence",
   },
 ];
 
-function Button({
-  children,
-  light = false,
-  className = "",
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { light?: boolean }) {
-  return (
-    <button
-      className={`inline-flex items-center justify-center gap-2 rounded-[10px] px-6 py-3.5 font-semibold text-[15px] cursor-pointer transition-transform duration-150 hover:-translate-y-0.5 hover:opacity-90 ${
-        light ? "bg-white text-ink border border-border" : "bg-ink text-white border-none"
-      } ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
+export function MynaHero() {
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+  const controls = useAnimation();
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const [activeEvidenceIndex, setActiveEvidenceIndex] = React.useState(0);
 
-function Banner({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="relative bg-yellow text-center font-semibold text-sm py-3 px-5 md:px-10">
-      📚 Built for AI-103 — evidence-grounded research analysis.{" "}
-      <a href="#pipeline" className="underline">
-        See how it works →
-      </a>
-      <button
-        onClick={onClose}
-        className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-lg bg-none border-none w-11 h-11 flex items-center justify-center"
-        aria-label="Dismiss banner"
-      >
-        ✕
-      </button>
-    </div>
-  );
-}
+  React.useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    }
+  }, [controls, isInView]);
 
-function Nav() {
-  return (
-    <header className="flex items-center justify-between max-w-[1280px] mx-auto px-5 md:px-10 py-7">
-      <div className="flex items-center gap-2.5 font-display font-bold text-[22px]">
-        <span className="w-[34px] h-[34px] rounded-full bg-ink flex items-center justify-center text-white text-sm">
-          R²
-        </span>
-        Research2Build
-      </div>
-      <Link to="/chat">
-        <Button light>Start chatting</Button>
-      </Link>
-    </header>
-  );
-}
-
-function Hero() {
-  const [citations, setCitations] = useState(0);
-  const [running, setRunning] = useState(false);
-
-  useEffect(() => {
-    if (!running) return;
-    const interval = setInterval(() => setCitations((c) => c + 1), 600);
-    return () => clearInterval(interval);
-  }, [running]);
-
-  return (
-    <section className="relative text-center max-w-[1100px] mx-auto px-5 md:px-10 pt-16 pb-10">
-      <div
-        className="absolute opacity-90 -left-[60px] top-[120px] w-10 h-10 bg-mint-deep"
-        style={{ borderRadius: "60% 40% 55% 45%" }}
-      />
-      <div
-        className="absolute opacity-90 -right-[30px] top-[60px] w-[50px] h-[50px] bg-blue"
-        style={{ borderRadius: "50% 60% 40% 55%" }}
-      />
-
-      <h1 className="font-display font-bold leading-[1.05] text-[clamp(36px,6vw,68px)]">
-        Turn research papers{" "}
-        <span className="inline-block align-middle w-[0.9em] h-[0.9em] bg-yellow rounded-full mx-1.5" /> into
-        grounded projects
-      </h1>
-
-      <div className="flex items-center justify-center gap-4 mx-auto mt-8 mb-5 max-w-[560px] bg-white rounded-2xl p-2.5 shadow-[0_10px_30px_rgba(21,27,49,0.06)]">
-        <Link to="/chat" className="flex-1">
-          <Button className="w-full py-4">Start chatting</Button>
-        </Link>
-        <div className="flex items-center gap-2.5 px-3.5 font-semibold text-muted">
-          {citations} citations
-          <button
-            onClick={() => setRunning((r) => !r)}
-            className="w-11 h-11 rounded-full bg-mint-deep text-white flex items-center justify-center border-none cursor-pointer"
-            aria-label={running ? "Pause live demo" : "Start live demo"}
-          >
-            {running ? "⏸" : "▶"}
-          </button>
-        </div>
-      </div>
-
-      <div className="font-display font-bold text-[clamp(28px,4.5vw,44px)] mt-2">
-        you'll actually <span className="text-coral">trust</span>
-      </div>
-      <p className="text-muted max-w-[520px] mx-auto mt-4.5 text-base">
-        Upload PDFs, get structured analysis, ask grounded questions, and generate
-        feasibility-checked project proposals — every claim traceable to a paper, section, and
-        page.
-      </p>
-    </section>
-  );
-}
-
-function Showcase() {
-  const [activeTab, setActiveTab] = useState(0);
-
-  const rows: [string, string][] = [
-    ["Evaluation only covers a single datacenter.", "Limitations · p.9"],
-    ["We reduce communication overhead via gradient sparsification.", "Method · p.4"],
-    ["Accuracy drops by 2% under non-IID data splits.", "Results · p.6"],
-    ["Future work should explore cross-silo settings.", "Future Work · p.11"],
+  const titleWords = [
+    "THE",
+    "AI",
+    "REVOLUTION",
+    "FOR",
+    "BUSINESS",
+    "INTELLIGENCE",
   ];
 
   return (
-    <section id="pipeline" className="bg-panel-dark rounded-[28px] max-w-[1200px] mx-auto my-[70px] p-5 md:p-10">
-      <div className="flex gap-9 justify-center border-b border-panel-line pb-4.5 mb-7.5 flex-wrap">
-        {TABS.map((tab, i) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(i)}
-            className={`relative bg-none border-none text-base font-semibold cursor-pointer py-1.5 px-0.5 ${
-              activeTab === i
-                ? "text-white after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-[19px] after:h-[3px] after:bg-coral after:rounded-[3px]"
-                : "text-tab-inactive"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
-        <div className="flex justify-between items-center py-4 px-5.5 border-b border-border text-sm text-muted">
-          <span>{TABS[activeTab]}</span>
-          <span>Share live ↗</span>
-        </div>
-        <div className="flex min-h-[340px]">
-          <div className="w-[220px] border-r border-border p-4.5 text-sm text-muted max-md:hidden">
-            <div className="py-2 px-2.5 rounded-lg mb-1 bg-pill-bg text-ink font-semibold">
-              Federated Learning at Scale
-            </div>
-            <div className="py-2 px-2.5 rounded-lg mb-1">Overview</div>
-            <div className="py-2 px-2.5 rounded-lg mb-1">Citations</div>
-            <div className="py-2 px-2.5 rounded-lg mb-1">Export</div>
-          </div>
-          <div className="flex-1 p-5.5 px-6.5">
-            <h3 className="font-display font-bold text-lg mb-3.5">Evidence chunks</h3>
-            {rows.map(([label, pill]) => (
-              <div key={label} className="flex justify-between items-center py-3 border-b border-row-border text-sm gap-4">
-                <span>{label}</span>
-                <span className="bg-pill-bg rounded-full py-1 px-2.5 text-xs font-semibold text-muted whitespace-nowrap">
-                  {pill}
-                </span>
+    <div className="min-h-screen bg-background text-foreground selection:bg-[#FF6B2C] selection:text-white">
+      {/* Top Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/95 backdrop-blur-md">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="flex items-center space-x-2">
+                <div className="p-1.5 bg-[#FF6B2C]/10 text-[#FF6B2C] group-hover:bg-[#FF6B2C] group-hover:text-white transition-all">
+                  <Bird className="h-6 w-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-mono text-xl font-bold tracking-tight text-foreground">
+                    Research<span className="text-[#FF6B2C]">2</span>Build
+                  </span>
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground -mt-1">
+                    Myna AI Core
+                  </span>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+            </Link>
 
-const DOMAIN_CARDS: HoverStackCard[] = [
-  { quote: "AI & Machine Learning", tag: "Domain", bg: "#E4FF1A", accent: "text-[#1A1A1A]" },
-  { quote: "Cybersecurity", tag: "Domain", bg: "#DD1155", accent: "text-white" },
-  { quote: "Healthcare Technology", tag: "Domain", bg: "#67D6A3", accent: "text-[#1A1A1A]" },
-  { quote: "Robotics", tag: "Domain", bg: "#FF5714", accent: "text-[#1A1A1A]" },
-  { quote: "Climate & Sustainability", tag: "Domain", bg: "#3454D1", accent: "text-white" },
-  { quote: "Computer Vision", tag: "Domain", bg: "#B98CFF", accent: "text-[#1A1A1A]" },
-  { quote: "Natural Language Processing", tag: "Domain", bg: "#E980FC", accent: "text-[#1A1A1A]" },
-];
-
-function ExploreDomains() {
-  const navigate = useNavigate();
-
-  return (
-    <section className="flex min-h-screen w-full flex-col items-center justify-center gap-[4vw] overflow-hidden bg-[#fff9ec] px-4 py-16">
-      <div className="flex w-full flex-col items-center text-center text-[#1a1a1a]">
-        <Eyebrow>Not sure what to build?</Eyebrow>
-        <h2
-          style={{ fontWeight: 300 }}
-          className="text-[5.5vw] tracking-tight max-[1025px]:text-[7vw] max-md:text-[9vw]"
-        >
-          Explore research domains
-        </h2>
-        <p className="mt-4 max-w-[560px] text-base text-muted">
-          Pick a domain — discover research papers and turn promising research into a buildable
-          project.
-        </p>
-      </div>
-
-      <HoverStack
-        cards={DOMAIN_CARDS}
-        onCardClick={(card) => navigate(`/discover?query=${encodeURIComponent(card.quote)}`)}
-      />
-    </section>
-  );
-}
-
-function SectionTitle({ title, sub, small = false }: { title: string; sub: string; small?: boolean }) {
-  return (
-    <div className="text-center max-w-[640px] mx-auto my-[50px] px-5 md:px-10">
-      <h2 className={`font-display font-bold ${small ? "text-[22px]" : "text-[clamp(28px,4vw,42px)]"}`}>{title}</h2>
-      <p className="text-muted mt-3 text-base">{sub}</p>
-    </div>
-  );
-}
-
-function FeatureGrid() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1200px] mx-auto px-5 md:px-10">
-      {FEATURES.map((f) => (
-        <div
-          key={f.title}
-          className={`rounded-2xl p-7.5 border border-border ${f.highlight ? "bg-[#EFEFEF]" : "bg-card"}`}
-        >
-          <div className={`w-13 h-13 rounded-[14px] flex items-center justify-center mb-5.5 ${f.iconBg}`}>
-            <f.Icon className="w-6 h-6" />
-          </div>
-          <h4 className="font-display font-bold text-[19px] mb-2">{f.title}</h4>
-          <p className="text-muted text-sm leading-relaxed">{f.body}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function FieldRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2.5 px-3 border border-border rounded-[10px] text-sm">
-      <span className="text-coral font-semibold text-xs uppercase tracking-[0.04em] w-[92px] flex-shrink-0">
-        {label}
-      </span>
-      <span className="text-ink truncate">{value}</span>
-    </div>
-  );
-}
-
-function CitationChip({ paper, section, page }: { paper: string; section: string; page: number }) {
-  return (
-    <span className="inline-block bg-pill-bg rounded-full py-1 px-2.5 text-xs font-semibold text-muted mr-2 mb-2">
-      {paper} · {section} · p.{page}
-    </span>
-  );
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <div className="text-coral uppercase text-sm font-bold tracking-[0.06em] mb-3.5">{children}</div>;
-}
-
-function Split({
-  reverse = false,
-  art,
-  eyebrow,
-  badge,
-  title,
-  body,
-  cta,
-}: {
-  reverse?: boolean;
-  art: React.ReactNode;
-  eyebrow?: string;
-  badge?: string;
-  title: string;
-  body: string;
-  cta: string;
-}) {
-  const artEl = (
-    <div className="bg-white rounded-[20px] border border-border p-6.5 min-h-[320px] flex flex-col justify-center gap-3 shadow-[0_16px_40px_rgba(21,27,49,0.06)]">
-      {art}
-    </div>
-  );
-  const textEl = (
-    <div>
-      {badge && (
-        <span className="inline-block bg-yellow text-ink text-xs font-bold py-1.5 px-3 rounded-full mb-3.5">
-          {badge}
-        </span>
-      )}
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 className="font-display font-bold text-[clamp(24px,3.2vw,34px)] mb-3.5">{title}</h2>
-      <p className="text-muted text-base leading-relaxed mb-6">{body}</p>
-      <Button>{cta}</Button>
-    </div>
-  );
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12.5 max-w-[1200px] mx-auto my-[110px] px-5 md:px-10 items-center">
-      {reverse ? (
-        <>
-          {artEl}
-          {textEl}
-        </>
-      ) : (
-        <>
-          {textEl}
-          {artEl}
-        </>
-      )}
-    </div>
-  );
-}
-
-function Testimonials() {
-  return (
-    <div className="max-w-[1200px] mx-auto my-[110px] px-5 md:px-10 text-center">
-      <h2 className="font-display font-bold text-[clamp(28px,4vw,42px)]">Every claim, traced to its source</h2>
-      <p className="text-muted mt-3 text-base">
-        A sample of the evidence chunks our pipeline pulls straight from uploaded papers.
-      </p>
-      <div className="flex gap-5 overflow-hidden mt-10">
-        {CITATIONS.map((c) => (
-          <div
-            key={c.quote}
-            className="bg-white border border-border rounded-2xl p-6 min-w-[280px] text-left flex-shrink-0"
-          >
-            <p className="text-ink text-sm leading-relaxed mb-4">"{c.quote}"</p>
-            <div className="flex items-center gap-2.5 text-[13px] text-muted">
-              <div className="w-8 h-8 rounded-full bg-periwinkle flex items-center justify-center text-ink text-xs font-bold">
-                p.{c.page}
-              </div>
-              <span>
-                {c.paper} · {c.section}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Marquee() {
-  const words = ["Evidence-grounded", "No claim without a citation", "Paper → Section → Page"];
-  const chunk = words.join(" • ") + " • ";
-  const repeated = chunk.repeat(6);
-  return (
-    <div className="bg-ink text-white py-5.5 overflow-hidden whitespace-nowrap mt-[110px]">
-      <div className="inline-block animate-marquee font-display font-bold text-[22px]">
-        {(repeated + repeated).split("• ").map((part, i, arr) =>
-          i === arr.length - 1 ? (
-            part
-          ) : (
-            <span key={i}>
-              {part}
-              <span className="text-coral">•</span>
-            </span>
-          ),
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="max-w-[1200px] mx-auto px-5 md:px-10 pt-[70px] pb-10 text-center">
-      <h2 className="font-display font-bold text-[clamp(28px,4vw,44px)] mb-6.5">
-        Ready to turn papers into projects? 📚
-      </h2>
-      <Button>Upload your first paper</Button>
-      <div className="flex justify-between items-center mt-[70px] pt-6 border-t border-border text-muted text-[13px] flex-wrap gap-2.5">
-        <span>© 2026 Research2Build. An AI-103 project.</span>
-        <span>
-          <a href="#" className="underline">
-            GitHub
-          </a>{" "}
-          &nbsp;·&nbsp;{" "}
-          <a href="#" className="underline">
-            Architecture docs
-          </a>
-        </span>
-      </div>
-    </footer>
-  );
-}
-
-export default function LandingPage() {
-  const [bannerVisible, setBannerVisible] = useState(true);
-
-  return (
-    <div className="min-h-screen bg-bg text-ink font-sans overflow-x-hidden">
-      {bannerVisible && <Banner onClose={() => setBannerVisible(false)} />}
-      <Nav />
-      <Hero />
-      <Showcase />
-      <ExploreDomains />
-
-      <SectionTitle
-        title="Grounded research, without the busywork"
-        sub="Let's have a sneak peek here to get the idea."
-      />
-      <SectionTitle
-        title="So what can you do with Research2Build?"
-        sub="Upload a stack of papers — see what you can build from them."
-        small
-      />
-
-      <FeatureGrid />
-
-      <Split
-        eyebrow="One extraction, reused everywhere"
-        title="Know each paper cold"
-        body="Every paper is broken into problem, method, results, limitations, and future work — extracted once and reused across Q&A, opportunities, and feasibility checks."
-        cta="See an analysis"
-        art={
-          <>
-            <strong className="font-display">Federated Learning at Scale</strong>
-            <FieldRow label="Problem" value="Communication cost dominates training time." />
-            <FieldRow label="Method" value="Gradient sparsification + async updates." />
-            <FieldRow label="Results" value="38% latency reduction on edge devices." />
-            <FieldRow label="Limitations" value="Single-datacenter evaluation only." />
-          </>
-        }
-      />
-
-      <Split
-        reverse
-        eyebrow="Ask, and verify"
-        title="Evidence-based Q&A"
-        body="Ask a question across your paper set and get an answer with citations attached — paper, section, and page for every supporting claim."
-        cta="Ask a question"
-        art={
-          <>
-            <strong className="font-display">Q: What limitations recur across papers?</strong>
-            <p className="text-sm text-muted leading-relaxed">
-              A: Latency and single-datacenter evaluation are repeatedly cited as limitations.
-            </p>
-            <div>
-              <CitationChip paper="Federated Learning at Scale" section="Limitations" page={7} />
-              <CitationChip paper="Federated Learning at Scale" section="Limitations" page={9} />
-              <CitationChip paper="Edge Inference Survey" section="Limitations" page={4} />
-            </div>
-          </>
-        }
-      />
-
-      <Split
-        badge="Inferred, not asserted"
-        title="Potential research opportunities"
-        body="Recurring limitations across papers surface as potential opportunities — inferred from the evidence, never stated as fact."
-        cta="View opportunities"
-        art={
-          <>
-            <strong className="font-display">Potential opportunity</strong>
-            <div className="flex justify-between items-center py-3 border-b border-row-border text-sm">
-              <span>Latency mentioned as a limitation in 4 of 6 papers</span>
-              <span className="bg-pill-bg rounded-full py-1 px-2.5 text-xs font-semibold text-muted">
-                Recurring
-              </span>
-            </div>
-            <p className="text-xs text-muted italic mt-1">
-              Novelty confidence: requires human validation.
-            </p>
-          </>
-        }
-      />
-
-      <Split
-        reverse
-        eyebrow="Plan it out"
-        title="Feasibility & roadmap"
-        body="Tell us your team size, timeline, budget, and skills — get a feasibility score and a basic roadmap for turning an opportunity into a project."
-        cta="Check feasibility"
-        art={
-          <table className="w-full border-collapse text-[13px]">
-            <thead>
-              <tr>
-                <th className="text-left text-muted font-semibold p-2 border-b border-border">Constraint</th>
-                <th className="text-left text-muted font-semibold p-2 border-b border-border">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Team size", "3 members"],
-                ["Timeline", "6 weeks"],
-                ["Budget", "$100 credit"],
-                ["Feasibility score", "72%"],
-              ].map(([constraint, value]) => (
-                <tr key={constraint}>
-                  <td className="p-2.5 border-b border-hairline">{constraint}</td>
-                  <td className="p-2.5 border-b border-hairline">{value}</td>
-                </tr>
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.href}
+                  className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-[#FF6B2C] transition-colors py-1 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-[#FF6B2C] hover:after:w-full after:transition-all"
+                >
+                  {item.title}
+                </Link>
               ))}
-            </tbody>
-          </table>
-        }
-      />
+            </nav>
 
-      <Testimonials />
-      <Marquee />
-      <Footer />
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <Link to="/chat" className="hidden sm:inline-block">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-none border-foreground/20 font-mono text-xs hover:border-[#FF6B2C] hover:text-[#FF6B2C]"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-[#FF6B2C]" />
+                  AI COPILOT
+                </Button>
+              </Link>
+              {currentUser ? (
+                <div className="hidden md:flex items-center gap-2 font-mono text-xs">
+                  <div className="w-7 h-7 rounded-full bg-[#1F2023] text-white flex items-center justify-center text-xs font-bold">
+                    {currentUser.email ? currentUser.email[0].toUpperCase() : "U"}
+                  </div>
+                  <button
+                    onClick={() => logout()}
+                    className="p-1.5 text-muted-foreground hover:text-red-500 cursor-pointer"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className="hidden md:inline-block">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-none font-mono text-xs uppercase"
+                  >
+                    <UserIcon className="w-3.5 h-3.5 mr-1.5 text-[#FF6B2C]" />
+                    SIGN IN
+                  </Button>
+                </Link>
+              )}
+              <Button
+                onClick={() => navigate(currentUser ? "/chat" : "/discover")}
+                variant="default"
+                size="sm"
+                className="rounded-none hidden md:inline-flex bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 font-mono text-xs uppercase tracking-wider font-semibold shadow-xs"
+              >
+                GET STARTED <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+              </Button>
+
+              {/* Mobile Drawer */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="lg:hidden rounded-none">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <div className="flex flex-col gap-6 mt-6">
+                    <div className="flex items-center space-x-2 pb-4 border-b border-border">
+                      <Bird className="h-6 w-6 text-[#FF6B2C]" />
+                      <span className="font-mono text-lg font-bold">Research2Build</span>
+                    </div>
+                    <nav className="flex flex-col gap-3">
+                      {navigationItems.map((item) => (
+                        <Link
+                          key={item.title}
+                          to={item.href}
+                          className="text-sm font-mono uppercase text-foreground hover:text-[#FF6B2C] transition-colors p-2 hover:bg-foreground/5"
+                        >
+                          {item.title}
+                        </Link>
+                      ))}
+                      <Link
+                        to="/chat"
+                        className="text-sm font-mono uppercase text-foreground hover:text-[#FF6B2C] transition-colors p-2 hover:bg-foreground/5 flex items-center justify-between"
+                      >
+                        <span>AI RESEARCH COPILOT</span>
+                        <Sparkles className="w-4 h-4 text-[#FF6B2C]" />
+                      </Link>
+                    </nav>
+                    <div className="pt-4 border-t border-border flex flex-col gap-2">
+                      <Button
+                        onClick={() => navigate("/discover")}
+                        className="w-full cursor-pointer rounded-none bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 font-mono text-xs uppercase font-bold"
+                      >
+                        GET STARTED <ArrowRight className="ml-1 w-4 h-4" />
+                      </Button>
+                      <Button
+                        onClick={() => navigate("/upload")}
+                        variant="outline"
+                        className="w-full rounded-none font-mono text-xs uppercase"
+                      >
+                        UPLOAD PAPERS
+                      </Button>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 md:pt-24 md:pb-32">
+          <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
+            {/* Live badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1 mb-8 border border-[#FF6B2C]/30 bg-[#FF6B2C]/5 font-mono text-xs uppercase tracking-widest text-[#FF6B2C]"
+            >
+              <span className="inline-block w-2 h-2 rounded-full bg-[#FF6B2C] animate-pulse" />
+              Evidence-Grounded Research & Engineering Engine
+            </motion.div>
+
+            {/* Staggered Animated Title Words */}
+            <motion.h1
+              initial={{ filter: "blur(10px)", opacity: 0, y: 40 }}
+              animate={{ filter: "blur(0px)", opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="relative font-mono text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight md:leading-none text-foreground"
+            >
+              {titleWords.map((text, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: index * 0.12,
+                    duration: 0.5,
+                  }}
+                  className={`inline-block mx-1.5 sm:mx-2.5 md:mx-3 ${
+                    text === "AI" || text === "INTELLIGENCE"
+                      ? "text-[#FF6B2C]"
+                      : ""
+                  }`}
+                >
+                  {text}
+                </motion.span>
+              ))}
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.6 }}
+              className="mx-auto mt-8 max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground font-mono leading-relaxed"
+            >
+              We empower researchers and engineering teams with cutting-edge AI solutions to transform
+              unstructured research papers into evidence-backed, feasibility-scored product blueprints.
+            </motion.p>
+
+            {/* Feature Label Badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+              className="mt-10 flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6"
+            >
+              {labels.map((feature, index) => (
+                <motion.div
+                  key={feature.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: 1.2 + index * 0.1,
+                    duration: 0.5,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 10,
+                  }}
+                  className="flex items-center gap-2 px-3.5 py-1.5 bg-background border border-border/80 shadow-2xs hover:border-[#FF6B2C]/60 transition-colors"
+                >
+                  <feature.icon className="h-4 w-4 text-[#FF6B2C]" />
+                  <span className="text-xs sm:text-sm font-mono text-foreground font-medium">
+                    {feature.label}
+                  </span>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Hero CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 1.6,
+                duration: 0.6,
+                type: "spring",
+                stiffness: 100,
+                damping: 10,
+              }}
+              className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full justify-center"
+            >
+              <Button
+                onClick={() => navigate(currentUser ? "/chat" : "/login")}
+                size="lg"
+                className="w-full sm:w-auto cursor-pointer rounded-none bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 font-mono text-sm uppercase tracking-wider font-bold shadow-md h-12 px-8"
+              >
+                GET STARTED <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+              <Button
+                onClick={() => navigate(currentUser ? "/upload" : "/login")}
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto rounded-none font-mono text-sm uppercase tracking-wider border-foreground/30 hover:border-foreground h-12 px-8"
+              >
+                UPLOAD YOUR PAPERS
+              </Button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Core Pillars Section */}
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-border/80" ref={ref}>
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <span className="font-mono text-xs uppercase tracking-widest text-[#FF6B2C] font-semibold">
+                Autonomous Intelligence Layer
+              </span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-foreground mt-2 tracking-tight">
+                Unlock the Power of AI
+              </h2>
+              <p className="text-muted-foreground font-mono text-sm sm:text-base max-w-xl mx-auto mt-3">
+                High-precision reasoning engines built for rigorous literature review and defensible system design.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="grid md:grid-cols-3 gap-6"
+            >
+              {features.map((feature, index) => (
+                <motion.div
+                  key={feature.label}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{
+                    delay: 0.3 + index * 0.15,
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 10,
+                  }}
+                  className="flex flex-col items-center text-center p-8 bg-card border border-border/80 hover:border-[#FF6B2C] hover:shadow-lg transition-all group relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-full h-[3px] bg-transparent group-hover:bg-[#FF6B2C] transition-colors" />
+                  <div className="mb-6 rounded-full bg-[#FF6B2C]/10 p-4 group-hover:scale-110 transition-transform">
+                    <feature.icon className="h-8 w-8 text-[#FF6B2C]" />
+                  </div>
+                  <h3 className="mb-3 text-xl font-mono font-bold text-foreground">
+                    {feature.label}
+                  </h3>
+                  <p className="text-muted-foreground font-mono text-sm leading-relaxed mb-6 grow">
+                    {feature.description}
+                  </p>
+                  <Link
+                    to={feature.actionUrl}
+                    className="inline-flex items-center text-xs font-mono uppercase font-bold text-[#FF6B2C] group-hover:translate-x-1 transition-transform"
+                  >
+                    {feature.actionLabel} <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Live Grounding & Citations Showcase */}
+        <section className="bg-foreground/5 py-20 border-y border-border/80">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-1/2 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 border border-[#FF6B2C]/30 bg-[#FF6B2C]/10 font-mono text-xs uppercase text-[#FF6B2C]">
+                  <ShieldCheck className="w-4 h-4" /> Zero-Hallucination Grounding
+                </div>
+                <h3 className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-tight">
+                  Every claim is backed by exact page & section citations.
+                </h3>
+                <p className="font-mono text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  Unlike generic language models that hallucinate research findings, Research2Build extracts
+                  verifiable quotes from indexed PDF chunks and validates every statement before presenting it.
+                </p>
+                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={() => navigate("/qa")}
+                    className="rounded-none bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 font-mono text-xs uppercase tracking-wider font-bold"
+                  >
+                    TEST Q&A RETRIEVAL <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                  </Button>
+                  <Button
+                    onClick={() => navigate("/compare")}
+                    variant="outline"
+                    className="rounded-none font-mono text-xs uppercase tracking-wider"
+                  >
+                    COMPARE PAPERS
+                  </Button>
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 w-full">
+                <div className="bg-card border border-border p-6 shadow-md font-mono">
+                  <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+                    <span className="text-xs uppercase font-bold text-muted-foreground flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Live Evidence Inspector
+                    </span>
+                    <span className="text-[11px] px-2 py-0.5 bg-[#FF6B2C]/10 text-[#FF6B2C] font-semibold">
+                      Chunk {activeEvidenceIndex + 1} of {sampleCitations.length}
+                    </span>
+                  </div>
+
+                  <div className="min-h-[140px] flex items-center">
+                    <p className="text-sm italic text-foreground leading-relaxed border-l-2 border-[#FF6B2C] pl-4 py-1">
+                      "{sampleCitations[activeEvidenceIndex].quote}"
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-border/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div>
+                      <div className="font-bold text-foreground">
+                        {sampleCitations[activeEvidenceIndex].paper}
+                      </div>
+                      <div className="text-muted-foreground text-[11px] mt-0.5">
+                        Section: {sampleCitations[activeEvidenceIndex].section} • Page {sampleCitations[activeEvidenceIndex].page}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {sampleCitations.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setActiveEvidenceIndex(i)}
+                          className={`w-2.5 h-2.5 rounded-none transition-all ${
+                            activeEvidenceIndex === i
+                              ? "bg-[#FF6B2C] w-6"
+                              : "bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                          }`}
+                          aria-label={`Show quote ${i + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Capability Directory */}
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-widest text-[#FF6B2C] font-semibold">
+                  Modular Workflow
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-mono font-bold text-foreground mt-1">
+                  Complete End-to-End Pipeline
+                </h2>
+              </div>
+              <p className="font-mono text-xs text-muted-foreground max-w-sm">
+                From broad keyword discovery to verified PRD deliverables in one unified workflow.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {platformModules.map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.href}
+                  className="p-5 bg-card border border-border/80 hover:border-[#FF6B2C] hover:shadow-md transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="p-2 bg-foreground/5 text-foreground group-hover:bg-[#FF6B2C] group-hover:text-white transition-colors">
+                        <item.icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-foreground/5 text-muted-foreground group-hover:text-foreground">
+                        {item.tag}
+                      </span>
+                    </div>
+                    <h4 className="font-mono font-bold text-sm text-foreground mb-1.5 group-hover:text-[#FF6B2C] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="font-mono text-xs text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs font-mono font-bold text-muted-foreground group-hover:text-[#FF6B2C]">
+                    <span>LAUNCH</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Bottom CTA Banner */}
+        <section className="bg-foreground text-background py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
+            <h2 className="font-mono text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4">
+              Ready to turn research papers into reality?
+            </h2>
+            <p className="font-mono text-sm sm:text-base text-background/80 max-w-xl mx-auto mb-8">
+              Start by discovering new publications or uploading your local PDF library.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button
+                onClick={() => navigate("/discover")}
+                size="lg"
+                className="rounded-none bg-[#FF6B2C] text-white hover:bg-[#FF6B2C]/90 font-mono text-sm uppercase tracking-wider font-bold h-12 px-8"
+              >
+                DISCOVER PAPERS <Search className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
+                onClick={() => navigate("/upload")}
+                variant="outline"
+                size="lg"
+                className="rounded-none border-background/30 text-background hover:bg-background/10 font-mono text-sm uppercase tracking-wider h-12 px-8"
+              >
+                UPLOAD LOCAL PDFS <Upload className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-12 bg-background font-mono text-xs">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <Bird className="h-5 w-5 text-[#FF6B2C]" />
+              <span className="font-bold text-sm">Research2Build</span>
+              <span className="text-muted-foreground">• Myna AI Interface</span>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
+              <Link to="/discover" className="hover:text-foreground">Discovery</Link>
+              <Link to="/analysis" className="hover:text-foreground">Analysis</Link>
+              <Link to="/qa" className="hover:text-foreground">Grounded Q&A</Link>
+              <Link to="/opportunities" className="hover:text-foreground">Opportunities</Link>
+              <Link to="/feasibility" className="hover:text-foreground">Feasibility</Link>
+              <Link to="/chat" className="hover:text-foreground">Copilot</Link>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>All Systems Operational</span>
+            </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-border/60 text-center text-muted-foreground text-[11px]">
+            &copy; {new Date().getFullYear()} Research2Build. AI-powered evidence synthesis & project planning.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
+
+export default MynaHero;

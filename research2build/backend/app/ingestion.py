@@ -11,6 +11,7 @@ API layer.
 
 from __future__ import annotations
 
+import json
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from typing import Sequence
@@ -29,6 +30,49 @@ except ImportError:  # pragma: no cover - only hit on very old PyMuPDF installs
 
 class IngestionError(ValueError):
     """Raised when a PDF can't be validated or parsed into evidence."""
+
+
+# ---------------------------------------------------------------------------
+# Content-addressed caching: same PDF bytes -> same paper_id -> extraction,
+# chunking, and (crucially) the caller's embedding call all get skipped on a
+# re-upload. Without this, re-uploading an already-indexed paper burns a
+# real Azure embedding API call for every chunk, every time (CLAUDE.md:
+# "process each paper once ... never re-run extraction or embedding on
+# every query").
+# ---------------------------------------------------------------------------
+
+def paper_id_for_content(content: bytes) -> str:
+    """Deterministic paper_id derived from PDF bytes, replacing the old
+    random uuid so identical uploads always resolve to the same id."""
+    return storage_service.content_hash(content)
+
+
+def _load_cached_chunks(paper_id: str) -> list[EvidenceChunk] | None:
+    path = storage_service.paper_manifest_path(paper_id)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return [EvidenceChunk(**item) for item in data]
+    except (json.JSONDecodeError, OSError, TypeError, ValueError):
+        return None
+
+
+def _save_chunks_manifest(paper_id: str, chunks: list[EvidenceChunk]) -> None:
+    path = storage_service.paper_manifest_path(paper_id)
+    path.write_text(
+        json.dumps([chunk.model_dump() for chunk in chunks]),
+        encoding="utf-8",
+    )
+
+
+def get_cached_chunks(content: bytes) -> list[EvidenceChunk] | None:
+    """Previously computed chunks for this exact PDF content, if any.
+
+    Callers should skip extraction, chunking, AND re-adding to the vector
+    store when this returns non-None — the paper is already fully indexed.
+    """
+    return _load_cached_chunks(paper_id_for_content(content))
 
 
 def _isolate_headings(raw_text: str) -> str:
@@ -119,12 +163,15 @@ def _persist_and_chunk(
     paper_id_override: str | None,
 ) -> list[EvidenceChunk]:
     """Persist an already-extracted PDF and assemble its EvidenceChunks."""
-    storage_id = storage_service.generate_paper_id()
+    storage_id = paper_id_for_content(content)
     storage_service.save_pdf(storage_id, content)
 
-    title = paper_title or filename.rsplit(".", 1)[0]
     paper_id = paper_id_override or storage_id
-    return chunk_pages(pages, paper_id=paper_id, paper_title=title)
+    title = paper_title or filename.rsplit(".", 1)[0]
+    chunks = chunk_pages(pages, paper_id=paper_id, paper_title=title)
+    if not paper_id_override:
+        _save_chunks_manifest(storage_id, chunks)
+    return chunks
 
 
 def ingest_pdf(
@@ -142,13 +189,20 @@ def ingest_pdf(
 
     `paper_id_override` lets a caller pin the chunks' logical paper_id to
     one it already knows (e.g. an OpenAlex work id for a discovered paper
-    whose full text is being fetched after the fact) — storage still uses
-    its own filesystem-safe id internally, since an OpenAlex id contains
-    characters ("/", ":") that aren't valid in a file path.
+    whose full text is being fetched after the fact). Storage always uses
+    its own filesystem-safe id internally (derived from content, never the
+    override), since an OpenAlex id contains characters ("/", ":") that
+    aren't valid in a file path on any platform.
+
+    Without an override, the paper_id is derived deterministically from
+    the PDF's content (see `paper_id_for_content`), so re-uploading the
+    same file resolves to the same id. Callers that want to skip
+    extraction entirely on a re-upload should check `get_cached_chunks`
+    first — this function still does the full extract+chunk work.
     """
     storage_service.validate_pdf_upload(filename, content, max_bytes=max_bytes)
 
-    storage_id = storage_service.generate_paper_id()
+    storage_id = paper_id_for_content(content)
     storage_service.save_pdf(storage_id, content)
 
     pages = extract_pages(content)
@@ -158,9 +212,12 @@ def ingest_pdf(
             "Scanned/image-only PDFs need OCR, which is out of scope for Phase 1."
         )
 
-    title = paper_title or filename.rsplit(".", 1)[0]
     paper_id = paper_id_override or storage_id
-    return chunk_pages(pages, paper_id=paper_id, paper_title=title)
+    title = paper_title or filename.rsplit(".", 1)[0]
+    chunks = chunk_pages(pages, paper_id=paper_id, paper_title=title)
+    if not paper_id_override:
+        _save_chunks_manifest(storage_id, chunks)
+    return chunks
 
 
 def ingest_pdfs(

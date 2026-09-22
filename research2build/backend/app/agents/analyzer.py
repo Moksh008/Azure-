@@ -5,14 +5,6 @@ from backend.app.services.llm_service import LLMService
 from shared.schemas import (
     Citation,
     EvidenceChunk,
-    GroundedAnswer,
-)
-import json
-
-from backend.app.services.llm_service import LLMService
-from shared.schemas import (
-    Citation,
-    EvidenceChunk,
     GroundedClaim,
     PaperAnalysis,
 )
@@ -82,28 +74,54 @@ Rules:
             (len(prompt) + 3) // 4,
         )
 
-        response = self.llm_service.generate(
-            prompt=prompt,
-            system_prompt=(
-                "You are a research paper analysis assistant. "
-                "Every claim must be grounded in the supplied evidence."
-            ),
-            temperature=0.0,
-        )
-        data = self._parse_response(response)
         evidence_map = {chunk.chunk_id: chunk for chunk in evidence}
+        system_prompt = (
+            "You are a research paper analysis assistant. "
+            "Every claim must be grounded in the supplied evidence."
+        )
 
+        try:
+            response = self.llm_service.generate(
+                prompt=prompt, system_prompt=system_prompt, temperature=0.0
+            )
+            data = self._parse_response(response)
+            return self._build_analysis(paper_id, paper_title, data, evidence_map)
+        except ValueError as exc:
+            logger.warning(
+                "Paper analysis validation failed, retrying once: %s", exc
+            )
+            retry_prompt = (
+                f"{prompt}\n\n"
+                "IMPORTANT CORRECTION: your previous answer was rejected because it "
+                f"failed this check: {exc}\n"
+                "Only use evidence IDs exactly as they appear in brackets above — "
+                "never invent, abbreviate, or renumber an evidence ID."
+            )
+            response = self.llm_service.generate(
+                prompt=retry_prompt, system_prompt=system_prompt, temperature=0.0
+            )
+            data = self._parse_response(response)
+            return self._build_analysis(paper_id, paper_title, data, evidence_map)
+
+    @classmethod
+    def _build_analysis(
+        cls,
+        paper_id: str,
+        paper_title: str,
+        data: dict,
+        evidence_map: dict[str, EvidenceChunk],
+    ) -> PaperAnalysis:
         return PaperAnalysis(
             paper_id=paper_id,
             paper_title=paper_title,
-            problem=self._claim(data.get("problem"), evidence_map),
-            objective=self._claim(data.get("objective"), evidence_map),
-            methodology=self._claim(data.get("methodology"), evidence_map),
-            dataset=self._claim(data.get("dataset"), evidence_map),
-            models=self._claim(data.get("models"), evidence_map),
-            results=self._claims(data.get("results"), evidence_map),
-            limitations=self._claims(data.get("limitations"), evidence_map),
-            future_work=self._claims(data.get("future_work"), evidence_map),
+            problem=cls._claim(data.get("problem"), evidence_map),
+            objective=cls._claim(data.get("objective"), evidence_map),
+            methodology=cls._claim(data.get("methodology"), evidence_map),
+            dataset=cls._claim(data.get("dataset"), evidence_map),
+            models=cls._claim(data.get("models"), evidence_map),
+            results=cls._claims(data.get("results"), evidence_map),
+            limitations=cls._claims(data.get("limitations"), evidence_map),
+            future_work=cls._claims(data.get("future_work"), evidence_map),
         )
 
     @staticmethod

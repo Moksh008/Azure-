@@ -140,15 +140,70 @@ def test_paper_analyzer_rejects_unknown_evidence_id():
         )
 
 
-def test_paper_analyzer_rejects_claim_without_evidence():
-    class BadLLMService:
+def test_paper_analyzer_retries_once_after_hallucinated_evidence_id():
+    """First attempt references a made-up evidence ID (as real LLMs do
+    occasionally); the retry uses a valid one. Analysis should succeed
+    without surfacing a 400 to the caller."""
+
+    class FlakyLLMService:
+        def __init__(self):
+            self.calls: list[str] = []
+
+        def generate(self, prompt, system_prompt=None, temperature=0.0):
+            self.calls.append(prompt)
+            evidence_id = "chunk-1" if "IMPORTANT CORRECTION" in prompt else "66"
+            return f"""
+            {{
+                "problem": {{
+                    "text": "The paper addresses limited accuracy in image classification.",
+                    "evidence_ids": ["{evidence_id}"]
+                }}
+            }}
+            """
+
+    evidence = [
+        EvidenceChunk(
+            chunk_id="chunk-1",
+            paper_id="paper-1",
+            paper_title="Test Research Paper",
+            section="Introduction",
+            page=2,
+            text="The paper discusses image classification.",
+        )
+    ]
+
+    llm = FlakyLLMService()
+    analyzer = PaperAnalyzer(llm)
+
+    result = analyzer.analyze(
+        paper_id="paper-1",
+        paper_title="Test Research Paper",
+        evidence=evidence,
+    )
+
+    assert len(llm.calls) == 2
+    assert "IMPORTANT CORRECTION" in llm.calls[1]
+    assert result.problem is not None
+    assert result.problem.citations[0].chunk_id == "chunk-1"
+
+
+def test_paper_analyzer_drops_claims_without_evidence_but_keeps_the_rest():
+    class MixedLLMService:
         def generate(self, prompt, system_prompt=None, temperature=0.0):
             return """
             {
                 "problem": {
-                    "text": "This claim has no citation.",
+                    "text": "Image classification is studied.",
+                    "evidence_ids": ["chunk-1"]
+                },
+                "dataset": {
+                    "text": "The paper does not mention any specific dataset.",
                     "evidence_ids": []
-                }
+                },
+                "limitations": [
+                    {"text": "Grounded limitation.", "evidence_ids": ["chunk-1"]},
+                    {"text": "Ungrounded limitation.", "evidence_ids": []}
+                ]
             }
             """
 
@@ -163,14 +218,17 @@ def test_paper_analyzer_rejects_claim_without_evidence():
         )
     ]
 
-    analyzer = PaperAnalyzer(BadLLMService())
+    analysis = PaperAnalyzer(MixedLLMService()).analyze(
+        paper_id="paper-1",
+        paper_title="Test Research Paper",
+        evidence=evidence,
+    )
 
-    with pytest.raises(ValueError, match="no valid evidence citations"):
-        analyzer.analyze(
-            paper_id="paper-1",
-            paper_title="Test Research Paper",
-            evidence=evidence,
-        )
+    assert analysis.problem is not None
+    assert analysis.problem.citations[0].chunk_id == "chunk-1"
+    assert analysis.dataset is None
+    assert [c.claim for c in analysis.limitations] == ["Grounded limitation."]
+    assert all(c.citations for c in analysis.limitations)
 
 
 def test_analyzer_rejects_unknown_evidence_id():

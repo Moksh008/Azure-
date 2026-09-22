@@ -111,6 +111,12 @@ export interface RoadmapPlan {
 
 export type FeasibilityLevel = "high" | "medium" | "low" | "not_feasible";
 
+export interface FeasibilityComponent {
+  label: string;
+  score: number;
+  explanation: string;
+}
+
 export interface FeasibilityAssessment {
   proposal_id: string;
   score: number;
@@ -120,6 +126,7 @@ export interface FeasibilityAssessment {
   risks: string[];
   constraint_notes: string[];
   roadmap: RoadmapPlan;
+  components: FeasibilityComponent[];
 }
 
 export interface PRDDocument {

@@ -36,6 +36,29 @@ export default function ScoreCard({ assessment }: { assessment: FeasibilityAsses
         </dl>
       </div>
 
+      {assessment.components.length > 0 && (
+        <div className="mt-5 pt-5 border-t border-row-border">
+          <p className="font-semibold text-sm text-ink mb-3">Feasibility breakdown</p>
+          <div className="space-y-3">
+            {assessment.components.map((component) => (
+              <div key={component.label}>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="text-ink font-medium">{component.label}</span>
+                  <span className="text-muted">{component.score}/100</span>
+                </div>
+                <div className="h-2 rounded-full bg-row-border overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-mint-deep"
+                    style={{ width: `${component.score}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted mt-1">{component.explanation}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {assessment.risks.length > 0 && (
         <div className="mt-5 pt-5 border-t border-row-border">
           <p className="font-semibold text-sm text-ink mb-2">Risks</p>

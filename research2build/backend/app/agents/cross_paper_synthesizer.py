@@ -100,22 +100,42 @@ Rules:
             (len(prompt) + 3) // 4,
         )
 
-        response = self.llm_service.generate(
-            prompt=prompt,
-            system_prompt=(
-                "You are a cross-paper research synthesis assistant. "
-                "Every claim must be grounded in the supplied evidence."
-            ),
-            temperature=0.0,
-        )
         evidence_map = {chunk.chunk_id: chunk for chunk in evidence}
-        self._log_response_diagnostics(response, evidence_map)
-        data = self._parse_response(response)
-        paper_titles = [chunks[0].paper_title for chunks in evidence_by_paper.values()]
-        structured = self._build_structured_analysis(
-            data, evidence_by_paper, evidence_map
+        system_prompt = (
+            "You are a cross-paper research synthesis assistant. "
+            "Every claim must be grounded in the supplied evidence."
         )
-        return structured
+
+        try:
+            response = self.llm_service.generate(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                temperature=0.0,
+            )
+            self._log_response_diagnostics(response, evidence_map)
+            data = self._parse_response(response)
+            return self._build_structured_analysis(data, evidence_by_paper, evidence_map)
+        except ValueError as exc:
+            logger.warning(
+                "Cross-paper synthesis validation failed, retrying once: %s", exc
+            )
+            retry_prompt = (
+                f"{prompt}\n\n"
+                "IMPORTANT CORRECTION: your previous answer was rejected because it "
+                f"failed this check: {exc}\n"
+                "Each evidence ID belongs to exactly one paper. Only reference an "
+                "evidence ID inside the paper_analyses entry for the paper it was "
+                "listed under in 'Evidence grouped by paper' above. Do not reuse an "
+                "evidence ID from one paper's group under a different paper's entry."
+            )
+            response = self.llm_service.generate(
+                prompt=retry_prompt,
+                system_prompt=system_prompt,
+                temperature=0.0,
+            )
+            self._log_response_diagnostics(response, evidence_map)
+            data = self._parse_response(response)
+            return self._build_structured_analysis(data, evidence_by_paper, evidence_map)
 
     def synthesize_for_ui(
         self,

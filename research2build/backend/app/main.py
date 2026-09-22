@@ -1,5 +1,9 @@
+import io
 import logging
 import os
+import re
+import sys
+import zipfile
 from pathlib import Path
 
 import requests
@@ -7,13 +11,31 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+
+# This module mixes two import styles: `backend.app.*` (below) and
+# `app.retrieval.*` / `app.embeddings.*` (further down, and throughout
+# backend/app/retrieval + backend/app/embeddings). That only resolves when
+# both the repo root and backend/ are on sys.path. `main.py` at the repo
+# root sets this up before importing us, but launching directly via
+# `uvicorn backend.app.main:app` (as documented in README.md) only puts the
+# repo root on sys.path, so `from app.retrieval...` below fails with
+# ModuleNotFoundError. Make this module self-sufficient regardless of how
+# it's launched.
+_backend_dir = str(Path(__file__).resolve().parents[1])
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 from backend.app.agents.analyzer import PaperAnalyzer
 from backend.app.agents.chat_router import LibrarySummaryEntry, classify_intent
 from backend.app.agents.cross_paper_synthesizer import CrossPaperSynthesizer
-from backend.app.agents.deliverables import PRDDocument, generate_prd
+from backend.app.agents.deliverables import (
+    PRDDocument,
+    generate_mvp_scaffold,
+    generate_prd,
+)
 from backend.app.agents.feasibility import FeasibilityAssessment, score_feasibility
 from backend.app.agents.qa import GroundedQA
 from backend.app.api_schemas import (
@@ -62,7 +84,7 @@ from shared.schemas import (
 from app.retrieval.factory import get_retriever
 from app.retrieval.evidence import EvidenceChunk as RetrievalEvidenceChunk
 from app.retrieval.factory import get_vector_store
-from .ingestion import IngestionError, ingest_pdf, ingest_pdfs
+from .ingestion import IngestionError, get_cached_chunks, ingest_pdf, ingest_pdfs
 from .services.storage_service import MAX_FETCHED_PDF_BYTES, InvalidUploadError
 
 
@@ -108,6 +130,14 @@ def health() -> HealthResponse:
 @app.post("/papers/upload", response_model=list[SchemaEvidenceChunk])
 async def upload_paper(file: UploadFile) -> list[SchemaEvidenceChunk]:
     content = await file.read()
+
+    cached = get_cached_chunks(content)
+    if cached is not None:
+        logger.info(
+            "Paper already ingested — skipping re-extraction and re-embedding",
+            extra={"paper_id": cached[0].paper_id, "chunk_count": len(cached)},
+        )
+        return cached
 
     try:
         chunks = ingest_pdf(
@@ -161,13 +191,40 @@ async def upload_papers_batch(
 
     payloads = [(file.filename, await file.read()) for file in files]
 
-    try:
-        batches = await run_in_threadpool(ingest_pdfs, payloads)
-    except (InvalidUploadError, IngestionError) as exc:
-        raise HTTPException(
-            status_code=422,
-            detail=str(exc),
-        ) from exc
+    # Files already ingested (same content -> same content-hash paper_id)
+    # skip extraction, chunking, and re-embedding entirely; only genuinely
+    # new files go through ingest_pdfs.
+    cached_by_index: dict[int, list] = {}
+    fresh_payloads: list[tuple[str, bytes]] = []
+    fresh_indexes: list[int] = []
+    for idx, (filename, content) in enumerate(payloads):
+        cached = get_cached_chunks(content)
+        if cached is not None:
+            cached_by_index[idx] = cached
+        else:
+            fresh_payloads.append((filename, content))
+            fresh_indexes.append(idx)
+
+    fresh_batches: list[list] = []
+    if fresh_payloads:
+        try:
+            fresh_batches = await run_in_threadpool(ingest_pdfs, fresh_payloads)
+        except (InvalidUploadError, IngestionError) as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=str(exc),
+            ) from exc
+
+    batches_by_index = dict(cached_by_index)
+    batches_by_index.update(zip(fresh_indexes, fresh_batches))
+    batches = [batches_by_index[idx] for idx in range(len(payloads))]
+
+    if cached_by_index:
+        logger.info(
+            "Batch upload: %d of %d papers already ingested — skipped re-extraction and re-embedding",
+            len(cached_by_index),
+            len(payloads),
+        )
 
     retrieval_chunks = [
         RetrievalEvidenceChunk(
@@ -178,11 +235,11 @@ async def upload_papers_batch(
             page_number=chunk.page,
             section=chunk.section,
         )
-        for batch in batches
-        for chunk in batch
+        for idx in fresh_indexes
+        for chunk in batches_by_index[idx]
     ]
     vector_store = get_vector_store()
-    if hasattr(vector_store, "ensure_index_exists"):
+    if retrieval_chunks and hasattr(vector_store, "ensure_index_exists"):
         vector_store.ensure_index_exists()
     vector_store.add_chunks(retrieval_chunks)
     logger.info(
@@ -474,6 +531,32 @@ def deliverables_prd(request: PRDRequest) -> PRDDocument:
         request.proposal,
         opportunity=request.opportunity,
         feasibility=request.feasibility,
+    )
+
+
+@app.post("/deliverables/scaffold")
+def deliverables_scaffold(request: PRDRequest) -> StreamingResponse:
+    """Download an honest MVP starter scaffold (README, requirements.txt,
+    stub entrypoints) for a project proposal as a zip file.
+
+    Reuses PRDRequest since only `proposal` is needed — opportunity/
+    feasibility are accepted but ignored, matching the /deliverables/prd
+    request shape the frontend already sends.
+    """
+    manifest = generate_mvp_scaffold(request.proposal)
+
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for rel_path, content in manifest.items():
+            archive.writestr(rel_path, content)
+    buffer.seek(0)
+
+    slug = re.sub(r"[^a-z0-9]+", "-", request.proposal.title.lower()).strip("-") or "project"
+    filename = f"{slug}-scaffold.zip"
+    return StreamingResponse(
+        buffer,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

@@ -58,6 +58,17 @@ export async function uploadPaper(file: File): Promise<EvidenceChunk[]> {
   return res.json();
 }
 
+export async function uploadPapersBatch(files: File[]): Promise<EvidenceChunk[]> {
+  const form = new FormData();
+  for (const file of files) form.append("files", file);
+  const res = await fetch(`${API_BASE}/papers/upload-batch`, { method: "POST", body: form });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText);
+    throw new ApiError(detail || "Upload failed", res.status);
+  }
+  return res.json();
+}
+
 export async function fetchFullText(
   paperId: string,
   title: string,
@@ -123,6 +134,46 @@ export function generatePRD(
   feasibility?: FeasibilityAssessment,
 ): Promise<PRDDocument> {
   return postJSON("/deliverables/prd", { proposal, opportunity, feasibility });
+}
+
+/** Fetch the MVP starter scaffold as a zip and trigger a browser download. */
+export async function downloadScaffold(proposal: ProjectProposal): Promise<void> {
+  const res = await fetch(`${API_BASE}/deliverables/scaffold`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ proposal }),
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText);
+    throw new ApiError(detail || "Scaffold download failed", res.status);
+  }
+  const blob = await res.blob();
+  const disposition = res.headers.get("Content-Disposition") ?? "";
+  const match = /filename="?([^"]+)"?/.exec(disposition);
+  const filename = match?.[1] ?? "scaffold.zip";
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+/** Trigger a browser download of the PRD as a Markdown file. */
+export function downloadPRDMarkdown(prd: PRDDocument, markdown: string): void {
+  const slug = prd.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "prd";
+  const blob = new Blob([markdown], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${slug}-prd.md`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 // -- unified chat workflow ---------------------------------------------------
