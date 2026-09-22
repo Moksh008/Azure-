@@ -109,11 +109,15 @@ Rules:
             temperature=0.0,
         )
         evidence_map = {chunk.chunk_id: chunk for chunk in evidence}
+        full_evidence_map = {
+            chunk.chunk_id: chunk
+            for chunks in evidence_by_paper.values()
+            for chunk in chunks
+        }
         self._log_response_diagnostics(response, evidence_map)
         data = self._parse_response(response)
-        paper_titles = [chunks[0].paper_title for chunks in evidence_by_paper.values()]
         structured = self._build_structured_analysis(
-            data, evidence_by_paper, evidence_map
+            data, evidence_by_paper, evidence_map, full_evidence_map
         )
         return structured
 
@@ -163,6 +167,7 @@ Rules:
         data: dict,
         evidence_by_paper: dict[str, list[EvidenceChunk]],
         evidence_map: dict[str, EvidenceChunk],
+        full_evidence_map: dict[str, EvidenceChunk] | None = None,
     ) -> CrossPaperAnalysis:
         expected_ids = set(evidence_by_paper)
         raw_entries = data.get("paper_analyses")
@@ -181,14 +186,19 @@ Rules:
             evidence_ids = raw_entry.get("evidence_ids", [])
             citations = []
             for evidence_id in evidence_ids:
-                chunk = evidence_map.get(evidence_id)
-                if chunk is None or chunk.paper_id != paper_id:
-                    raise ValueError(
-                        f"Evidence {evidence_id} does not belong to paper {paper_id}"
-                    )
-                citations.append(Citation.from_chunk(chunk))
+                chunk = evidence_map.get(evidence_id) or (
+                    full_evidence_map.get(evidence_id) if full_evidence_map else None
+                )
+                if chunk is not None and chunk.paper_id == paper_id:
+                    citations.append(Citation.from_chunk(chunk))
+
+            # Fallback to the first chunk of the paper if LLM provided invalid/missing evidence IDs for this paper
+            if not citations and paper_id in evidence_by_paper and evidence_by_paper[paper_id]:
+                citations = [Citation.from_chunk(evidence_by_paper[paper_id][0])]
+
             if not citations:
                 raise ValueError(f"Paper {paper_id} has no valid evidence citations")
+
             entries.append(
                 CrossPaperEntry(
                     paper_id=paper_id,

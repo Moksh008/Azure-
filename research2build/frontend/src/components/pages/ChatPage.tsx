@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ApiError, fetchFullText, sendChatMessage, uploadPaper } from "../../lib/api";
+import { ApiError, fetchFullText, sendChatMessage, uploadPapersBatch } from "../../lib/api";
 import { useAppData } from "../../lib/AppDataContext";
 import type { ChatMessage as ChatMessageType, OpenAlexPaper } from "../../types";
 import AnalysisCard from "../shared/AnalysisCard";
@@ -76,21 +76,23 @@ export default function ChatPage() {
   }
 
   async function handleFileChosen(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+    const files = Array.from(fileList);
     e.target.value = "";
-    if (!file) return;
     setUploading(true);
     setError(null);
     try {
-      const chunks = await uploadPaper(file);
+      const chunks = await uploadPapersBatch(files);
       addUploadedPaper(chunks);
-      const title = chunks[0]?.paper_title ?? file.name;
+      const count = files.length;
+      const label = count === 1 ? `Uploaded "${files[0].name}"` : `Uploaded ${count} PDFs`;
       setTurns((prev) => [
         ...prev,
         {
           kind: "text",
           role: "assistant",
-          content: `Uploaded "${title}" — extracted ${chunks.length} chunk(s) and selected it for you. Ask me anything about it.`,
+          content: `${label} — extracted ${chunks.length} total chunk(s) and selected them for you. Ask me anything about them.`,
         },
       ]);
     } catch (err) {
@@ -148,6 +150,7 @@ export default function ChatPage() {
               ref={fileInputRef}
               type="file"
               accept="application/pdf"
+              multiple
               className="sr-only"
               onChange={handleFileChosen}
             />
@@ -156,7 +159,7 @@ export default function ChatPage() {
               disabled={uploading}
               className="w-full rounded-[10px] bg-ink text-white text-sm font-semibold py-2.5 mb-4 cursor-pointer hover:opacity-90 disabled:opacity-40"
             >
-              {uploading ? "Uploading…" : "Upload PDF"}
+              {uploading ? "Uploading…" : "Upload PDF(s)"}
             </button>
 
             {library.length === 0 && (

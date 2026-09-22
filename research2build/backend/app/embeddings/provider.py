@@ -74,24 +74,28 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
         self.allow_fallback = allow_fallback
         self._fallback_provider = HashEmbeddingProvider()
 
-    def _embed_remote(self, inputs: list[str]) -> list[list[float]]:
+    def _embed_remote(self, inputs: list[str], batch_size: int = 16) -> list[list[float]]:
         import httpx
 
         url = f"{self.base_url}/api/embed"
+        all_embeddings: list[list[float]] = []
         with httpx.Client(timeout=self.timeout) as client:
-            res = client.post(
-                url,
-                json={"model": self.model, "input": inputs},
-            )
-            res.raise_for_status()
-            data = res.json()
-        embeddings = data.get("embeddings")
-        if not embeddings or len(embeddings) != len(inputs):
-            raise RuntimeError(
-                f"Ollama embedding response mismatch: expected {len(inputs)} "
-                f"vectors, got {len(embeddings or [])}"
-            )
-        return embeddings
+            for i in range(0, len(inputs), batch_size):
+                batch = inputs[i : i + batch_size]
+                res = client.post(
+                    url,
+                    json={"model": self.model, "input": batch},
+                )
+                res.raise_for_status()
+                data = res.json()
+                embeddings = data.get("embeddings")
+                if not embeddings or len(embeddings) != len(batch):
+                    raise RuntimeError(
+                        f"Ollama embedding response mismatch: expected {len(batch)} "
+                        f"vectors, got {len(embeddings or [])}"
+                    )
+                all_embeddings.extend(embeddings)
+        return all_embeddings
 
     def embed(self, text: str) -> list[float]:
         try:

@@ -58,6 +58,22 @@ export async function uploadPaper(file: File): Promise<EvidenceChunk[]> {
   return res.json();
 }
 
+export async function uploadPapersBatch(files: File[]): Promise<EvidenceChunk[]> {
+  if (files.length === 1) {
+    return uploadPaper(files[0]);
+  }
+  const form = new FormData();
+  for (const file of files) {
+    form.append("files", file);
+  }
+  const res = await fetch(`${API_BASE}/papers/upload-batch`, { method: "POST", body: form });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText);
+    throw new ApiError(detail || "Batch upload failed", res.status);
+  }
+  return res.json();
+}
+
 export async function fetchFullText(
   paperId: string,
   title: string,

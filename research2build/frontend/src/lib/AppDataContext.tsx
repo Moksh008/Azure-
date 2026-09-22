@@ -65,12 +65,29 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       library,
       addUploadedPaper: (chunks) => {
         if (chunks.length === 0) return;
-        const { paper_id, paper_title } = chunks[0];
-        setLibraryById((prev) => ({
-          ...prev,
-          [paper_id]: { paper_id, title: paper_title, source: "upload", evidence: chunks },
-        }));
-        setSelectedPaperIds((prev) => new Set(prev).add(paper_id));
+        const grouped: Record<string, { title: string; chunks: EvidenceChunk[] }> = {};
+        for (const chunk of chunks) {
+          if (!grouped[chunk.paper_id]) {
+            grouped[chunk.paper_id] = { title: chunk.paper_title, chunks: [] };
+          }
+          grouped[chunk.paper_id].chunks.push(chunk);
+        }
+
+        setLibraryById((prev) => {
+          const next = { ...prev };
+          for (const [paper_id, { title, chunks: paperChunks }] of Object.entries(grouped)) {
+            next[paper_id] = { paper_id, title, source: "upload", evidence: paperChunks };
+          }
+          return next;
+        });
+
+        setSelectedPaperIds((prev) => {
+          const next = new Set(prev);
+          for (const paper_id of Object.keys(grouped)) {
+            next.add(paper_id);
+          }
+          return next;
+        });
       },
       addDiscoveredPapers: (papers) => {
         setLibraryById((prev) => {
