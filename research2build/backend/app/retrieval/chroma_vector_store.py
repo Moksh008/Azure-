@@ -91,12 +91,25 @@ class ChromaVectorStore(BaseVectorStore):
             )
 
         collection = self._ensure_collection()
-        collection.upsert(
-            ids=[c.chunk_id for c in chunks],
-            embeddings=vectors,
-            documents=[c.text for c in chunks],
-            metadatas=[_clean_metadata(c) for c in chunks],
-        )
+        try:
+            collection.upsert(
+                ids=[c.chunk_id for c in chunks],
+                embeddings=vectors,
+                documents=[c.text for c in chunks],
+                metadatas=[_clean_metadata(c) for c in chunks],
+            )
+        except Exception as exc:
+            if "dimension" in str(exc).lower():
+                self.clear()
+                collection = self._ensure_collection()
+                collection.upsert(
+                    ids=[c.chunk_id for c in chunks],
+                    embeddings=vectors,
+                    documents=[c.text for c in chunks],
+                    metadatas=[_clean_metadata(c) for c in chunks],
+                )
+            else:
+                raise
 
     def search(self, query: str, top_k: int = 5) -> list[EvidenceChunk]:
         if not query or not query.strip():
@@ -107,11 +120,17 @@ class ChromaVectorStore(BaseVectorStore):
             return []
 
         query_vector = self.embedding_provider.embed(query)
-        results = collection.query(
-            query_embeddings=[query_vector],
-            n_results=max(1, min(top_k, collection.count())),
-            include=["documents", "metadatas"],
-        )
+        try:
+            results = collection.query(
+                query_embeddings=[query_vector],
+                n_results=max(1, min(top_k, collection.count())),
+                include=["documents", "metadatas"],
+            )
+        except Exception as exc:
+            if "dimension" in str(exc).lower():
+                self.clear()
+                return []
+            raise
 
         records = results["ids"][0]
         chunks: list[EvidenceChunk] = []

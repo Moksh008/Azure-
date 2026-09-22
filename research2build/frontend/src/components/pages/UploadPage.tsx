@@ -1,23 +1,26 @@
 import { useState } from "react";
-import { ApiError, uploadPaper } from "../../lib/api";
+import { ApiError, uploadPapersBatch } from "../../lib/api";
+import { useAppData } from "../../lib/AppDataContext";
 import type { EvidenceChunk } from "../../types";
 import ErrorState from "../shared/ErrorState";
 import LoadingState from "../shared/LoadingState";
 import PageShell from "../PageShell";
 
 export default function UploadPage() {
-  const [file, setFile] = useState<File | null>(null);
+  const { addUploadedPaper } = useAppData();
+  const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const [chunks, setChunks] = useState<EvidenceChunk[]>([]);
 
   async function handleUpload() {
-    if (!file) return;
+    if (files.length === 0) return;
     setStatus("loading");
     setError(null);
     try {
-      const result = await uploadPaper(file);
+      const result = await uploadPapersBatch(files);
       setChunks(result);
+      addUploadedPaper(result);
       setStatus("done");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Upload failed. Is the backend running?");
@@ -27,8 +30,8 @@ export default function UploadPage() {
 
   return (
     <PageShell
-      title="Upload a paper"
-      description="Upload a PDF to extract and chunk its text — every chunk carries paper, section, and page metadata so later analysis and Q&A can cite it exactly."
+      title="Upload papers"
+      description="Upload one or multiple PDFs to extract and chunk their text — every chunk carries paper, section, and page metadata so later analysis and Q&A can cite it exactly."
     >
       <div className="bg-white rounded-2xl border border-border p-8">
         <label
@@ -36,24 +39,27 @@ export default function UploadPage() {
           className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-2xl py-14 cursor-pointer hover:border-mint-deep transition-colors"
         >
           <span className="font-display font-bold text-ink">
-            {file ? file.name : "Click to choose a PDF"}
+            {files.length > 0
+              ? `${files.length} PDF(s) selected: ${files.map((f) => f.name).join(", ")}`
+              : "Click to choose PDF(s)"}
           </span>
-          <span className="text-muted text-sm">or drag and drop — max 25MB</span>
+          <span className="text-muted text-sm">or drag and drop — choose multiple PDFs at once</span>
           <input
             id="paper-upload"
             type="file"
             accept="application/pdf"
+            multiple
             className="sr-only"
-            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
           />
         </label>
 
         <button
           onClick={handleUpload}
-          disabled={!file || status === "loading"}
+          disabled={files.length === 0 || status === "loading"}
           className="mt-6 w-full rounded-[10px] bg-ink text-white font-semibold py-3.5 cursor-pointer hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {status === "loading" ? "Uploading…" : "Upload and extract"}
+          {status === "loading" ? "Uploading…" : `Upload and extract (${files.length} file${files.length === 1 ? "" : "s"})`}
         </button>
       </div>
 
