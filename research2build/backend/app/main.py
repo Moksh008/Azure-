@@ -5,6 +5,7 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -61,7 +62,7 @@ from shared.schemas import (
 from app.retrieval.factory import get_retriever
 from app.retrieval.evidence import EvidenceChunk as RetrievalEvidenceChunk
 from app.retrieval.factory import get_vector_store
-from .ingestion import IngestionError, ingest_pdf
+from .ingestion import IngestionError, ingest_pdf, ingest_pdfs
 from .services.storage_service import MAX_FETCHED_PDF_BYTES, InvalidUploadError
 
 
@@ -139,6 +140,56 @@ async def upload_paper(file: UploadFile) -> list[SchemaEvidenceChunk]:
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+@app.post("/papers/upload-batch", response_model=list[SchemaEvidenceChunk])
+async def upload_papers_batch(
+    files: list[UploadFile],
+) -> list[SchemaEvidenceChunk]:
+    """Ingest multiple PDFs in one request.
+
+    Uploads are read in the async layer, then validation, parallel text
+    extraction (worker processes — PyMuPDF is not thread-safe), storage,
+    and chunking run in FastAPI's threadpool via ingest_pdfs. All chunks
+    from all papers are indexed into the vector store in a single batch,
+    so multi-paper ingestion costs one embedding round-trip, not one per
+    chunk. The whole batch is rejected up front if any file is invalid,
+    avoiding partial ingests.
+    """
+    if not files:
+        raise HTTPException(status_code=422, detail="No files provided.")
+
+    payloads = [(file.filename, await file.read()) for file in files]
+
+    try:
+        batches = await run_in_threadpool(ingest_pdfs, payloads)
+    except (InvalidUploadError, IngestionError) as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+    retrieval_chunks = [
+        RetrievalEvidenceChunk(
+            chunk_id=chunk.chunk_id,
+            paper_id=chunk.paper_id,
+            title=chunk.paper_title,
+            text=chunk.text,
+            page_number=chunk.page,
+            section=chunk.section,
+        )
+        for batch in batches
+        for chunk in batch
+    ]
+    vector_store = get_vector_store()
+    if hasattr(vector_store, "ensure_index_exists"):
+        vector_store.ensure_index_exists()
+    vector_store.add_chunks(retrieval_chunks)
+    logger.info(
+        "Batch of papers ingested and indexed",
+        extra={"paper_count": len(batches), "chunk_count": len(retrieval_chunks)},
+    )
+    return [chunk for batch in batches for chunk in batch]
 
 
 @app.post("/retrieval/search", response_model=RetrievalResult)

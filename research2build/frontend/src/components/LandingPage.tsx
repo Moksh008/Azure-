@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import HoverStack, { type HoverStackCard } from "./HoverStack";
 
 const TABS = ["Ingestion", "Analysis", "Q&A", "Opportunities", "Feasibility"];
 
@@ -288,6 +289,43 @@ function Showcase() {
   );
 }
 
+const DOMAIN_CARDS: HoverStackCard[] = [
+  { quote: "AI & Machine Learning", tag: "Domain", bg: "#E4FF1A", accent: "text-[#1A1A1A]" },
+  { quote: "Cybersecurity", tag: "Domain", bg: "#DD1155", accent: "text-white" },
+  { quote: "Healthcare Technology", tag: "Domain", bg: "#67D6A3", accent: "text-[#1A1A1A]" },
+  { quote: "Robotics", tag: "Domain", bg: "#FF5714", accent: "text-[#1A1A1A]" },
+  { quote: "Climate & Sustainability", tag: "Domain", bg: "#3454D1", accent: "text-white" },
+  { quote: "Computer Vision", tag: "Domain", bg: "#B98CFF", accent: "text-[#1A1A1A]" },
+  { quote: "Natural Language Processing", tag: "Domain", bg: "#E980FC", accent: "text-[#1A1A1A]" },
+];
+
+function ExploreDomains() {
+  const navigate = useNavigate();
+
+  return (
+    <section className="flex min-h-screen w-full flex-col items-center justify-center gap-[4vw] overflow-hidden bg-[#fff9ec] px-4 py-16">
+      <div className="flex w-full flex-col items-center text-center text-[#1a1a1a]">
+        <Eyebrow>Not sure what to build?</Eyebrow>
+        <h2
+          style={{ fontWeight: 300 }}
+          className="text-[5.5vw] tracking-tight max-[1025px]:text-[7vw] max-md:text-[9vw]"
+        >
+          Explore research domains
+        </h2>
+        <p className="mt-4 max-w-[560px] text-base text-muted">
+          Pick a domain — discover research papers and turn promising research into a buildable
+          project.
+        </p>
+      </div>
+
+      <HoverStack
+        cards={DOMAIN_CARDS}
+        onCardClick={(card) => navigate(`/discover?query=${encodeURIComponent(card.quote)}`)}
+      />
+    </section>
+  );
+}
+
 function SectionTitle({ title, sub, small = false }: { title: string; sub: string; small?: boolean }) {
   return (
     <div className="text-center max-w-[640px] mx-auto my-[50px] px-5 md:px-10">
@@ -475,6 +513,7 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <Showcase />
+      <ExploreDomains />
 
       <SectionTitle
         title="Grounded research, without the busywork"
