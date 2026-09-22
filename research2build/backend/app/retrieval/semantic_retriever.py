@@ -20,7 +20,13 @@ class SemanticRetriever(Retriever):
     ):
         self.client = openalex_client or OpenAlexClient()
         self.embedding_provider = embedding_provider or HashEmbeddingProvider()
-        self.vector_store = vector_store or InMemoryVectorStore(
+        # Discovery gets its own store (a dedicated Chroma collection locally)
+        # because retrieve() clears it every call — sharing the library store
+        # would wipe full-text evidence indexed from uploaded papers. Imported
+        # here rather than at module level: factory imports this module.
+        from app.retrieval.factory import get_discovery_vector_store
+
+        self.vector_store = vector_store or get_discovery_vector_store(
             embedding_provider=self.embedding_provider
         )
 

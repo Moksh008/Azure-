@@ -1,12 +1,18 @@
 import logging
 import os
+from pathlib import Path
 
 import requests
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 from backend.app.agents.analyzer import PaperAnalyzer
 from backend.app.agents.chat_router import LibrarySummaryEntry, classify_intent
+from backend.app.agents.cross_paper_synthesizer import CrossPaperSynthesizer
 from backend.app.agents.deliverables import PRDDocument, generate_prd
 from backend.app.agents.feasibility import FeasibilityAssessment, score_feasibility
 from backend.app.agents.qa import GroundedQA
@@ -35,7 +41,11 @@ from backend.app.research_intelligence.opportunities import generate_opportuniti
 from backend.app.research_intelligence.project_generator import generate_project_proposals
 from backend.app.services.evidence_selection import select_evidence
 from backend.app.services.llm_factory import get_llm_service
-from backend.app.services.llm_service import AzureFoundryLLMService, LLMService
+from backend.app.services.llm_service import (
+    AzureFoundryLLMService,
+    LLMService,
+    start_chat_call_tracking,
+)
 from backend.app.services.pdf_fetch_service import PdfDownloadError, download_pdf
 from shared.schemas import (
     AnalysisRequest,
@@ -50,7 +60,9 @@ from shared.schemas import (
 )
 
 from app.retrieval.factory import get_retriever
-from .ingestion import IngestionError, ingest_pdf
+from app.retrieval.evidence import EvidenceChunk as RetrievalEvidenceChunk
+from app.retrieval.factory import get_vector_store
+from .ingestion import IngestionError, ingest_pdf, ingest_pdfs
 from .services.storage_service import MAX_FETCHED_PDF_BYTES, InvalidUploadError
 
 
@@ -98,15 +110,86 @@ async def upload_paper(file: UploadFile) -> list[SchemaEvidenceChunk]:
     content = await file.read()
 
     try:
-        return ingest_pdf(
+        chunks = ingest_pdf(
             filename=file.filename,
             content=content,
         )
+
+        retrieval_chunks = [
+            RetrievalEvidenceChunk(
+                chunk_id=chunk.chunk_id,
+                paper_id=chunk.paper_id,
+                title=chunk.paper_title,
+                text=chunk.text,
+                page_number=chunk.page,
+                section=chunk.section,
+            )
+            for chunk in chunks
+        ]
+        vector_store = get_vector_store()
+        if hasattr(vector_store, "ensure_index_exists"):
+            vector_store.ensure_index_exists()
+        vector_store.add_chunks(retrieval_chunks)
+        logger.info(
+            "Paper ingested and indexed",
+            extra={"paper_id": chunks[0].paper_id, "chunk_count": len(chunks)},
+        )
+        return chunks
     except (InvalidUploadError, IngestionError) as exc:
         raise HTTPException(
             status_code=422,
             detail=str(exc),
         ) from exc
+
+
+@app.post("/papers/upload-batch", response_model=list[SchemaEvidenceChunk])
+async def upload_papers_batch(
+    files: list[UploadFile],
+) -> list[SchemaEvidenceChunk]:
+    """Ingest multiple PDFs in one request.
+
+    Uploads are read in the async layer, then validation, parallel text
+    extraction (worker processes — PyMuPDF is not thread-safe), storage,
+    and chunking run in FastAPI's threadpool via ingest_pdfs. All chunks
+    from all papers are indexed into the vector store in a single batch,
+    so multi-paper ingestion costs one embedding round-trip, not one per
+    chunk. The whole batch is rejected up front if any file is invalid,
+    avoiding partial ingests.
+    """
+    if not files:
+        raise HTTPException(status_code=422, detail="No files provided.")
+
+    payloads = [(file.filename, await file.read()) for file in files]
+
+    try:
+        batches = await run_in_threadpool(ingest_pdfs, payloads)
+    except (InvalidUploadError, IngestionError) as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+    retrieval_chunks = [
+        RetrievalEvidenceChunk(
+            chunk_id=chunk.chunk_id,
+            paper_id=chunk.paper_id,
+            title=chunk.paper_title,
+            text=chunk.text,
+            page_number=chunk.page,
+            section=chunk.section,
+        )
+        for batch in batches
+        for chunk in batch
+    ]
+    vector_store = get_vector_store()
+    if hasattr(vector_store, "ensure_index_exists"):
+        vector_store.ensure_index_exists()
+    vector_store.add_chunks(retrieval_chunks)
+    logger.info(
+        "Batch of papers ingested and indexed",
+        extra={"paper_count": len(batches), "chunk_count": len(retrieval_chunks)},
+    )
+    return [chunk for batch in batches for chunk in batch]
 
 
 @app.post("/retrieval/search", response_model=RetrievalResult)
@@ -136,12 +219,18 @@ async def search_evidence(
     )
 
     try:
-        retriever = get_retriever()
-
-        chunks = await retriever.retrieve(
-            question=request.query,
+        indexed_chunks = get_vector_store().search(
+            request.query,
             top_k=request.top_k,
         )
+        if indexed_chunks:
+            chunks = indexed_chunks
+        else:
+            retriever = get_retriever()
+            chunks = await retriever.retrieve(
+                question=request.query,
+                top_k=request.top_k,
+            )
 
         schema_chunks = []
 
@@ -399,6 +488,13 @@ def chat(
     Stateless like the rest of the API — the caller (frontend) supplies the
     paper library and selected evidence on every call.
     """
+    start_chat_call_tracking()
+    logger.info(
+        "Chat request: message_chars=%d selected_chunks=%d selected_papers=%d",
+        len(request.message),
+        len(request.evidence),
+        len({chunk.paper_id for chunk in request.evidence}),
+    )
     library_summary = [
         LibrarySummaryEntry(paper_id=p.paper_id, title=p.title, source=p.source)
         for p in request.library
@@ -475,20 +571,46 @@ def chat(
             target_ids = list(evidence_by_paper.keys())
 
         analyzer = PaperAnalyzer(llm_service)
-        analyses = []
+        selected_by_paper: dict[str, list] = {}
         try:
             for paper_id in target_ids:
                 paper_evidence = evidence_by_paper[paper_id]
-                paper_title = paper_evidence[0].paper_title
-                analyses.append(
+                selected_evidence = select_evidence(
+                    paper_evidence, ANALYSIS_QUERY, lead_chunks=1
+                )
+                selected_chars = sum(
+                    len(chunk.text) for chunk in selected_evidence
+                )
+                logger.info(
+                    "Chat analysis evidence: paper_id=%s input_chunks=%d "
+                    "selected_chunks=%d selected_chars=%d "
+                    "approx_selected_tokens=%d",
+                    paper_id,
+                    len(paper_evidence),
+                    len(selected_evidence),
+                    selected_chars,
+                    (selected_chars + 3) // 4,
+                )
+                selected_by_paper[paper_id] = selected_evidence
+
+            if len(target_ids) > 1:
+                synthesis_question = request.message
+                analyses = [
+                    CrossPaperSynthesizer(llm_service).synthesize_for_ui(
+                        question=synthesis_question,
+                        evidence_by_paper=selected_by_paper,
+                    )
+                ]
+            else:
+                paper_id = target_ids[0]
+                paper_evidence = selected_by_paper[paper_id]
+                analyses = [
                     analyzer.analyze(
                         paper_id=paper_id,
-                        paper_title=paper_title,
-                        evidence=select_evidence(
-                            paper_evidence, ANALYSIS_QUERY, lead_chunks=1
-                        ),
+                        paper_title=evidence_by_paper[paper_id][0].paper_title,
+                        evidence=paper_evidence,
                     )
-                )
+                ]
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
 

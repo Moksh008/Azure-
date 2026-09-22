@@ -1,6 +1,6 @@
 from backend.app.agents.analyzer import PaperAnalyzer
 from backend.app.agents.qa import GroundedQA
-from app.retrieval.factory import get_retriever
+from app.retrieval.factory import get_retriever, get_vector_store
 from backend.app.services.llm_service import LLMService
 from shared.schemas import (
     EvidenceChunk,
@@ -23,11 +23,13 @@ class ResearchService:
         if not question.strip():
             raise ValueError("Question cannot be empty")
 
-        retriever = get_retriever()
-        chunks = await retriever.retrieve(
-            question=question,
-            top_k=top_k,
-        )
+        chunks = get_vector_store().search(question, top_k=top_k)
+        if not chunks:
+            retriever = get_retriever()
+            chunks = await retriever.retrieve(
+                question=question,
+                top_k=top_k,
+            )
         evidence = [self._to_schema_chunk(chunk) for chunk in chunks]
 
         return GroundedQA(self.llm_service).answer(
@@ -45,11 +47,13 @@ class ResearchService:
         if not query.strip():
             raise ValueError("Analysis query cannot be empty")
 
-        retriever = get_retriever()
-        chunks = await retriever.retrieve(
-            question=query,
-            top_k=top_k,
-        )
+        chunks = get_vector_store().search(query, top_k=top_k)
+        if not chunks:
+            retriever = get_retriever()
+            chunks = await retriever.retrieve(
+                question=query,
+                top_k=top_k,
+            )
         evidence = [self._to_schema_chunk(chunk) for chunk in chunks]
 
         return PaperAnalyzer(self.llm_service).analyze(

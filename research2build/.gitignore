@@ -19,6 +19,8 @@ build/
 data/
 uploads/
 backend/storage/
+backend/chroma_db/
+chroma_db/
 *.pdf
 
 # IDE/OS

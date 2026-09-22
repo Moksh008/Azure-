@@ -45,6 +45,77 @@ class HashEmbeddingProvider(EmbeddingProvider):
         return vector
 
 
+class OllamaEmbeddingProvider(EmbeddingProvider):
+    """
+    Local embedding provider talking to Ollama's native /api/embed endpoint
+    (default http://localhost:11434, model nomic-embed-text). embed_batch
+    sends all texts in one request, so ingesting a whole paper costs one
+    HTTP round-trip instead of one per chunk. Failures surface as
+    RuntimeError (or fall back to HashEmbeddingProvider when
+    RETRIEVAL_ALLOW_LOCAL_FALLBACK is enabled, mirroring the Azure provider).
+    """
+
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        model: Optional[str] = None,
+        allow_fallback: Optional[bool] = None,
+        timeout: float = 60.0,
+    ):
+        self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")).rstrip("/")
+        self.model = model or os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text")
+        self.timeout = timeout
+
+        if allow_fallback is None:
+            allow_fallback = (
+                os.getenv("RETRIEVAL_ALLOW_LOCAL_FALLBACK", "true").lower()
+                == "true"
+            )
+        self.allow_fallback = allow_fallback
+        self._fallback_provider = HashEmbeddingProvider()
+
+    def _embed_remote(self, inputs: list[str]) -> list[list[float]]:
+        import httpx
+
+        url = f"{self.base_url}/api/embed"
+        with httpx.Client(timeout=self.timeout) as client:
+            res = client.post(
+                url,
+                json={"model": self.model, "input": inputs},
+            )
+            res.raise_for_status()
+            data = res.json()
+        embeddings = data.get("embeddings")
+        if not embeddings or len(embeddings) != len(inputs):
+            raise RuntimeError(
+                f"Ollama embedding response mismatch: expected {len(inputs)} "
+                f"vectors, got {len(embeddings or [])}"
+            )
+        return embeddings
+
+    def embed(self, text: str) -> list[float]:
+        try:
+            return self._embed_remote([text])[0]
+        except Exception as err:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    f"Ollama embedding call failed: {err}"
+                ) from err
+            return self._fallback_provider.embed(text)
+
+    def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        try:
+            return self._embed_remote(texts)
+        except Exception as err:
+            if not self.allow_fallback:
+                raise RuntimeError(
+                    f"Ollama embedding call failed: {err}"
+                ) from err
+            return self._fallback_provider.embed_batch(texts)
+
+
 class AzureOpenAIEmbeddingProvider(EmbeddingProvider):
     """
     Production embedding provider targeting Azure OpenAI Service.

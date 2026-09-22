@@ -1,4 +1,17 @@
+import contextvars
+import logging
+
 import httpx
+
+
+logger = logging.getLogger("research2build.llm")
+_chat_call_count: contextvars.ContextVar[int | None] = contextvars.ContextVar(
+    "chat_call_count", default=None
+)
+
+
+def start_chat_call_tracking() -> None:
+    _chat_call_count.set(0)
 
 
 def _build_messages(prompt: str, system_prompt: str | None) -> list[dict]:
@@ -68,6 +81,19 @@ class LLMService:
         system_prompt: str | None = None,
         temperature: float = 0.0,
     ) -> str:
+        call_number = _chat_call_count.get()
+        if call_number is not None:
+            call_number += 1
+            _chat_call_count.set(call_number)
+        total_chars = len(prompt) + len(system_prompt or "")
+        logger.info(
+            "LLM request: provider=plain call=%s prompt_chars=%d "
+            "approx_prompt_tokens=%d timeout_seconds=%s",
+            call_number if call_number is not None else "untracked",
+            total_chars,
+            (total_chars + 3) // 4,
+            self.timeout,
+        )
         payload = {
             "model": self.model,
             "messages": _build_messages(prompt, system_prompt),
@@ -133,6 +159,19 @@ class AzureFoundryLLMService:
         system_prompt: str | None = None,
         temperature: float = 0.0,
     ) -> str:
+        call_number = _chat_call_count.get()
+        if call_number is not None:
+            call_number += 1
+            _chat_call_count.set(call_number)
+        total_chars = len(prompt) + len(system_prompt or "")
+        logger.info(
+            "LLM request: provider=azure call=%s prompt_chars=%d "
+            "approx_prompt_tokens=%d timeout_seconds=%s",
+            call_number if call_number is not None else "untracked",
+            total_chars,
+            (total_chars + 3) // 4,
+            self.timeout,
+        )
         url = (
             f"{self.endpoint}/openai/deployments/{self.deployment}"
             f"/chat/completions?api-version={self.api_version}"
